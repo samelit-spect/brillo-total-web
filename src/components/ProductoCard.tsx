@@ -1,14 +1,16 @@
 // src/components/ProductoCard.tsx
 import React from 'react';
 import { type Producto } from '../info/productos';
+import { useCart } from '../context/CartContext'; // Importamos el cerebro del carrito
 
 interface ProductoCardProps {
   producto: Producto;
 }
 
 export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
-  // Simulamos que el usuario es minorista por defecto para esta vista previa
-  const esMayorista = false;
+  // Consumimos el estado mayorista y la función de agregar desde el contexto global
+  const { esMayorista, agregarAlCarrito } = useCart();
+  
   const precioMostrar = esMayorista ? producto.precioMayorista : producto.precioMinorista;
 
   return (
@@ -20,7 +22,7 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'between',
+      justifyContent: 'space-between',
       transition: 'transform 0.2s',
     }}>
       {/* Contenedor de la Imagen */}
@@ -65,11 +67,12 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
           <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#2980b9' }}>
             ${precioMostrar}
           </span>
-          {esMayorista && <span style={{ fontSize: '11px', color: '#27ae60', display: 'block' }}>Precio Mayorista</span>}
+          {esMayorista && <span style={{ fontSize: '11px', color: '#27ae60', display: 'block', fontWeight: 'bold' }}>Precio Mayorista</span>}
         </div>
 
         <button 
           disabled={!producto.stock}
+          onClick={() => agregarAlCarrito(producto)} // Conectamos el evento de clic de verdad
           style={{
             backgroundColor: producto.stock ? '#2980b9' : '#95a5a6',
             color: '#ffffff',
