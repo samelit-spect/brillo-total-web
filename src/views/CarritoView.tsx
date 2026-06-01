@@ -36,8 +36,8 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
     // Reemplazamos espacios y caracteres especiales para la URL
     const mensajeCodificado = encodeURIComponent(mensaje);
     
-    // Tu número de WhatsApp del negocio (reemplazalo por el de tu hermana con código de país, ej: 5493804xxxxxx)
-    const numeroTelefono = '5493804000000'; 
+    // Tu número de WhatsApp del negocio
+    const numeroTelefono = '5493837402375'; 
     
     window.open(`https://wa.me/${numeroTelefono}?text=${mensajeCodificado}`, '_blank');
   };

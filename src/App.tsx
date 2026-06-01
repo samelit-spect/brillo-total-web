@@ -4,12 +4,32 @@ import { Header } from './components/Header';
 import { Main } from './components/Main';
 import { Footer } from './components/Footer';
 import { Home } from './views/Home';
-import { CarritoView } from './views/CarritoView'; // Importamos la nueva vista
+import { CarritoView } from './views/CarritoView';
+import { NosotrosView } from './views/NosotrosView'; // Importación nueva
+import { UbicacionView } from './views/UbicacionView'; // Importación nueva
 import { CartProvider } from './context/CartContext';
 
+// Definimos el tipo estricto de las secciones disponibles
+export type TipoVista = 'catalogo' | 'carrito' | 'nosotros' | 'ubicacion';
+
 function App() {
-  // Estado para controlar qué vista renderizar ('catalogo' o 'carrito')
-  const [vistaActual, setVistaActual] = useState<'catalogo' | 'carrito'>('catalogo');
+  const [vistaActual, setVistaActual] = useState<TipoVista>('catalogo');
+
+  // Función renderizadora condicional
+  const renderizarVista = () => {
+    switch (vistaActual) {
+      case 'catalogo':
+        return <Home />;
+      case 'carrito':
+        return <CarritoView alCambiarVista={setVistaActual} />;
+      case 'nosotros':
+        return <NosotrosView />;
+      case 'ubicacion':
+        return <UbicacionView />;
+      default:
+        return <Home />;
+    }
+  };
 
   return (
     <CartProvider>
@@ -20,16 +40,10 @@ function App() {
         backgroundColor: '#f8f9fa',
         fontFamily: 'system-ui, -apple-system, sans-serif'
       }}>
-        {/* Le pasamos la vista actual y la función para cambiarla al Header */}
         <Header vistaActual={vistaActual} alCambiarVista={setVistaActual} />
 
-        {/* Contenedor principal condicional */}
         <Main>
-          {vistaActual === 'catalogo' ? (
-            <Home />
-          ) : (
-            <CarritoView alCambiarVista={setVistaActual} />
-          )}
+          {renderizarVista()}
         </Main>
 
         <Footer />
