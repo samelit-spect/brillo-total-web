@@ -1,24 +1,28 @@
+// src/App.tsx
+import React from 'react';
 import { Header } from './components/Header';
 import { Main } from './components/Main';
 import { Footer } from './components/Footer';
+import { Home } from './views/Home';
 
 function App() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-      {/* 1. Componente Encabezado Semántico */}
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      minHeight: '100vh',
+      backgroundColor: '#f8f9fa',
+      fontFamily: 'system-ui, -apple-system, sans-serif'
+    }}>
+      {/* Barra de navegación superior */}
       <Header />
-      
-      {/* 2. Componente Contenedor Principal */}
+
+      {/* Contenedor principal donde montamos la vista del catálogo */}
       <Main>
-        <section id="catalogo" style={{ textAlign: 'center', marginTop: '2rem' }}>
-          <h2 style={{ color: '#222', fontSize: '2rem' }}>Catálogo de Productos</h2>
-          <p style={{ color: '#666', maxWidth: '600px', margin: '1rem auto', lineHeight: '1.6' }}>
-            Próximamente vas a poder armar tu pedido de productos de limpieza minorista o mayorista acá y enviarlo directo a WhatsApp de forma automatizada.
-          </p>
-        </section>
+        <Home />
       </Main>
 
-      {/* 3. Componente Pie de Página Semántico */}
+      {/* Pie de página con datos de contacto */}
       <Footer />
     </div>
   );
