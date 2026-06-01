@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
   // 📝 ACÁ VA EL LINK DE TU VIDEO DE YOUTUBE:
   // Cuando subas el video, cambiá lo que va después de "embed/" por el ID de tu video.
   // Ejemplo: https://www.youtube.com/embed/TU_ID_DE_VIDEO
-  const urlVideoYouTube = "https://www.youtube.com/embed/dQw4w9WgXcQ"; 
+  const urlVideoYouTube = "https://www.youtube.com/embed/dQw4w9WgXcQ";
 
   return (
     <header style={{
@@ -41,10 +41,10 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
         alignItems: 'center',
         position: 'relative'
       }}>
-        
+
         {/* LADO IZQUIERDO: Botón Hamburguesa + Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <button 
+          <button
             onClick={() => setMenuAbierto(!menuAbierto)}
             style={{
               background: 'none', border: 'none', color: 'white',
@@ -55,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             {menuAbierto ? '✕' : '☰'}
           </button>
 
-          <div 
+          <div
             onClick={() => navegarA('catalogo')}
             style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
           >
@@ -66,9 +66,15 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           </div>
         </div>
 
-        {/* LADO DERECHO: Botón Tutorial + Switch + Carrito */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          
+        {/* LADO DERECHO: Botón Tutorial + Switch + Carrito (Responsivo) */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',              // Ajustamos el espacio a 10px para ganar margen
+          flexWrap: 'wrap',         // Si no entra en celulares, se acomoda abajo sin desbordar
+          justifyContent: 'flex-end'
+        }}>
+
           {/* Botón de Ayuda / Video Tutorial */}
           <button
             onClick={() => setVideoAbierto(true)}
@@ -76,23 +82,20 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               backgroundColor: '#2d3748',
               color: '#ffffff',
               border: '1px solid #4a5568',
-              padding: '8px 12px',
+              padding: '6px 10px',   // Un toque más compacto
               borderRadius: '20px',
               cursor: 'pointer',
               fontWeight: 'bold',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              fontSize: '13px',
+              gap: '4px',
+              fontSize: '12px',
               transition: 'background-color 0.2s'
             }}
             title="¿Cómo usar la App?"
           >
             <span>📺</span>
-            {/* Corregido: Quitamos la propiedad fantasma y usamos estilos estándar */}
-            <span style={{ display: 'inline', whiteSpace: 'nowrap' }}>
-              Ver Tutorial
-            </span>
+            <span style={{ display: 'inline', whiteSpace: 'nowrap' }}>Tutorial</span>
           </button>
 
           {/* Switch Mayorista / Minorista */}
@@ -100,16 +103,16 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             display: 'flex',
             alignItems: 'center',
             backgroundColor: '#2d3748',
-            padding: '6px 12px',
+            padding: '5px 10px',
             borderRadius: '20px',
             border: '1px solid #4a5568'
           }}>
-            <label style={{ position: 'relative', display: 'inline-block', width: '34px', height: '18px', cursor: 'pointer' }}>
-              <input 
-                type="checkbox" 
+            <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
                 checked={esMayorista}
                 onChange={(e) => setEsMayorista(e.target.checked)}
-                style={{ opacity: 0, width: 0, height: 0 }} 
+                style={{ opacity: 0, width: 0, height: 0 }}
               />
               <span style={{
                 position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
@@ -117,30 +120,31 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
                 borderRadius: '20px', transition: '0.3s',
               }}>
                 <span style={{
-                  position: 'absolute', height: '12px', width: '12px',
-                  left: esMayorista ? '19px' : '3px', bottom: '3px',
+                  position: 'absolute', height: '10px', width: '10px',
+                  left: esMayorista ? '17px' : '3px', bottom: '3px',
                   backgroundColor: '#ffffff', borderRadius: '50%', transition: '0.3s'
                 }} />
               </span>
             </label>
-            <span style={{ fontSize: '12px', marginLeft: '8px', color: esMayorista ? '#48bb78' : '#cbd5e0', fontWeight: 'bold' }}>
+            <span style={{ fontSize: '11px', marginLeft: '6px', color: esMayorista ? '#48bb78' : '#cbd5e0', fontWeight: 'bold' }}>
               {esMayorista ? 'May.' : 'Min.'}
             </span>
           </div>
 
           {/* Botón Carrito */}
-          <button 
+          <button
             onClick={() => navegarA(vistaActual === 'carrito' ? 'catalogo' : 'carrito')}
             style={{
               backgroundColor: vistaActual === 'carrito' ? '#e67e22' : '#3182ce',
-              color: '#ffffff', border: 'none', padding: '8px 14px', borderRadius: '8px',
-              fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
+              color: '#ffffff', border: 'none', padding: '6px 12px', borderRadius: '8px',
+              fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+              fontSize: '13px'
             }}
           >
             <span>🛒</span>
             <span style={{
-              backgroundColor: '#e53e3e', color: '#ffffff', fontSize: '11px',
-              padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold'
+              backgroundColor: '#e53e3e', color: '#ffffff', fontSize: '10px',
+              padding: '1px 5px', borderRadius: '10px', fontWeight: 'bold'
             }}>
               {obtenerCantidadTotal()}
             </span>
@@ -176,14 +180,14 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               {/* Encabezado del Modal */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px', backgroundColor: '#f1f5f9', borderBottom: '1px solid #e2e8f0', color: '#1a365d' }}>
                 <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>📺 ¿Cómo usar e instalar la App?</h3>
-                <button 
+                <button
                   onClick={() => setVideoAbierto(false)}
                   style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}
                 >
                   ✕
                 </button>
               </div>
-              
+
               {/* Contenedor Responsivo del Video */}
               <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
                 <iframe
