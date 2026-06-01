@@ -11,11 +11,17 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) => {
   const { esMayorista, setEsMayorista, obtenerCantidadTotal } = useCart();
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [videoAbierto, setVideoAbierto] = useState(false); // Estado para el modal del tutorial
 
   const navegarA = (vista: TipoVista) => {
     alCambiarVista(vista);
-    setMenuAbierto(false); // Cierra el menú automáticamente al hacer clic
+    setMenuAbierto(false);
   };
+
+  // 📝 ACÁ VA EL LINK DE TU VIDEO DE YOUTUBE:
+  // Cuando subas el video, cambiá lo que va después de "embed/" por el ID de tu video.
+  // Ejemplo: https://www.youtube.com/embed/TU_ID_DE_VIDEO
+  const urlVideoYouTube = "https://www.youtube.com/embed/dQw4w9WgXcQ"; 
 
   return (
     <header style={{
@@ -38,25 +44,17 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
         
         {/* LADO IZQUIERDO: Botón Hamburguesa + Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          {/* Botón de Menú Hamburguesa */}
           <button 
             onClick={() => setMenuAbierto(!menuAbierto)}
             style={{
-              background: 'none',
-              border: 'none',
-              color: 'white',
-              fontSize: '24px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '5px',
-              userSelect: 'none'
+              background: 'none', border: 'none', color: 'white',
+              fontSize: '24px', cursor: 'pointer', display: 'flex',
+              alignItems: 'center', padding: '5px', userSelect: 'none'
             }}
           >
             {menuAbierto ? '✕' : '☰'}
           </button>
 
-          {/* Logo Marca */}
           <div 
             onClick={() => navegarA('catalogo')}
             style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
@@ -68,9 +66,35 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           </div>
         </div>
 
-        {/* LADO DERECHO: Switch Mayorista + Botón Carrito */}
+        {/* LADO DERECHO: Botón Tutorial + Switch + Carrito */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           
+          {/* Botón de Ayuda / Video Tutorial */}
+          <button
+            onClick={() => setVideoAbierto(true)}
+            style={{
+              backgroundColor: '#2d3748',
+              color: '#ffffff',
+              border: '1px solid #4a5568',
+              padding: '8px 12px',
+              borderRadius: '20px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '13px',
+              transition: 'background-color 0.2s'
+            }}
+            title="¿Cómo usar la App?"
+          >
+            <span>📺</span>
+            {/* Corregido: Quitamos la propiedad fantasma y usamos estilos estándar */}
+            <span style={{ display: 'inline', whiteSpace: 'nowrap' }}>
+              Ver Tutorial
+            </span>
+          </button>
+
           {/* Switch Mayorista / Minorista */}
           <div style={{
             display: 'flex',
@@ -123,44 +147,58 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           </button>
         </div>
 
-        {/* 🍔 MENÚ HAMBURGUESA DESPLEGABLE (Sidebar / Drawer Flotante) */}
+        {/* 🍔 MENÚ HAMBURGUESA DESPLEGABLE */}
         {menuAbierto && (
           <div style={{
-            position: 'absolute',
-            top: '55px',
-            left: '-20px',
-            backgroundColor: '#1a202c',
-            width: '260px',
-            boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
-            borderRadius: '0 0 8px 0',
-            padding: '10px 0',
-            zIndex: 200,
-            animation: 'fadeIn 0.2s ease-out',
-            borderLeft: '4px solid #3182ce'
+            position: 'absolute', top: '55px', left: '-20px', backgroundColor: '#1a202c',
+            width: '260px', boxShadow: '0 8px 16px rgba(0,0,0,0.2)', borderRadius: '0 0 8px 0',
+            padding: '10px 0', zIndex: 200, borderLeft: '4px solid #3182ce'
           }}>
-            <div 
-              onClick={() => navegarA('catalogo')}
-              style={{ padding: '12px 20px', cursor: 'pointer', fontWeight: vistaActual === 'catalogo' ? 'bold' : 'normal', color: vistaActual === 'catalogo' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'catalogo' ? '#2d3748' : 'transparent' }}
-            >
-              🛍️ Catálogo de Productos
-            </div>
-            <div 
-              onClick={() => navegarA('carrito')}
-              style={{ padding: '12px 20px', cursor: 'pointer', fontWeight: vistaActual === 'carrito' ? 'bold' : 'normal', color: vistaActual === 'carrito' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'carrito' ? '#2d3748' : 'transparent' }}
-            >
-              🛒 Mi Pedido ({obtenerCantidadTotal()})
-            </div>
-            <div 
-              onClick={() => navegarA('nosotros')}
-              style={{ padding: '12px 20px', cursor: 'pointer', fontWeight: vistaActual === 'nosotros' ? 'bold' : 'normal', color: vistaActual === 'nosotros' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'nosotros' ? '#2d3748' : 'transparent' }}
-            >
-              ✨ Sobre Nosotros
-            </div>
-            <div 
-              onClick={() => navegarA('ubicacion')}
-              style={{ padding: '12px 20px', cursor: 'pointer', fontWeight: vistaActual === 'ubicacion' ? 'bold' : 'normal', color: vistaActual === 'ubicacion' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'ubicacion' ? '#2d3748' : 'transparent' }}
-            >
-              📍 Ubicación y Horarios
+            <div onClick={() => navegarA('catalogo')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'catalogo' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'catalogo' ? '#2d3748' : 'transparent' }}>🛍️ Catálogo de Productos</div>
+            <div onClick={() => navegarA('carrito')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'carrito' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'carrito' ? '#2d3748' : 'transparent' }}>🛒 Mi Pedido ({obtenerCantidadTotal()})</div>
+            <div onClick={() => navegarA('nosotros')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'nosotros' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'nosotros' ? '#2d3748' : 'transparent' }}>✨ Sobre Nosotros</div>
+            <div onClick={() => navegarA('ubicacion')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'ubicacion' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'ubicacion' ? '#2d3748' : 'transparent' }}>📍 Ubicación y Horarios</div>
+          </div>
+        )}
+
+        {/* 📺 MODAL FLOTANTE DEL TUTORIAL DE YOUTUBE */}
+        {videoAbierto && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)', display: 'flex', justifyContent: 'center',
+            alignItems: 'center', zIndex: 300, padding: '20px', boxSizing: 'border-box'
+          }}>
+            <div style={{
+              backgroundColor: '#ffffff', width: '100%', maxWidth: '640px',
+              borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.3)',
+              position: 'relative', display: 'flex', flexDirection: 'column'
+            }}>
+              {/* Encabezado del Modal */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px', backgroundColor: '#f1f5f9', borderBottom: '1px solid #e2e8f0', color: '#1a365d' }}>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>📺 ¿Cómo usar e instalar la App?</h3>
+                <button 
+                  onClick={() => setVideoAbierto(false)}
+                  style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}
+                >
+                  ✕
+                </button>
+              </div>
+              
+              {/* Contenedor Responsivo del Video */}
+              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
+                <iframe
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                  src={urlVideoYouTube}
+                  title="Tutorial Brillo Total"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              </div>
+
+              {/* Pie del Modal con Instrucciones Rápidas */}
+              <div style={{ padding: '15px 20px', backgroundColor: '#f8fafc', fontSize: '13px', color: '#475569', lineHeight: '1.5' }}>
+                💡 <strong>Tip PWA:</strong> Podés instalar esta página como una aplicación en tu celular tocando los tres puntitos del navegador de tu móvil y seleccionando <strong>"Agregar a la pantalla principal"</strong>.
+              </div>
             </div>
           </div>
         )}
