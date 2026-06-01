@@ -86,6 +86,7 @@ src/
 ├── context/         # Estado global (Carrito de compras y tipo de tarifa)
 ├── hooks/           # Funciones lógicas personalizadas (Custom Hooks)
 ├── info/            # Catálogo estático de productos (Línea Hogar y Automotor)
+|__ views            # Pantallas principales de la SPA (ej. Home/Catálogo, Vista de Carrito)
 ├── App.tsx          # Componente raíz donde se orquestan las secciones
 └── main.tsx         # Punto de entrada de la aplicación para el DOM
 ```
