@@ -18,14 +18,79 @@ export const Home: React.FC = () => {
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
 
-      {/* Encabezado de la Sección */}
-      <div style={{ textAlign: 'center', marginBottom: '30px', marginTop: '20px' }}>
-        <h2 style={{ fontSize: '28px', color: '#2c3e50', marginBottom: '10px' }}>
-          Nuestro Catálogo de Productos
-        </h2>
-        <p style={{ color: '#7f8c8d', fontSize: '16px', maxWidth: '600px', margin: '0 auto' }}>
-          Seleccioná los productos que necesites fraccionar por litro y armá tu pedido de forma rápida.
-        </p>
+      {/* 🐕 BANNER HERO - IDENTIDAD BRILLO TOTAL */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+        borderRadius: '16px',
+        padding: '35px 25px',
+        color: 'white',
+        marginTop: '10px',
+        marginBottom: '35px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '20px',
+        boxShadow: '0 10px 20px rgba(59, 130, 246, 0.15)',
+        position: 'relative',
+        overflow: 'hidden',
+        flexWrap: 'wrap' // Clave para que en celulares no se rompa y el perrito baje ordenado
+      }}>
+        {/* Efecto de fondo brillante decorativo */}
+        <div style={{
+          position: 'absolute',
+          top: '-50px',
+          right: '-50px',
+          width: '150px',
+          height: '150px',
+          background: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: '50%',
+          filter: 'blur(20px)'
+        }} />
+
+        {/* Textos del Banner */}
+        <div style={{ flex: '1', minWidth: '280px', zIndex: 1 }}>
+          <span style={{
+            backgroundColor: '#25d366',
+            color: 'white',
+            padding: '4px 12px',
+            borderRadius: '20px',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            display: 'inline-block',
+            marginBottom: '12px'
+          }}>
+            🐾 Traé tu Envase y Ahorrá
+          </span>
+          <h1 style={{ margin: '0 0 10px 0', fontSize: '30px', fontWeight: '800', lineHeight: '1.2' }}>
+            ¡Llená de Brillo tu Hogar! ✨
+          </h1>
+          <p style={{ margin: '0', fontSize: '15px', opacity: '0.94', lineHeight: '1.5', maxWidth: '550px' }}>
+            Elegí los mejores productos de limpieza sueltos para fraccionar por litro.
+            Armá tu carrito rápido y envialo directo por WhatsApp.
+            <strong style={{ display: 'block', marginTop: '8px', color: '#fef08a', fontSize: '14px' }}>
+              🐕 ¡Si tu pedido es tan largo como yo y supera los 20L, accedés a tarifa Mayorista!
+            </strong>
+          </p>
+        </div>
+
+        {/* El Salchicha de Brillo Total */}
+        <div style={{
+          fontSize: '75px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          userSelect: 'none',
+          zIndex: 1,
+          backgroundColor: 'rgba(255,255,255,0.15)',
+          padding: '10px 20px',
+          borderRadius: '50px', // Forma más alargada estilo salchicha
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)',
+          margin: '0 auto'
+        }}>
+          🌭
+        </div>
       </div>
 
       {/* Botonera Interactiva de Filtros */}
