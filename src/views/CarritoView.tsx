@@ -51,15 +51,33 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
 
   if (cart.length === 0) {
     return (
-      <div style={{ padding: '40px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
-        <span style={{ fontSize: '50px' }}>🛒</span>
-        <h3 style={{ fontSize: '22px', color: '#2c3e50', marginTop: '10px' }}>Tu pedido está vacío</h3>
-        <p style={{ color: '#7f8c8d', marginBottom: '20px' }}>Explorá nuestro catálogo y sumá los productos que necesites fraccionar.</p>
+      <div style={{ padding: '50px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+        {/* Icono temático provisorio del salchicha guardián del carrito */}
+        <div style={{ fontSize: '65px', marginBottom: '15px', display: 'inline-block', transform: 'scaleX(-1)' }}>
+          🐕💨
+        </div>
+        <h3 style={{ fontSize: '24px', color: '#1a365d', marginTop: '10px', fontWeight: 'bold' }}>
+          ¡El perro salchicha vio tu carrito vacío!
+        </h3>
+        <p style={{ color: '#7f8c8d', marginBottom: '25px', fontSize: '16px', lineHeight: '1.5' }}>
+          Ladra de tristeza porque todavía no sumaste ningún producto para fraccionar. ¡Dale una alegría y llenalo de brillo!
+        </p>
         <button
           onClick={() => alCambiarVista('catalogo')}
-          style={{ backgroundColor: '#3182ce', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+          style={{
+            backgroundColor: '#3182ce',
+            color: 'white',
+            border: 'none',
+            padding: '12px 24px',
+            borderRadius: '25px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '15px',
+            boxShadow: '0 4px 6px rgba(49, 130, 206, 0.3)',
+            transition: 'transform 0.1s ease'
+          }}
         >
-          Volver al Catálogo
+          🐾 Explorar el Catálogo
         </button>
       </div>
     );
@@ -144,11 +162,11 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
             <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a365d' }}>Total: ${obtenerTotal()}</span>
           </div>
 
-          {/* Cartel dinámico de Litros mínimos */}
-          <div style={{ marginTop: '8px', fontSize: '14px', color: totalLitrosActuales >= 20 ? '#2f855a' : '#c53030', fontWeight: '600' }}>
+          {/* Cartel dinámico con la personalidad del Salchicha */}
+          <div style={{ marginTop: '10px', fontSize: '14px', color: totalLitrosActuales >= 20 ? '#2f855a' : '#c53030', fontWeight: '600', textAlign: 'right' }}>
             {totalLitrosActuales >= 20
-              ? `✅ ¡Excelente! Superaste el mínimo mayorista (Llevás ${totalLitrosActuales}L)`
-              : `ℹ️ Llevás ${totalLitrosActuales} litros. Necesitás 20 para validar tarifa Mayorista (Faltan ${20 - totalLitrosActuales}L)`
+              ? `🐕 ¡Guau! Tu pedido ya es tan largo como yo. ¡Destrabaste la tarifa Mayorista! (Llevás ${totalLitrosActuales}L)`
+              : `ℹ️ Llevás ${totalLitrosActuales}L. El salchicha necesita un pedido de 20 litros para habilitarte los precios de Revendedor (Faltan ${20 - totalLitrosActuales}L) 🐾`
             }
           </div>
         </div>
