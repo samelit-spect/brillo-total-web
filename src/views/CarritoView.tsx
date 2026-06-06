@@ -31,12 +31,12 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
 
     mensaje += `-----------------------------------\n`;
     mensaje += `*Total Estimado: $${obtenerTotal()}*\n\n`;
-    mensaje += `_Pedido generado desde la aplicación web._`;
+    mensaje += `_Pedido generado desde la application web._`;
 
     // Reemplazamos espacios y caracteres especiales para la URL
     const mensajeCodificado = encodeURIComponent(mensaje);
 
-    // Tu número de WhatsApp del negocio
+    // Tu numero de WhatsApp del negocio
     const numeroTelefono = '5493837402375';
 
     window.open(`https://wa.me/${numeroTelefono}?text=${mensajeCodificado}`, '_blank');
@@ -63,7 +63,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
       <h2 style={{ fontSize: '26px', color: '#2c3e50', marginBottom: '20px' }}>Resumen de tu Pedido</h2>
 
       {/* Lista de productos en el carrito */}
-      <div style={{ backgroundColor: '#white', borderRadius: '12px', border: '1px solid #e0e0e0', padding: '20px', marginBottom: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+      <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e0e0e0', padding: '20px', marginBottom: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
         {cart.map((item) => {
           const precio = esMayorista ? item.producto.precioMayorista : item.producto.precioMinorista;
           return (
@@ -90,7 +90,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
                       cursor: 'pointer',
                       fontWeight: 'bold',
                       padding: '4px 10px',
-                      color: '#2c3e50', // Forzamos el color oscuro estético
+                      color: '#2c3e50',
                       fontSize: '16px',
                       userSelect: 'none'
                     }}
@@ -103,7 +103,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
                     fontWeight: 'bold',
                     minWidth: '20px',
                     textAlign: 'center',
-                    color: '#2c3e50' // Forzamos color para la cantidad por las dudas
+                    color: '#2c3e50'
                   }}>
                     {item.cantidad}
                   </span>
@@ -117,7 +117,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
                       cursor: 'pointer',
                       fontWeight: 'bold',
                       padding: '4px 10px',
-                      color: '#2c3e50', // Forzamos el color oscuro estético
+                      color: '#2c3e50',
                       fontSize: '16px',
                       userSelect: 'none'
                     }}
@@ -158,7 +158,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
             value={nota}
             onChange={(e) => setNota(e.target.value)}
             placeholder="Ej: Llevo los envases vacíos para fraccionar..."
-            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e0', minHeight: '8px', boxSizing: 'border-box', fontFamily: 'inherit' }}
+            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e0', minHeight: '80px', boxSizing: 'border-box', fontFamily: 'inherit' }}
           />
         </div>
 
