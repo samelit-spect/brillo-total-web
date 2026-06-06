@@ -17,10 +17,20 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
       return;
     }
 
+    // Calculamos el total de litros/unidades que lleva acumulados en el carrito
+    const totalLitros = cart.reduce((acumulado, item) => acumulado + item.cantidad, 0);
+
+    // CONTROL MAYORISTA: Si está en modo mayorista pero no llega a los 20 litros
+    if (esMayorista && totalLitros < 20) {
+      alert(`⚠️ Para acceder a la tarifa Mayorista tenés que sumar al menos 20 litros/unidades al carrito. ¡Actualmente llevás ${totalLitros}! Podés sumar más productos o cambiar la tarifa a Minorista.`);
+      return;
+    }
+
     // Estructuramos el mensaje de texto de forma pro
     let mensaje = `*Nuevo Pedido - Brillo Total* ✨🪣\n`;
     mensaje += `*Cliente:* ${nombre}\n`;
     mensaje += `*Tipo de Tarifa:* ${esMayorista ? 'Mayorista' : 'Minorista'}\n`;
+    mensaje += `*Total de Litros/Unidades:* ${totalLitros}\n`; // Sumamos este dato útil para el negocio
     if (nota.trim()) mensaje += `*Notas:* ${nota}\n`;
     mensaje += `-----------------------------------\n`;
 
@@ -31,12 +41,9 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
 
     mensaje += `-----------------------------------\n`;
     mensaje += `*Total Estimado: $${obtenerTotal()}*\n\n`;
-    mensaje += `_Pedido generado desde la application web._`;
+    mensaje += `_Pedido generado desde la aplicación web._`;
 
-    // Reemplazamos espacios y caracteres especiales para la URL
     const mensajeCodificado = encodeURIComponent(mensaje);
-
-    // Tu numero de WhatsApp del negocio
     const numeroTelefono = '5493837402375';
 
     window.open(`https://wa.me/${numeroTelefono}?text=${mensajeCodificado}`, '_blank');
@@ -57,7 +64,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
       </div>
     );
   }
-
+  const totalLitrosActuales = cart.reduce((acumulado, item) => acumulado + item.cantidad, 0);
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
       <h2 style={{ fontSize: '26px', color: '#2c3e50', marginBottom: '20px' }}>Resumen de tu Pedido</h2>
@@ -131,9 +138,19 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
           );
         })}
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px', paddingTop: '15px', borderTop: '2px solid #e2e8f0' }}>
-          <button onClick={vaciarCarrito} style={{ color: '#e53e3e', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>Vaciar Carrito</button>
-          <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a365d' }}>Total: ${obtenerTotal()}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: '20px', paddingTop: '15px', borderTop: '2px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <button onClick={vaciarCarrito} style={{ color: '#e53e3e', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>Vaciar Carrito</button>
+            <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a365d' }}>Total: ${obtenerTotal()}</span>
+          </div>
+
+          {/* Cartel dinámico de Litros mínimos */}
+          <div style={{ marginTop: '8px', fontSize: '14px', color: totalLitrosActuales >= 20 ? '#2f855a' : '#c53030', fontWeight: '600' }}>
+            {totalLitrosActuales >= 20
+              ? `✅ ¡Excelente! Superaste el mínimo mayorista (Llevás ${totalLitrosActuales}L)`
+              : `ℹ️ Llevás ${totalLitrosActuales} litros. Necesitás 20 para validar tarifa Mayorista (Faltan ${20 - totalLitrosActuales}L)`
+            }
+          </div>
         </div>
       </div>
 
