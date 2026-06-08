@@ -1,17 +1,22 @@
 // src/components/ProductoCard.tsx
 import React from 'react';
 import { type Producto } from '../info/productos';
-import { useCart } from '../context/CartContext'; // Importamos el cerebro del carrito
+import { useCart } from '../context/CartContext';
 
 interface ProductoCardProps {
   producto: Producto;
 }
 
 export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
-  // Consumimos el estado mayorista y la función de agregar desde el contexto global
   const { esMayorista, agregarAlCarrito } = useCart();
-  
+
   const precioMostrar = esMayorista ? producto.precioMayorista : producto.precioMinorista;
+
+  // 🔥 OPTIMIZACIÓN DE PRECIOS: Formateo con separador de miles para Argentina
+  const precioFormateado = precioMostrar.toLocaleString('es-AR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  });
 
   return (
     <div style={{
@@ -27,10 +32,10 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
     }}>
       {/* Contenedor de la Imagen */}
       <div style={{ textAlign: 'center', marginBottom: '15px' }}>
-        <img 
-          src={producto.imagenUrl} 
-          alt={producto.nombre} 
-          style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px' }} 
+        <img
+          src={producto.imagenUrl}
+          alt={producto.nombre}
+          style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px' }}
         />
       </div>
 
@@ -47,15 +52,15 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
         }}>
           {producto.categoria === 'insumos' ? 'Insumo' : 'Línea Hogar'}
         </span>
-        
+
         <h3 style={{ margin: '10px 0 5px 0', fontSize: '18px', color: '#2c3e50' }}>
           {producto.nombre}
         </h3>
-        
+
         <p style={{ fontSize: '13px', color: '#7f8c8d', margin: '0 0 10px 0', minHeight: '40px' }}>
           {producto.descripcion}
         </p>
-        
+
         <p style={{ fontSize: '14px', fontWeight: '500', color: '#95a5a6', margin: '0 0 15px 0' }}>
           Presentación: <strong>{producto.presentacion}</strong>
         </p>
@@ -65,23 +70,24 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px' }}>
         <div>
           <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#2980b9' }}>
-            ${precioMostrar}
+            ${precioFormateado} {/* <-- Ahora usa el formato limpio con puntos */}
           </span>
           {esMayorista && <span style={{ fontSize: '11px', color: '#27ae60', display: 'block', fontWeight: 'bold' }}>Precio Mayorista</span>}
         </div>
 
-        <button 
+        <button
           disabled={!producto.stock}
-          onClick={() => agregarAlCarrito(producto)} // Conectamos el evento de clic de verdad
+          onClick={() => agregarAlCarrito(producto)}
           style={{
-            backgroundColor: producto.stock ? '#2980b9' : '#95a5a6',
-            color: '#ffffff',
+            backgroundColor: producto.stock ? '#2980b9' : '#cbd5e0', // Gris más suave si está inactivo
+            color: producto.stock ? '#ffffff' : '#718096',         // Letra gris en lugar de blanca pura para dar efecto apagado
             border: 'none',
             padding: '10px 15px',
             borderRadius: '8px',
             cursor: producto.stock ? 'pointer' : 'not-allowed',
             fontWeight: '600',
             fontSize: '14px',
+            transition: 'background-color 0.2s'
           }}
         >
           {producto.stock ? 'Agregar' : 'Sin Stock'}

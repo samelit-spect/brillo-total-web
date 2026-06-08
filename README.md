@@ -198,3 +198,20 @@ La plataforma ha superado la etapa de maquetación estática y se encuentra en u
 3. **Arquitectura SPA/PWA Consolidada:** Rutas y renderizado condicional optimizados para una navegación fluida sin recargas de página, empaquetado bajo los estándares de una Progressive Web App para su instalación e interacción ágil en dispositivos móviles.
 
 ---
+
+---
+
+## 🚀 9. Plan de Escalabilidad y Trabajo Futuro
+
+Como toda plataforma tecnológica en constante evolución, el sistema de **Brillo Total** está diseñado bajo una arquitectura modular que permitirá expandir sus capacidades en futuras fases de desarrollo:
+
+* **Autenticación Robusta:** Reemplazar el flujo actual de tokens locales por **Firebase Authentication**, permitiendo el registro e inicio de sesión seguro de clientes frecuentes y roles administrativos mediante correo/contraseña o Google Sign-In.
+* **Pasarela de Pagos Integrada:** Incorporación del SDK de **Mercado Pago** para automatizar el cobro electrónico de pedidos minoristas directo desde la aplicación antes de derivar al canal de distribución.
+* **Módulo de Analíticas y Reportes:** Creación de un dashboard estadístico dentro del panel admin utilizando gráficos interactivos (`Recharts`) para monitorear los productos más vendidos, ingresos mensuales y tendencias de compra entre canales mayoristas y minoristas.
+* **Persistencia Avanzada Offline:** Optimización de Service Workers para permitir el armado de carritos de preventa en zonas sin cobertura de red en el interior de la provincia, sincronizando el pedido automáticamente una vez recuperada la conexión a internet.
+
+---
+
+## 📷 10. Vista Previa de la Interfaz (Screenshots)
+
+*Próximamente se anexarán capturas de pantalla de la interfaz pública responsiva y del Panel de Control de Inventario.*

@@ -2,15 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase/config';
 import { collection, getDocs, doc, updateDoc, addDoc } from 'firebase/firestore';
-import { type Producto } from '../info/productos'; // Usamos tu tipo oficial
+import { type Producto } from '../info/productos';
 
 export const Admin: React.FC = () => {
-    // Lista de productos traídos de la base de datos
     const [productos, setProductos] = useState<Producto[]>([]);
     const [cargando, setCargando] = useState<boolean>(true);
     const [errorDb, setErrorDb] = useState<string | null>(null);
 
-    // Estados del Formulario (Alineados a tu base de datos)
     const [nombre, setNombre] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [precioMinorista, setPrecioMinorista] = useState('');
@@ -18,10 +16,8 @@ export const Admin: React.FC = () => {
     const [categoria, setCategoria] = useState<string>('hogar');
     const [presentacion, setPresentacion] = useState('Por Litro');
 
-    // El Estado Clave: Si tiene una ID, estamos EDITANDO.
     const [idEnEdicion, setIdEnEdicion] = useState<string | null>(null);
 
-    // 1. Traer los productos frescos de Firebase
     const obtenerProductos = async () => {
         try {
             setCargando(true);
@@ -30,7 +26,6 @@ export const Admin: React.FC = () => {
             const lista: Producto[] = [];
 
             querySnapshot.forEach((docSnap) => {
-                // Guardamos los productos asegurándonos de conservar el ID del documento
                 lista.push({ id: docSnap.id, ...docSnap.data() } as Producto);
             });
 
@@ -47,7 +42,20 @@ export const Admin: React.FC = () => {
         obtenerProductos();
     }, []);
 
-    // 2. Función para disparar el modo edición al tocar el botón de la tabla
+    // Alternar el estado de stock rápidamente desde la tabla
+    const conmutarStock = async (id: string, stockActual: boolean) => {
+        try {
+            const productoRef = doc(db, "productos", id);
+            await updateDoc(productoRef, { stock: !stockActual });
+
+            // Actualizamos el estado local rápido para que se vea el cambio al toque
+            setProductos(prev => prev.map(p => p.id === id ? { ...p, stock: !stockActual } : p));
+        } catch (error) {
+            console.error("Error al cambiar stock: ", error);
+            alert("No se pudo actualizar el stock en Firebase.");
+        }
+    };
+
     const activarEdicion = (producto: Producto) => {
         setIdEnEdicion(producto.id);
         setNombre(producto.nombre);
@@ -60,7 +68,6 @@ export const Admin: React.FC = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // 3. Limpiar el formulario
     const cancelarEdicion = () => {
         setIdEnEdicion(null);
         setNombre('');
@@ -71,7 +78,6 @@ export const Admin: React.FC = () => {
         setPresentacion('Por Litro');
     };
 
-    // 4. Guardar (Alta o Modificación)
     const manejarEnvio = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -87,7 +93,6 @@ export const Admin: React.FC = () => {
             precioMayorista: Number(precioMayorista),
             categoria,
             presentacion,
-            stock: true // Se mantiene disponible por defecto
         };
 
         try {
@@ -96,16 +101,16 @@ export const Admin: React.FC = () => {
                 await updateDoc(productoRef, datosProducto);
                 alert("✨ ¡Producto actualizado con éxito!");
             } else {
-                // Para el alta le sumamos una imagen temporal si no tiene
                 await addDoc(collection(db, "productos"), {
                     ...datosProducto,
+                    stock: true, // Disponible por defecto al crearse
                     imagenUrl: 'https://via.placeholder.com/180'
                 });
                 alert("✅ ¡Producto creado con éxito!");
             }
 
             cancelarEdicion();
-            obtenerProductos(); // Recarga la tabla
+            obtenerProductos();
         } catch (error) {
             console.error("Error al guardar en Firebase: ", error);
             alert("Hubo un error al procesar la operación.");
@@ -113,7 +118,7 @@ export const Admin: React.FC = () => {
     };
 
     return (
-        <div style={{ maxWidth: '900px', margin: '40px auto', padding: '0 20px' }}>
+        <div style={{ maxWidth: '950px', margin: '40px auto', padding: '0 20px' }}>
 
             {/* SECCIÓN 1: FORMULARIO */}
             <div style={{ backgroundColor: '#ffffff', padding: '30px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '40px' }}>
@@ -183,33 +188,46 @@ export const Admin: React.FC = () => {
                         ⚠️ Error al conectar: {errorDb}
                     </div>
                 ) : productos.length === 0 ? (
-                    <p style={{ color: '#718096', textAlign: 'center' }}>No hay productos cargados en la base de datos.</p>
+                    <p style={{ color: '#718096', textAlign: 'center' }}>No hay productos cargados.</p>
                 ) : (
                     <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                             <thead>
                                 <tr style={{ borderBottom: '2px solid #edf2f7', textAlign: 'left', color: '#4a5568' }}>
                                     <th style={{ padding: '12px 8px' }}>Producto</th>
-                                    <th style={{ padding: '12px 8px' }}>Categoría</th>
                                     <th style={{ padding: '12px 8px' }}>Precios (Min / May)</th>
+                                    <th style={{ padding: '12px 8px', textAlign: 'center' }}>Stock</th>
                                     <th style={{ padding: '12px 8px', textAlign: 'right' }}>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {productos.map((prod) => (
                                     <tr key={prod.id} style={{ borderBottom: '1px solid #edf2f7', backgroundColor: idEnEdicion === prod.id ? '#ebf8ff' : 'transparent' }}>
-
                                         <td style={{ padding: '12px 8px', fontWeight: '500', color: '#1a202c' }}>
                                             {prod.nombre} <span style={{ fontSize: '12px', color: '#718096', display: 'block' }}>({prod.presentacion})</span>
-                                        </td>
-                                        <td style={{ padding: '12px 8px' }}>
-                                            <span style={{ backgroundColor: '#edf2f7', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', textTransform: 'capitalize' }}>
-                                                {prod.categoria}
-                                            </span>
                                         </td>
                                         <td style={{ padding: '12px 8px', color: '#2d3748' }}>
                                             <span style={{ fontWeight: 'bold', color: '#2b6cb0' }}>${prod.precioMinorista}</span> /
                                             <span style={{ color: '#38a169', marginLeft: '4px' }}>${prod.precioMayorista}</span>
+                                        </td>
+                                        {/* BOTÓN RÁPIDO DE CONFIGURACIÓN DE STOCK */}
+                                        <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                                            <button
+                                                onClick={() => conmutarStock(prod.id, prod.stock)}
+                                                style={{
+                                                    backgroundColor: prod.stock ? '#e6fffa' : '#fff5f5',
+                                                    color: prod.stock ? '#319795' : '#e53e3e',
+                                                    border: `1px solid ${prod.stock ? '#b2f5ea' : '#fed7d7'}`,
+                                                    padding: '4px 10px',
+                                                    borderRadius: '20px',
+                                                    fontSize: '12px',
+                                                    fontWeight: 'bold',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                            >
+                                                {prod.stock ? '🟢 Disponible' : '🔴 Sin Stock'}
+                                            </button>
                                         </td>
                                         <td style={{ padding: '12px 8px', textAlign: 'right' }}>
                                             <button
@@ -237,8 +255,8 @@ const styles = {
         padding: '10px',
         borderRadius: '4px',
         border: '1px solid #cbd5e0',
-        backgroundColor: '#ffffff', // Forzamos fondo blanco
-        color: '#1a202c',           // 🔥 ACÁ ESTÁ EL CAMBIO: Letra gris oscuro/negra para que se lea perfecto
+        backgroundColor: '#ffffff',
+        color: '#1a202c',
         boxSizing: 'border-box' as const,
         fontSize: '14px'
     }
