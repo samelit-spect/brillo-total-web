@@ -1,19 +1,62 @@
 // src/views/Home.tsx
-import React, { useState } from 'react';
-import { CATALOGO_PRUEBA } from '../info/productos';
+import React, { useState, useEffect } from 'react';
+import { type Producto } from '../info/productos';
 import { ProductoCard } from '../components/ProductoCard';
+import { db } from '../firebase/config'; // Nuestro puente a la DB
+import { collection, getDocs } from 'firebase/firestore'; // Herramientas de consulta de Google
 
 export const Home: React.FC = () => {
-  // Definimos el tipo del estado. Puede ser 'todos' o cualquiera de las categorías estrictas del Producto.
+  // 1. Estados para la base de datos dinámica
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [cargando, setCargando] = useState<boolean>(true);
   const [categoriaActual, setCategoriaActual] = useState<string>('todos');
 
   // Array de control para armar los botones del menú
   const categorias: string[] = ['todos', 'hogar', 'automotor', 'insumos'];
 
-  // Lógica de filtrado: si es 'todos' pasa el catálogo completo; si no, filtra por la propiedad exacta
+  // 2. Efecto para ir a buscar los productos a internet apenas abra la pantalla
+  useEffect(() => {
+    const obtenerProductos = async () => {
+      try {
+        setCargando(true);
+        const productosRef = collection(db, "productos");
+        const querySnapshot = await getDocs(productosRef);
+
+        const listaProductos: Producto[] = [];
+        querySnapshot.forEach((doc) => {
+          listaProductos.push({ ...doc.data() } as Producto);
+        });
+
+        setProductos(listaProductos);
+      } catch (error) {
+        console.error("Error al traer los productos de Firebase:", error);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    obtenerProductos();
+  }, []);
+
+  // 3. Lógica de filtrado usando el estado dinámico "productos" en vez del archivo estático
   const productosFiltrados = categoriaActual === 'todos'
-    ? CATALOGO_PRUEBA
-    : CATALOGO_PRUEBA.filter((prod) => prod.categoria === categoriaActual);
+    ? productos
+    : productos.filter((prod) => prod.categoria === categoriaActual);
+
+  // 4. Pantalla de carga integrada estéticamente
+  if (cargando) {
+    return (
+      <div style={{
+        textAlign: 'center',
+        padding: '100px 20px',
+        fontSize: '18px',
+        color: '#3182ce',
+        fontWeight: 'bold'
+      }}>
+        ✨ Cargando el catálogo de Brillo Total desde la nube...
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -33,7 +76,7 @@ export const Home: React.FC = () => {
         boxShadow: '0 10px 20px rgba(59, 130, 246, 0.15)',
         position: 'relative',
         overflow: 'hidden',
-        flexWrap: 'wrap' // Clave para que en celulares no se rompa y el perrito baje ordenado
+        flexWrap: 'wrap'
       }}>
         {/* Efecto de fondo brillante decorativo */}
         <div style={{
@@ -85,7 +128,7 @@ export const Home: React.FC = () => {
           zIndex: 1,
           backgroundColor: 'rgba(255,255,255,0.15)',
           padding: '10px 20px',
-          borderRadius: '50px', // Forma más alargada estilo salchicha
+          borderRadius: '50px',
           boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)',
           margin: '0 auto'
         }}>
@@ -99,7 +142,7 @@ export const Home: React.FC = () => {
         justifyContent: 'center',
         gap: '12px',
         marginBottom: '40px',
-        flexWrap: 'wrap' // Clave para que en celulares no se desborde la pantalla y bajen ordenados
+        flexWrap: 'wrap'
       }}>
         {categorias.map((cat) => {
           const esActivo = categoriaActual === cat;
@@ -116,7 +159,7 @@ export const Home: React.FC = () => {
                 fontWeight: 'bold',
                 fontSize: '14px',
                 cursor: 'pointer',
-                textTransform: 'capitalize', // Convierte 'hogar' en 'Hogar' visualmente automáticamente
+                textTransform: 'capitalize',
                 transition: 'all 0.2s ease',
                 boxShadow: esActivo ? '0 4px 10px rgba(49, 130, 206, 0.25)' : 'none',
                 outline: 'none'

@@ -1,14 +1,39 @@
 // src/components/Footer.tsx
 import React from 'react';
 
-export const Footer: React.FC = () => {
+// Definimos el tipo acá directamente para evitar problemas de importación cruzada
+interface FooterProps {
+  vistaActual?: string;
+  alCambiarVista?: (vista: any) => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) => {
+
+  const manejarAccesoAdmin = () => {
+    if (!alCambiarVista) return;
+
+    if (vistaActual === 'admin') {
+      alCambiarVista('catalogo');
+      return;
+    }
+
+    const CLAVE_CORRECTA = 'BrilloAdmin2026';
+    const passwordIngresado = prompt('🔐 Ingrese la clave maestra de administrador:');
+
+    if (passwordIngresado === CLAVE_CORRECTA) {
+      alCambiarVista('admin');
+    } else if (passwordIngresado !== null) {
+      alert('❌ Clave incorrecta. Acceso denegado.');
+    }
+  };
+
   return (
     <footer style={{
-      backgroundColor: '#1a202c', // Gris oscuro/negro estético
+      backgroundColor: '#1a202c',
       color: '#a0aec0',
       padding: '40px 20px 20px 20px',
-      marginTop: 'auto', // Asegura que el footer siempre quede abajo de todo
-      borderTop: '4px solid #3182ce', // Línea azul divisoria
+      marginTop: 'auto',
+      borderTop: '4px solid #3182ce',
       fontSize: '14px'
     }}>
       <div style={{
@@ -20,7 +45,7 @@ export const Footer: React.FC = () => {
         gap: '30px',
         marginBottom: '30px'
       }}>
-        
+
         {/* Sección Comercial / Identidad */}
         <div style={{ flex: '1 1 300px' }}>
           <h3 style={{ color: '#ffffff', margin: '0 0 10px 0', fontSize: '18px' }}>✨ Brillo Total</h3>
@@ -54,14 +79,40 @@ export const Footer: React.FC = () => {
         paddingTop: '20px',
         textAlign: 'center',
         fontSize: '12px',
-        color: '#718096'
+        color: '#718096',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '5px'
       }}>
         <p style={{ margin: 0 }}>
           &copy; {new Date().getFullYear()} Brillo Total. Todos los derechos reservados.
         </p>
-        <p style={{ margin: '5px 0 0 0', fontSize: '11px' }}>
+        <p style={{ margin: 0, fontSize: '11px' }}>
           Desarrollado con React & TypeScript.
         </p>
+
+        {/* Botón de Administración */}
+        {alCambiarVista && (
+          <button
+            onClick={manejarAccesoAdmin}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: vistaActual === 'admin' ? '#3182ce' : '#4a5568',
+              cursor: 'pointer',
+              fontSize: '11px',
+              fontWeight: '500',
+              marginTop: '10px',
+              transition: 'color 0.2s',
+              outline: 'none'
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#a0aec0')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = vistaActual === 'admin' ? '#3182ce' : '#4a5568')}
+          >
+            {vistaActual === 'admin' ? '⬅️ Salir de Administración' : '⚙️ Configuración del Sistema'}
+          </button>
+        )}
       </div>
     </footer>
   );
