@@ -26,12 +26,12 @@ npm run dev
 
 A continuación se detalla cómo se distribuyen y operan los componentes del software entre la etapa de desarrollo y el despliegue final en producción:
 
-| Componente Técnico | Entorno de Desarrollo Local | Entorno de Producción | Tipo de Recurso |
-| :--- | :--- | :--- | :--- |
-| **Servidor de Aplicación** | Vite Dev Server (`localhost`) | GitHub Pages / Vercel | Hosting estático |
-| **Manejo de Estado** | LocalStorage / Mock Data | Context API + Estado Global | Lógica de negocio |
-| **Persistencia de Datos** | Memoria Local / Arrays de Prueba | API REST / Base de Datos | Almacenamiento |
-| **Proceso de Compilación** | Código TypeScript Nativo | JavaScript Minificado (Build) | Distribución |
+| Componente Técnico         | Entorno de Desarrollo Local      | Entorno de Producción         | Tipo de Recurso   |
+| :------------------------- | :------------------------------- | :---------------------------- | :---------------- |
+| **Servidor de Aplicación** | Vite Dev Server (`localhost`)    | GitHub Pages / Vercel         | Hosting estático  |
+| **Manejo de Estado**       | LocalStorage / Mock Data         | Context API + Estado Global   | Lógica de negocio |
+| **Persistencia de Datos**  | Memoria Local / Arrays de Prueba | API REST / Base de Datos      | Almacenamiento    |
+| **Proceso de Compilación** | Código TypeScript Nativo         | JavaScript Minificado (Build) | Distribución      |
 
 ---
 
@@ -119,3 +119,58 @@ Se ha consolidado con éxito la estructura base inicial requerida, cumpliendo co
 3. **Footer:** Pie de página institucional con datos de contacto.
 
 ---
+
+## Módulo: Integración de Base de Datos NoSQL en Tiempo Real (Firebase Firestore)
+
+Para garantizar la escalabilidad de la PWA "Brillo Total" y permitir la gestión dinámica de precios y stock por parte del administrador, se migró la arquitectura de datos de un estado estático (Hardcoded) a una solución de base de datos en la nube.
+
+### 1. Decisiones de Arquitectura y Configuración
+* **Tecnología Seleccionada:** Google Firebase Firestore.
+* **Modelo de Datos:** NoSQL orientado a documentos (Estructura flexible, ideal para sincronización offline en aplicaciones móviles y PWAs).
+* **Región de Servidor:** `us-central1` (Iowa, EE. UU.) seleccionada por sus bajos tiempos de latencia y óptimo rendimiento dentro de la capa gratuita (Spark Plan).
+* **Modo de Seguridad Inicial:** Modo de prueba (Permisos de lectura/escritura abiertos temporalmente en ambiente de desarrollo).
+
+### 2. Infraestructura del Código (Frontend en React + TypeScript)
+* Se instaló la dependencia oficial `firebase` a través del gestor de paquetes npm.
+* Se implementó el archivo de configuración centralizado en `src/firebase/config.ts` encargado de inicializar el SDK de Google y exportar la instancia de la base de datos (`db`) mediante el método `getFirestore()`.
+
+### 3. Proceso de Migración y Semillado (Seeding)
+Para poblar la base de datos sin necesidad de cargas manuales, se diseñó un script de migración asíncrono temporal en el ciclo de vida del componente principal (`useEffect`), estructurado bajo la siguiente interfaz de TypeScript:
+
+* **Estructura del Documento (`Producto`):**
+  * `id` (string)
+  * `nombre` (string)
+  * `descripcion` (string)
+  * `precioMinorista` (number)
+  * `precioMayorista` (number)
+  * `categoria` ('hogar' | 'automotor' | 'insumos')
+  * `presentacion` (string)
+  * `stock` (boolean)
+  * `imagenUrl` (string)
+
+**Resultado:** Se migraron con éxito los 7 productos iniciales del catálogo hacia la colección `"productos"` en la consola de Firebase, quedando la infraestructura lista para el consumo de datos en tiempo real.
+
+---
+
+## Guía de Estilos e Identidad Visual (UI)
+
+Para garantizar una experiencia de usuario (UX) coherente, profesional y con alta legibilidad, se definió un sistema de diseño basado en una paleta cromática que evoca limpieza, frescura y confianza, alineada al rubro comercial de "Brillo Total".
+
+### 1. Paleta de Colores (Design Tokens)
+La aplicación utiliza un esquema de colores controlado para mantener el contraste y cumplir con las pautas de accesibilidad web (WCAG):
+
+*   **Color Primario (Primary Blue):** `#007BFF` (o el azul que uses en tu Tailwind/CSS). Representa el agua, la tecnología y la confianza. Se utiliza en botones principales, llamados a la acción (CTA) y estados activos.
+*   **Color Secundario (Cyan/Teal):** `#0DCAF0` (o tu variante). Evoca frescura y limpieza profunda. Utilizado para destacar categorías (como "Automotor" o "Insumos") y elementos decorativos sutiles.
+*   **Colores Neutros (Grayscale):**
+    *   **Fondo Principal:** `#F8F9FA` / `#FFFFFF`. Blancos y grises muy claros para dar sensación de pulcritud, amplitud y espacio limpio.
+    *   **Texto Principal:** `#212529` (Gris oscuro/Casi negro). Garantiza un contraste óptimo sobre fondos claros, evitando la fatiga visual del usuario al leer el catálogo.
+    *   **Texto Secundario/Descripciones:** `#6C757D` (Gris medio). Para detalles de menor jerarquía como descripciones de productos o subtítulos.
+*   **Color de Alerta/Estado (Danger):** `#DC3545` (Rojo). Utilizado exclusivamente para indicar la falta de stock o errores en el sistema.
+
+### 2. Sistema Tipográfico
+Se seleccionó una familia tipográfica de tipo **Sans-serif (palo seco)** para priorizar la velocidad de lectura en pantallas de dispositivos móviles, factor crítico para una Progressive Web App (PWA):
+
+*   **Tipografía Principal:** `Inter` / `Roboto` (o `System-UI` según la que tengas configurada). 
+*   **Criterios de Aplicación:**
+    *   **Títulos y Encabezados (Headings):** Estilos en negrita (`Font-Bold`, pesos 700/800) para capturar la atención inmediata en nombres de productos y secciones del panel.
+    *   **Cuerpo de Texto y Precios (Body/Prices):** Pesos regulares y medianos (400/500) que optimizan el escaneo rápido de los importes minoristas y mayoristas.
