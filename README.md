@@ -24,14 +24,16 @@ npm run dev
 
 ### Arquitectura de Componentes según el Entorno
 
-A continuación se detalla cómo se distribuyen y operan los componentes del software entre la etapa de desarrollo y el despliegue final en producción:
+A continuación se detalla cómo se distribuyen y operan los componentes del software entre la etapa de desarrollo y el despliegue final en producción, integrando los servicios en la nube de Google Firebase:
 
-| Componente Técnico         | Entorno de Desarrollo Local      | Entorno de Producción         | Tipo de Recurso   |
-| :------------------------- | :------------------------------- | :---------------------------- | :---------------- |
-| **Servidor de Aplicación** | Vite Dev Server (`localhost`)    | GitHub Pages / Vercel         | Hosting estático  |
-| **Manejo de Estado**       | LocalStorage / Mock Data         | Context API + Estado Global   | Lógica de negocio |
-| **Persistencia de Datos**  | Memoria Local / Arrays de Prueba | API REST / Base de Datos      | Almacenamiento    |
-| **Proceso de Compilación** | Código TypeScript Nativo         | JavaScript Minificado (Build) | Distribución      |
+| Componente Técnico         | Entorno de Desarrollo Local      | Entorno de Producción                            | Tipo de Recurso                    |
+| :------------------------- | :------------------------------- | :----------------------------------------------- | :--------------------------------- |
+| **Servidor de Aplicación** | Vite Dev Server (`localhost`)    | Netlify                                          | Hosting estático optimizado        |
+| **Manejo de Estado**       | LocalStorage / Mock Data         | Context API + `useEffect` (Sincronización Cloud) | Lógica de negocio y persistencia   |
+| **Persistencia de Datos**  | Memoria Local / Arrays estáticos | Cloud Firestore (Firebase)                       | Base de datos NoSQL en tiempo real |
+| **Proceso de Compilación** | Código TypeScript Nativo         | JavaScript Minificado (Build de producción)      | Distribución y performance         |
+
+> 🔄 **Nota sobre la persistencia:** Durante la fase inicial de desarrollo se utilizó un catálogo estático (`CATALOGO_PRUEBA`). En producción, los datos migran al ecosistema de Firebase, permitiendo que tanto el catálogo de clientes como el Panel de Administración consuman y actualicen la información mediante consultas dinámicas en tiempo real.
 
 ---
 
@@ -78,17 +80,24 @@ Para mantener un código limpio, modular y mantenible a medida que el sistema cr
 
 ```text
 src/
-├── assets/          # Imágenes de marca, iconos y recursos estáticos
-├── components/      # Componentes reutilizables de la interfaz (UI)
-│   ├── Header.tsx   # Barra de navegación superior
-│   ├── Footer.tsx   # Pie de página con datos de contacto
-│   └── Main.tsx     # Contenedor principal de la aplicación
-├── context/         # Estado global (Carrito de compras y tipo de tarifa)
-├── hooks/           # Funciones lógicas personalizadas (Custom Hooks)
-├── info/            # Catálogo estático de productos (Línea Hogar y Automotor)
-|__ views            # Pantallas principales de la SPA (ej. Home/Catálogo, Vista de Carrito)
-├── App.tsx          # Componente raíz donde se orquestan las secciones
-└── main.tsx         # Punto de entrada de la aplicación para el DOM
+├── assets/           # Imágenes de marca, iconos y recursos estáticos
+├── components/       # Componentes reutilizables de la interfaz (UI)
+│   ├── Header.tsx    # Barra de navegación superior
+│   ├── Footer.tsx    # Pie de página con datos de contacto y acceso admin
+│   └── Main.tsx      # Contenedor principal de la aplicación
+├── context/          # Estado global (Carrito de compras y tipo de tarifa)
+├── firebase/         # Configuración e inicialización del SDK de Google
+│   └── config.ts     # Conexión centralizada a Cloud Firestore
+├── hooks/            # Funciones lógicas personalizadas (Custom Hooks)
+├── info/             # Tipados y catálogos de respaldo
+└── views/            # Pantallas principales de la SPA (Vistas condicionales)
+    ├── Home.tsx      # Catálogo público del cliente
+    ├── CarritoView.tsx
+    ├── NosotrosView.tsx
+    ├── UbicacionView.tsx
+    └── Admin.tsx     # Panel de control de inventario y precios
+├── App.tsx           # Componente raíz donde se orquestan las secciones
+└── main.tsx          # Punto de entrada de la aplicación para el DOM
 ```
 ---
 
@@ -104,23 +113,8 @@ La distribución e infraestructura de bloques semánticos se organiza de la sigu
 
 ---
 
-## 🔗 5. Información de Entrega y Despliegue
 
-A continuación se facilitan los accesos oficiales para la evaluación de la primera entrega del proyecto:
-
-* **Nombre del Repositorio:** `brillo-total-web`
-* **Enlace al Repositorio Remoto:** [Ver Código en GitHub](https://github.com/samelit-spect/brillo-total-web)
-* **Sitio Web en Producción (Despliegue):** [Visitar Plataforma En Vivo](brillo-total.netlify.app)
-
-### Estado Actual del Proyecto
-Se ha consolidado con éxito la estructura base inicial requerida, cumpliendo con el uso estricto de HTML semántico a través de la modularización de sus tres componentes principales:
-1. **Header:** Barra de navegación e identidad del comercio.
-2. **Main:** Contenedor dinámico principal para el futuro catálogo.
-3. **Footer:** Pie de página institucional con datos de contacto.
-
----
-
-## Módulo: Integración de Base de Datos NoSQL en Tiempo Real (Firebase Firestore)
+## 5. Integración de Base de Datos NoSQL en Tiempo Real (Firebase Firestore)
 
 Para garantizar la escalabilidad de la PWA "Brillo Total" y permitir la gestión dinámica de precios y stock por parte del administrador, se migró la arquitectura de datos de un estado estático (Hardcoded) a una solución de base de datos en la nube.
 
@@ -152,7 +146,7 @@ Para poblar la base de datos sin necesidad de cargas manuales, se diseñó un sc
 
 ---
 
-## Guía de Estilos e Identidad Visual (UI)
+## 6. Guía de Estilos e Identidad Visual (UI)
 
 Para garantizar una experiencia de usuario (UX) coherente, profesional y con alta legibilidad, se definió un sistema de diseño basado en una paleta cromática que evoca limpieza, frescura y confianza, alineada al rubro comercial de "Brillo Total".
 
@@ -174,3 +168,33 @@ Se seleccionó una familia tipográfica de tipo **Sans-serif (palo seco)** para 
 *   **Criterios de Aplicación:**
     *   **Títulos y Encabezados (Headings):** Estilos en negrita (`Font-Bold`, pesos 700/800) para capturar la atención inmediata en nombres de productos y secciones del panel.
     *   **Cuerpo de Texto y Precios (Body/Prices):** Pesos regulares y medianos (400/500) que optimizan el escaneo rápido de los importes minoristas y mayoristas.
+* 
+---
+
+##  🎛️ 7. Panel de Administración y Seguridad
+
+El sistema cuenta con un panel privado integrado de forma discreta en el pie de página (`Footer`), permitiendo la gestión total del negocio sin necesidad de alterar el código fuente.
+
+* **Filtro de Seguridad (Llave Maestra):** El acceso al panel está blindado mediante un flujo de autenticación por *Admin Token* local, solicitando una contraseña cifrada del lado del cliente para habilitar las herramientas de edición.
+* **Operaciones CRUD en Tiempo Real:** * **Alta de Productos:** Formulario dinámico para registrar nuevos artículos con especificaciones de precio minorista, mayorista, categoría y presentación.
+  * **Modificación Express:** Tabla de inventario que permite seleccionar cualquier producto existente, autofiltrar el formulario y actualizar sus valores en la base de datos de forma inmediata.
+* 
+
+---
+
+ ## 🔗 8. Información de Entrega y Despliegue
+
+A continuación se facilitan los accesos oficiales para la evaluación de la primera entrega del proyecto:
+
+* **Nombre del Repositorio:** `brillo-total-web`
+* **Enlace al Repositorio Remoto:** [Ver Código en GitHub](https://github.com/samelit-spect/brillo-total-web)
+* **Sitio Web en Producción (Despliegue):** [Visitar Plataforma En Vivo](brillo-total.netlify.app)
+
+### Estado Actual del Proyecto
+La plataforma ha superado la etapa de maquetación estática y se encuentra en una fase **completamente funcional e integrada (Full-Stack Frontend)**, consolidando los siguientes hitos de desarrollo:
+
+1. **Persistencia y Sincronización en la Nube:** Migración exitosa de un catálogo duro (hardcoded) a un consumo dinámico de datos mediante el SDK de Google Firebase Cloud Firestore, logrando actualizaciones de catálogo en tiempo real.
+2. **Entorno Administrativo Seguro (Admin CRUD):** Implementación de un panel de gestión privado con acceso controlado por clave maestra desde el pie de página. El panel permite realizar el alta de nuevos artículos y la modificación en caliente de precios (minorista/mayorista) y especificaciones desde la misma interfaz.
+3. **Arquitectura SPA/PWA Consolidada:** Rutas y renderizado condicional optimizados para una navegación fluida sin recargas de página, empaquetado bajo los estándares de una Progressive Web App para su instalación e interacción ágil en dispositivos móviles.
+
+---
