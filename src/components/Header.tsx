@@ -42,9 +42,10 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
         position: 'relative'
       }}>
 
+        {/* LADO IZQUIERDO: Ahora brilla tu logo gigante con su nombre sin interrupciones */}
         <div
           onClick={() => navegarA('catalogo')}
-          style={{ display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
         >
           {/* 🐕 MÁXIMO TAMAÑO FORZADO: Rompiendo el límite de caja estándar */}
           <div style={{ display: 'flex', alignItems: 'center', height: '48px', width: '70px', justifyContent: 'center' }}>
@@ -66,12 +67,12 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           </h1>
         </div>
 
-        {/* LADO DERECHO: Botón Tutorial + Switch + Carrito (Responsivo) */}
+        {/* LADO DERECHO: Botón Tutorial + Switch + Carrito + MENÚ HAMBURGUESA NUEVO */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',              // Ajustamos el espacio a 10px para ganar margen
-          flexWrap: 'wrap',         // Si no entra en celulares, se acomoda abajo sin desbordar
+          gap: '12px',               // Le damos 12px para que respire mejor con el nuevo botón
+          flexWrap: 'wrap',
           justifyContent: 'flex-end'
         }}>
 
@@ -82,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               backgroundColor: '#2d3748',
               color: '#ffffff',
               border: '1px solid #4a5568',
-              padding: '6px 10px',   // Un toque más compacto
+              padding: '6px 10px',
               borderRadius: '20px',
               cursor: 'pointer',
               fontWeight: 'bold',
@@ -97,7 +98,6 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             <span>📺</span>
             <span style={{ display: 'inline', whiteSpace: 'nowrap' }}>Tutorial</span>
           </button>
-
           {/* Switch Mayorista / Minorista */}
           <div style={{
             display: 'flex',
@@ -131,6 +131,25 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             </span>
           </div>
 
+          {/* ☰ MENÚ HAMBURGUESA: Único, ubicado a la izquierda del Carrito */}
+          <button
+            onClick={() => setMenuAbierto(!menuAbierto)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'white',
+              fontSize: '26px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '5px',
+              userSelect: 'none',
+              marginRight: '2px'
+            }}
+          >
+            {menuAbierto ? '✕' : '☰'}
+          </button>
+
           {/* Botón Carrito */}
           <button
             onClick={() => navegarA(vistaActual === 'carrito' ? 'catalogo' : 'carrito')}
@@ -151,12 +170,19 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           </button>
         </div>
 
-        {/* 🍔 MENÚ HAMBURGUESA DESPLEGABLE */}
+        {/* 🍔 MENÚ HAMBURGUESA DESPLEGABLE REALINEADO A LA DERECHA */}
         {menuAbierto && (
           <div style={{
-            position: 'absolute', top: '55px', left: '-20px', backgroundColor: '#1a202c',
-            width: '260px', boxShadow: '0 8px 16px rgba(0,0,0,0.2)', borderRadius: '0 0 8px 0',
-            padding: '10px 0', zIndex: 200, borderLeft: '4px solid #3182ce'
+            position: 'absolute',
+            top: '55px',
+            right: 0,
+            backgroundColor: '#1a202c',
+            width: '260px',
+            boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
+            borderRadius: '8px 0 8px 8px',
+            padding: '10px 0',
+            zIndex: 200,
+            borderRight: '4px solid #3182ce'
           }}>
             <div onClick={() => navegarA('catalogo')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'catalogo' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'catalogo' ? '#2d3748' : 'transparent' }}>🛍️ Catálogo de Productos</div>
             <div onClick={() => navegarA('carrito')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'carrito' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'carrito' ? '#2d3748' : 'transparent' }}>🛒 Mi Pedido ({obtenerCantidadTotal()})</div>
@@ -201,7 +227,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
 
               {/* Pie del Modal con Instrucciones Rápidas */}
               <div style={{ padding: '15px 20px', backgroundColor: '#f8fafc', fontSize: '13px', color: '#475569', lineHeight: '1.5' }}>
-                💡 <strong>Tip PWA:</strong> Podés instalar esta página como una aplicación en tu celular tocando los tres puntitos del navegador de tu móvil y seleccionando <strong>"Agregar a la pantalla principal"</strong>.
+                💡 <strong>Tip PWA:</strong> Podés instalar esta página como una application en tu celular tocando los tres puntitos del navegador de tu móvil y seleccionando <strong>"Agregar a la pantalla principal"</strong>.
               </div>
             </div>
           </div>
