@@ -61,7 +61,6 @@ export const Admin: React.FC = () => {
         setPrecioMayorista(producto.precioMayorista.toString());
         setCategoria(producto.categoria);
         setPresentacion(producto.presentacion || 'Por Litro');
-
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -115,66 +114,60 @@ export const Admin: React.FC = () => {
     };
 
     return (
-        /* 📱 CONTENEDOR PRINCIPAL: Ahora usa porcentajes dinámicos y box-sizing para no desbordar */
-        <div style={{ maxWidth: '950px', width: '100%', margin: '20px auto', padding: '0 10px', boxSizing: 'border-box' }}>
+        <div style={{ width: '100%', maxWidth: '900px', margin: '0 auto', padding: '15px', boxSizing: 'border-box' }}>
 
-            {/* SECCIÓN 1: FORMULARIO RESPONSIVO */}
-            <div style={{
-                backgroundColor: '#ffffff',
-                padding: '20px 15px', // Reducido para pantallas de celular
-                borderRadius: '8px',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
-                marginBottom: '25px',
-                boxSizing: 'border-box'
-            }}>
-                <h2 style={{ marginTop: 0, fontSize: '20px', color: idEnEdicion ? '#3182ce' : '#2d3748' }}>
+            {/* SECCIÓN 1: FORMULARIO ULTRA-RESPONSIVO (GRID AUTOMÁTICO) */}
+            <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', marginBottom: '25px', boxSizing: 'border-box' }}>
+                <h2 style={{ marginTop: 0, fontSize: '20px', color: idEnEdicion ? '#3182ce' : '#2d3748', marginBottom: '20px' }}>
                     {idEnEdicion ? `✏️ Editando: ${nombre}` : '➕ Alta de Producto'}
                 </h2>
 
                 <form onSubmit={manejarEnvio} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Nombre del Producto *</label>
+                    <div style={{ width: '100%' }}>
+                        <label style={styles.label}>Nombre del Producto *</label>
                         <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} style={styles.input} placeholder="Ej: Jabón Líquido Premium" />
                     </div>
 
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Descripción</label>
-                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} style={{ ...styles.input, minHeight: '60px', resize: 'vertical' }} placeholder="Detalles del producto..." />
+                    <div style={{ width: '100%' }}>
+                        <label style={styles.label}>Descripción</label>
+                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} style={{ ...styles.input, minHeight: '60px' }} placeholder="Detalles del producto..." />
                     </div>
 
-                    <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-                        <div style={{ flex: '1 1 140px' }}>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Precio Minorista ($) *</label>
+                    {/* CSS Grid adaptativo: 1 columna en celus, 2 en pantallas más grandes */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                        gap: '15px',
+                        width: '100%'
+                    }}>
+                        <div>
+                            <label style={styles.label}>Precio Minorista ($) *</label>
                             <input type="number" value={precioMinorista} onChange={e => setPrecioMinorista(e.target.value)} style={styles.input} placeholder="Ej: 1500" />
                         </div>
-                        <div style={{ flex: '1 1 140px' }}>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Precio Mayorista ($) *</label>
+                        <div>
+                            <label style={styles.label}>Precio Mayorista ($) *</label>
                             <input type="number" value={precioMayorista} onChange={e => setPrecioMayorista(e.target.value)} style={styles.input} placeholder="Ej: 1200" />
                         </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-                        <div style={{ flex: '1 1 140px' }}>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Categoría</label>
+                        <div>
+                            <label style={styles.label}>Categoría</label>
                             <select value={categoria} onChange={e => setCategoria(e.target.value)} style={styles.input}>
                                 <option value="hogar">🏡 Línea Hogar</option>
                                 <option value="automotor">🚗 Línea Automotor</option>
                                 <option value="insumos">📦 Insumos</option>
                             </select>
                         </div>
-                        <div style={{ flex: '1 1 140px' }}>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Presentación</label>
+                        <div>
+                            <label style={styles.label}>Presentación</label>
                             <input type="text" value={presentacion} onChange={e => setPresentacion(e.target.value)} style={styles.input} placeholder="Por Litro, Bidón 5L, etc." />
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                        <button type="submit" style={{ flex: 1, backgroundColor: idEnEdicion ? '#3182ce' : '#48bb78', color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
+                        <button type="submit" style={{ flex: '1 1 180px', backgroundColor: idEnEdicion ? '#3182ce' : '#48bb78', color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
                             {idEnEdicion ? '💾 Guardar Cambios' : '🚀 Registrar Producto'}
                         </button>
-
                         {idEnEdicion && (
-                            <button type="button" onClick={cancelarEdicion} style={{ backgroundColor: '#e2e8f0', color: '#4a5568', border: 'none', padding: '12px 15px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>
+                            <button type="button" onClick={cancelarEdicion} style={{ flex: '1 1 100px', backgroundColor: '#e2e8f0', color: '#4a5568', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
                                 Cancelar
                             </button>
                         )}
@@ -182,15 +175,8 @@ export const Admin: React.FC = () => {
                 </form>
             </div>
 
-            {/* SECCIÓN 2: TABLA DE INVENTARIO CONTROLADA */}
-            <div style={{
-                backgroundColor: '#ffffff',
-                padding: '20px 15px', // Reducido para celulares
-                borderRadius: '8px',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
-                maxWidth: '100%', // Evita estirarse más de la pantalla
-                boxSizing: 'border-box'
-            }}>
+            {/* SECCIÓN 2: LISTADO DE INVENTARIO EN TARJETAS PARA CELULAR */}
+            <div>
                 <h3 style={{ marginTop: 0, marginBottom: '15px', fontSize: '18px', color: '#2d3748' }}>📦 Inventario en Tiempo Real</h3>
 
                 {cargando ? (
@@ -202,58 +188,75 @@ export const Admin: React.FC = () => {
                 ) : productos.length === 0 ? (
                     <p style={{ color: '#718096', textAlign: 'center' }}>No hay productos cargados.</p>
                 ) : (
-                    /* 🔥 EL SECRETO REPARADOR: Forzamos ancho máximo e inyectamos scroll controlado horizontal */
-                    <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                        <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', fontSize: '14px' }}>
-                            <thead>
-                                <tr style={{ borderBottom: '2px solid #edf2f7', textAlign: 'left', color: '#4a5568' }}>
-                                    <th style={{ padding: '12px 8px' }}>Producto</th>
-                                    <th style={{ padding: '12px 8px' }}>Precios (Min / May)</th>
-                                    <th style={{ padding: '12px 8px', textAlign: 'center' }}>Stock</th>
-                                    <th style={{ padding: '12px 8px', textAlign: 'right' }}>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {productos.map((prod) => (
-                                    <tr key={prod.id} style={{ borderBottom: '1px solid #edf2f7', backgroundColor: idEnEdicion === prod.id ? '#ebf8ff' : 'transparent' }}>
-                                        <td style={{ padding: '12px 8px', fontWeight: '500', color: '#1a202c' }}>
-                                            {prod.nombre} <span style={{ fontSize: '12px', color: '#718096', display: 'block' }}>({prod.presentacion})</span>
-                                        </td>
-                                        <td style={{ padding: '12px 8px', color: '#2d3748', whiteSpace: 'nowrap' }}>
-                                            <span style={{ fontWeight: 'bold', color: '#2b6cb0' }}>${prod.precioMinorista}</span> /
-                                            <span style={{ color: '#38a169', marginLeft: '4px' }}>${prod.precioMayorista}</span>
-                                        </td>
-                                        <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-                                            <button
-                                                onClick={() => conmutarStock(prod.id, prod.stock)}
-                                                style={{
-                                                    backgroundColor: prod.stock ? '#e6fffa' : '#fff5f5',
-                                                    color: prod.stock ? '#319795' : '#e53e3e',
-                                                    border: `1px solid ${prod.stock ? '#b2f5ea' : '#fed7d7'}`,
-                                                    padding: '4px 10px',
-                                                    borderRadius: '20px',
-                                                    fontSize: '12px',
-                                                    fontWeight: 'bold',
-                                                    cursor: 'pointer',
-                                                    whiteSpace: 'nowrap',
-                                                    transition: 'all 0.2s'
-                                                }}
-                                            >
-                                                {prod.stock ? '🟢 Disp.' : '🔴 Sin Stk'}
-                                            </button>
-                                        </td>
-                                        <td style={{ padding: '12px 8px', textAlign: 'right' }}>
-                                            <button
-                                                onClick={() => activarEdicion(prod)}
-                                                style={{ backgroundColor: '#edf2f7', color: '#2b6cb0', border: 'none', padding: '6px 12px', borderRadius: '4px', fontWeight: '500', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                                            >
-                                                ✏️ Editar
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    /* Contenedor Flex que acumula tarjetas ordenadas verticales */
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+                        {productos.map((prod) => (
+                            <div
+                                key={prod.id}
+                                style={{
+                                    backgroundColor: idEnEdicion === prod.id ? '#ebf8ff' : '#ffffff',
+                                    padding: '15px',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
+                                    border: idEnEdicion === prod.id ? '1px solid #90cdf4' : '1px solid #edf2f7',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '8px',
+                                    boxSizing: 'border-box',
+                                    width: '100%'
+                                }}
+                            >
+                                {/* Fila superior: Nombre y Presentación */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '5px' }}>
+                                    <span style={{ fontWeight: 'bold', color: '#1a202c', fontSize: '15px' }}>{prod.nombre}</span>
+                                    <span style={{ fontSize: '12px', color: '#718096', backgroundColor: '#edf2f7', padding: '2px 8px', borderRadius: '4px' }}>
+                                        {prod.presentacion || 'Por Litro'}
+                                    </span>
+                                </div>
+
+                                {/* Fila media: Precios */}
+                                <div style={{ fontSize: '13px', color: '#4a5568', padding: '4px 0' }}>
+                                    <span>Min: <strong style={{ color: '#2b6cb0' }}>${prod.precioMinorista}</strong></span>
+                                    <span style={{ margin: '0 10px', color: '#cbd5e0' }}>|</span>
+                                    <span>May: <strong style={{ color: '#38a169' }}>${prod.precioMayorista}</strong></span>
+                                </div>
+
+                                {/* Fila inferior: Acciones de Stock y Edición (Hacen wrap si no entran) */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '5px', flexWrap: 'wrap', gap: '10px' }}>
+                                    <button
+                                        onClick={() => conmutarStock(prod.id, prod.stock)}
+                                        style={{
+                                            backgroundColor: prod.stock ? '#e6fffa' : '#fff5f5',
+                                            color: prod.stock ? '#319795' : '#e53e3e',
+                                            border: `1px solid ${prod.stock ? '#b2f5ea' : '#fed7d7'}`,
+                                            padding: '6px 12px',
+                                            borderRadius: '20px',
+                                            fontSize: '12px',
+                                            fontWeight: 'bold',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        {prod.stock ? '🟢 Disponible' : '🔴 Sin Stock'}
+                                    </button>
+
+                                    <button
+                                        onClick={() => activarEdicion(prod)}
+                                        style={{
+                                            backgroundColor: '#edf2f7',
+                                            color: '#2b6cb0',
+                                            border: 'none',
+                                            padding: '6px 16px',
+                                            borderRadius: '6px',
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        ✏️ Editar
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>
@@ -263,10 +266,17 @@ export const Admin: React.FC = () => {
 };
 
 const styles = {
+    label: {
+        display: 'block',
+        marginBottom: '5px',
+        fontWeight: 'bold' as const,
+        fontSize: '14px',
+        color: '#4a5568'
+    },
     input: {
         width: '100%',
-        padding: '10px',
-        borderRadius: '4px',
+        padding: '11px',
+        borderRadius: '6px',
         border: '1px solid #cbd5e0',
         backgroundColor: '#ffffff',
         color: '#1a202c',
