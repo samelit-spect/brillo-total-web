@@ -118,7 +118,7 @@ export const Home: React.FC = () => {
           </p>
         </div>
 
-        {/* El Salchicha de Brillo Total */}
+        {/* 🐕 El Verdadero Perro Salchicha de Brillo Total */}
         <div style={{
           fontSize: '75px',
           display: 'flex',
@@ -132,7 +132,7 @@ export const Home: React.FC = () => {
           boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)',
           margin: '0 auto'
         }}>
-          🌭
+          🐕
         </div>
       </div>
 
