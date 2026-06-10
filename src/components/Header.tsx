@@ -42,28 +42,25 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
         position: 'relative'
       }}>
 
-        {/* LADO IZQUIERDO: Botón Hamburguesa + Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <button
-            onClick={() => setMenuAbierto(!menuAbierto)}
+        <div
+          onClick={() => navegarA('catalogo')}
+          style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+        >
+          {/* 🐕 MÁXIMO TAMAÑO SEGURO PARA EL PERRITO */}
+          <img
+            src="/perro-header-transparente.png"
+            alt="Mascota Oficial Brillo Total"
             style={{
-              background: 'none', border: 'none', color: 'white',
-              fontSize: '24px', cursor: 'pointer', display: 'flex',
-              alignItems: 'center', padding: '5px', userSelect: 'none'
+              height: '45px',       // Subimos al máximo el tamaño vertical
+              width: 'auto',        // Sigue manteniendo la proporción horizontal del salchicha
+              objectFit: 'contain',
+              display: 'block'
             }}
-          >
-            {menuAbierto ? '✕' : '☰'}
-          </button>
+          />
 
-          <div
-            onClick={() => navegarA('catalogo')}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
-          >
-            <span style={{ fontSize: '24px' }}>✨🪣</span>
-            <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', letterSpacing: '0.5px' }}>
-              Brillo Total
-            </h1>
-          </div>
+          <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', letterSpacing: '0.5px' }}>
+            Brillo Total
+          </h1>
         </div>
 
         {/* LADO DERECHO: Botón Tutorial + Switch + Carrito (Responsivo) */}
