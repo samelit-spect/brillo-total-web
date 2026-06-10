@@ -44,19 +44,22 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
 
         <div
           onClick={() => navegarA('catalogo')}
-          style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer' }}
         >
-          {/* 🐕 MÁXIMO TAMAÑO SEGURO PARA EL PERRITO */}
-          <img
-            src="/perro-header-transparente.png"
-            alt="Mascota Oficial Brillo Total"
-            style={{
-              height: '45px',       // Subimos al máximo el tamaño vertical
-              width: 'auto',        // Sigue manteniendo la proporción horizontal del salchicha
-              objectFit: 'contain',
-              display: 'block'
-            }}
-          />
+          {/* 🐕 MÁXIMO TAMAÑO FORZADO: Rompiendo el límite de caja estándar */}
+          <div style={{ display: 'flex', alignItems: 'center', height: '48px', width: '70px', justifyContent: 'center' }}>
+            <img
+              src="/perro-header-transparente.png"
+              alt="Mascota Oficial Brillo Total"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                transform: 'scale(1.5)', /* 🔥 Agranda el dibujo un 50% más allá de su contenedor sin empujar el Header hacia abajo */
+                transformOrigin: 'center'
+              }}
+            />
+          </div>
 
           <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', letterSpacing: '0.5px' }}>
             Brillo Total
