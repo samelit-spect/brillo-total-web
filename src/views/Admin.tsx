@@ -42,13 +42,10 @@ export const Admin: React.FC = () => {
         obtenerProductos();
     }, []);
 
-    // Alternar el estado de stock rápidamente desde la tabla
     const conmutarStock = async (id: string, stockActual: boolean) => {
         try {
             const productoRef = doc(db, "productos", id);
             await updateDoc(productoRef, { stock: !stockActual });
-
-            // Actualizamos el estado local rápido para que se vea el cambio al toque
             setProductos(prev => prev.map(p => p.id === id ? { ...p, stock: !stockActual } : p));
         } catch (error) {
             console.error("Error al cambiar stock: ", error);
@@ -103,7 +100,7 @@ export const Admin: React.FC = () => {
             } else {
                 await addDoc(collection(db, "productos"), {
                     ...datosProducto,
-                    stock: true, // Disponible por defecto al crearse
+                    stock: true,
                     imagenUrl: 'https://via.placeholder.com/180'
                 });
                 alert("✅ ¡Producto creado con éxito!");
@@ -118,58 +115,66 @@ export const Admin: React.FC = () => {
     };
 
     return (
-        <div style={{ maxWidth: '950px', margin: '40px auto', padding: '0 20px' }}>
+        /* 📱 CONTENEDOR PRINCIPAL: Ahora usa porcentajes dinámicos y box-sizing para no desbordar */
+        <div style={{ maxWidth: '950px', width: '100%', margin: '20px auto', padding: '0 10px', boxSizing: 'border-box' }}>
 
-            {/* SECCIÓN 1: FORMULARIO */}
-            <div style={{ backgroundColor: '#ffffff', padding: '30px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '40px' }}>
-                <h2 style={{ marginTop: 0, color: idEnEdicion ? '#3182ce' : '#2d3748' }}>
-                    {idEnEdicion ? `✏️ Editando: ${nombre}` : '➕ Dar de Alta Nuevo Producto'}
+            {/* SECCIÓN 1: FORMULARIO RESPONSIVO */}
+            <div style={{
+                backgroundColor: '#ffffff',
+                padding: '20px 15px', // Reducido para pantallas de celular
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+                marginBottom: '25px',
+                boxSizing: 'border-box'
+            }}>
+                <h2 style={{ marginTop: 0, fontSize: '20px', color: idEnEdicion ? '#3182ce' : '#2d3748' }}>
+                    {idEnEdicion ? `✏️ Editando: ${nombre}` : '➕ Alta de Producto'}
                 </h2>
 
                 <form onSubmit={manejarEnvio} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Nombre del Producto *</label>
+                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Nombre del Producto *</label>
                         <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} style={styles.input} placeholder="Ej: Jabón Líquido Premium" />
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Descripción</label>
-                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} style={styles.input} placeholder="Detalles del producto..." />
+                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Descripción</label>
+                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} style={{ ...styles.input, minHeight: '60px', resize: 'vertical' }} placeholder="Detalles del producto..." />
                     </div>
 
-                    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                        <div style={{ flex: 1, minWidth: '140px' }}>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Precio Minorista ($) *</label>
+                    <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                        <div style={{ flex: '1 1 140px' }}>
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Precio Minorista ($) *</label>
                             <input type="number" value={precioMinorista} onChange={e => setPrecioMinorista(e.target.value)} style={styles.input} placeholder="Ej: 1500" />
                         </div>
-                        <div style={{ flex: 1, minWidth: '140px' }}>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Precio Mayorista ($) *</label>
+                        <div style={{ flex: '1 1 140px' }}>
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Precio Mayorista ($) *</label>
                             <input type="number" value={precioMayorista} onChange={e => setPrecioMayorista(e.target.value)} style={styles.input} placeholder="Ej: 1200" />
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                        <div style={{ flex: 1, minWidth: '140px' }}>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Categoría</label>
+                    <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                        <div style={{ flex: '1 1 140px' }}>
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Categoría</label>
                             <select value={categoria} onChange={e => setCategoria(e.target.value)} style={styles.input}>
                                 <option value="hogar">🏡 Línea Hogar</option>
                                 <option value="automotor">🚗 Línea Automotor</option>
                                 <option value="insumos">📦 Insumos</option>
                             </select>
                         </div>
-                        <div style={{ flex: 1, minWidth: '140px' }}>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Presentación</label>
+                        <div style={{ flex: '1 1 140px' }}>
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: '#4a5568' }}>Presentación</label>
                             <input type="text" value={presentacion} onChange={e => setPresentacion(e.target.value)} style={styles.input} placeholder="Por Litro, Bidón 5L, etc." />
                         </div>
                     </div>
 
                     <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                        <button type="submit" style={{ flex: 1, backgroundColor: idEnEdicion ? '#3182ce' : '#48bb78', color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                        <button type="submit" style={{ flex: 1, backgroundColor: idEnEdicion ? '#3182ce' : '#48bb78', color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>
                             {idEnEdicion ? '💾 Guardar Cambios' : '🚀 Registrar Producto'}
                         </button>
 
                         {idEnEdicion && (
-                            <button type="button" onClick={cancelarEdicion} style={{ backgroundColor: '#e2e8f0', color: '#4a5568', border: 'none', padding: '12px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                            <button type="button" onClick={cancelarEdicion} style={{ backgroundColor: '#e2e8f0', color: '#4a5568', border: 'none', padding: '12px 15px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>
                                 Cancelar
                             </button>
                         )}
@@ -177,9 +182,16 @@ export const Admin: React.FC = () => {
                 </form>
             </div>
 
-            {/* SECCIÓN 2: TABLA DE INVENTARIO */}
-            <div style={{ backgroundColor: '#ffffff', padding: '30px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-                <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#2d3748' }}>📦 Inventario en Tiempo Real</h3>
+            {/* SECCIÓN 2: TABLA DE INVENTARIO CONTROLADA */}
+            <div style={{
+                backgroundColor: '#ffffff',
+                padding: '20px 15px', // Reducido para celulares
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+                maxWidth: '100%', // Evita estirarse más de la pantalla
+                boxSizing: 'border-box'
+            }}>
+                <h3 style={{ marginTop: 0, marginBottom: '15px', fontSize: '18px', color: '#2d3748' }}>📦 Inventario en Tiempo Real</h3>
 
                 {cargando ? (
                     <p style={{ color: '#718096', textAlign: 'center' }}>Sincronizando con Firestore...</p>
@@ -190,8 +202,9 @@ export const Admin: React.FC = () => {
                 ) : productos.length === 0 ? (
                     <p style={{ color: '#718096', textAlign: 'center' }}>No hay productos cargados.</p>
                 ) : (
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                    /* 🔥 EL SECRETO REPARADOR: Forzamos ancho máximo e inyectamos scroll controlado horizontal */
+                    <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                        <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', fontSize: '14px' }}>
                             <thead>
                                 <tr style={{ borderBottom: '2px solid #edf2f7', textAlign: 'left', color: '#4a5568' }}>
                                     <th style={{ padding: '12px 8px' }}>Producto</th>
@@ -206,11 +219,10 @@ export const Admin: React.FC = () => {
                                         <td style={{ padding: '12px 8px', fontWeight: '500', color: '#1a202c' }}>
                                             {prod.nombre} <span style={{ fontSize: '12px', color: '#718096', display: 'block' }}>({prod.presentacion})</span>
                                         </td>
-                                        <td style={{ padding: '12px 8px', color: '#2d3748' }}>
+                                        <td style={{ padding: '12px 8px', color: '#2d3748', whiteSpace: 'nowrap' }}>
                                             <span style={{ fontWeight: 'bold', color: '#2b6cb0' }}>${prod.precioMinorista}</span> /
                                             <span style={{ color: '#38a169', marginLeft: '4px' }}>${prod.precioMayorista}</span>
                                         </td>
-                                        {/* BOTÓN RÁPIDO DE CONFIGURACIÓN DE STOCK */}
                                         <td style={{ padding: '12px 8px', textAlign: 'center' }}>
                                             <button
                                                 onClick={() => conmutarStock(prod.id, prod.stock)}
@@ -223,16 +235,17 @@ export const Admin: React.FC = () => {
                                                     fontSize: '12px',
                                                     fontWeight: 'bold',
                                                     cursor: 'pointer',
+                                                    whiteSpace: 'nowrap',
                                                     transition: 'all 0.2s'
                                                 }}
                                             >
-                                                {prod.stock ? '🟢 Disponible' : '🔴 Sin Stock'}
+                                                {prod.stock ? '🟢 Disp.' : '🔴 Sin Stk'}
                                             </button>
                                         </td>
                                         <td style={{ padding: '12px 8px', textAlign: 'right' }}>
                                             <button
                                                 onClick={() => activarEdicion(prod)}
-                                                style={{ backgroundColor: '#edf2f7', color: '#2b6cb0', border: 'none', padding: '6px 12px', borderRadius: '4px', fontWeight: '500', cursor: 'pointer' }}
+                                                style={{ backgroundColor: '#edf2f7', color: '#2b6cb0', border: 'none', padding: '6px 12px', borderRadius: '4px', fontWeight: '500', cursor: 'pointer', whiteSpace: 'nowrap' }}
                                             >
                                                 ✏️ Editar
                                             </button>
