@@ -52,8 +52,26 @@ La implementación de esta web centralizada busca resolver las problemáticas de
 3. **Diferenciación de Canales comerciales:** Proveer una experiencia de usuario adaptada que permita tanto a los compradores del hogar (minoristas) como a los revendedores de la región (mayoristas) operar con las tarifas y escalas correspondientes.
 
 ---
+## 📝 3. Requerimientos del Sistema (SRS)
 
-## ⚙️ 3. Análisis Arquitectónico: SPA y PWA
+Para dar respuesta formal al alcance del proyecto solicitado por la cátedra, se detallan los requerimientos de software implementados en la plataforma:
+
+### A. Requerimientos Funcionales (RF)
+* **RF-01 (Gestión de Catálogo Público):** El sistema debe permitir a cualquier usuario visualizar la lista completa de productos disponibles filtrados de manera interactiva por categorías (*Línea Hogar*, *Línea Automotor*, *Insumos*).
+* **RF-02 (Persistencia Dinámica):** La visualización del stock y los precios minoristas/mayoristas debe sincronizarse de manera asíncrona directamente desde la base de datos distribuida en la nube.
+* **RF-03 (Módulo de Carrito de Compras):** El sistema debe permitir al usuario agregar, restar y eliminar unidades de productos por litro o presentación, calculando el subtotal instantáneamente.
+* **RF-04 (Pasarela de Despacho por WhatsApp):** El sistema debe procesar el estado del carrito, formatear un mensaje de texto plano con el desglose del pedido e interactuar con la API de WhatsApp para derivar la orden al operador comercial.
+* **RF-05 (Panel Administrativo CRUD):** El sistema debe proveer una interfaz privada para realizar altas de nuevos productos y modificaciones de los atributos de precio, presentación y estado de stock en caliente.
+* **RF-06 (Control de Acceso Básico):** La vista de administración debe estar protegida mediante un filtro por token de acceso del lado del cliente (Clave Maestra).
+
+### B. Requerimientos No Funcionales (RNF)
+* **RNF-01 (Responsividad Móvil):** La interfaz completa (interfaz pública y panel administrativo) debe ser 100% responsiva (Mobile-First), adaptando sus formularios y grillas mediante layouts flexibles o componentes de tarjetas independientes para evitar scrolls laterales defectuosos en smartphones.
+* **RNF-02 (Arquitectura PWA):** El sistema debe ser instalable en sistemas operativos Android e iOS mediante un archivo de manifiesto web y operar de forma fluida bajo redes móviles inestables gracias al almacenamiento en caché.
+* **RNF-03 (Velocidad de Respuesta):** El tiempo de renderizado de la interfaz ante el cambio de rutas o filtros debe ser inferior a 150ms gracias al motor de Single Page Application (SPA).
+* **RNF-04 (Mantenibilidad y Robustez):** El código debe estructurarse mediante componentes modulares fuertemente tipados utilizando TypeScript para minimizar fallos en tiempo de ejecución.
+---
+
+## ⚙️ 4. Análisis Arquitectónico: SPA y PWA
 
 Para garantizar el rendimiento, la fluidez y la usabilidad de la plataforma en dispositivos móviles, el sistema se apoya en dos pilares tecnológicos:
 
@@ -70,7 +88,7 @@ Para garantizar el rendimiento, la fluidez y la usabilidad de la plataforma en d
 
 ---
 
-## 📦 4. Entorno, Frameworks y Estructura del Proyecto
+## 📦 5. Entorno, Frameworks y Estructura del Proyecto
 
 ### Inicialización del Entorno
 La base de la plataforma se construyó utilizando **React** junto con **TypeScript** sobre el motor de construcción **Vite**. Esta combinación garantiza un tipado estático seguro para evitar errores en el manejo del catálogo y una velocidad de refresco instantánea durante el desarrollo local.
@@ -91,11 +109,11 @@ src/
 ├── hooks/            # Funciones lógicas personalizadas (Custom Hooks)
 ├── info/             # Tipados y catálogos de respaldo
 └── views/            # Pantallas principales de la SPA (Vistas condicionales)
-    ├── Home.tsx      # Catálogo público del cliente
+    ├── Home.tsx      # Catálogo público del cliente (Con Banner del Perro Salchicha 🐕)
     ├── CarritoView.tsx
     ├── NosotrosView.tsx
     ├── UbicacionView.tsx
-    └── Admin.tsx     # Panel de control de inventario y precios
+    └── Admin.tsx     # Panel de control CRUD de inventario responsivo por tarjetas
 ├── App.tsx           # Componente raíz donde se orquestan las secciones
 └── main.tsx          # Punto de entrada de la aplicación para el DOM
 ```
@@ -114,7 +132,7 @@ La distribución e infraestructura de bloques semánticos se organiza de la sigu
 ---
 
 
-## 5. Integración de Base de Datos NoSQL en Tiempo Real (Firebase Firestore)
+## 6. Integración de Base de Datos NoSQL en Tiempo Real (Firebase Firestore)
 
 Para garantizar la escalabilidad de la PWA "Brillo Total" y permitir la gestión dinámica de precios y stock por parte del administrador, se migró la arquitectura de datos de un estado estático (Hardcoded) a una solución de base de datos en la nube.
 
@@ -146,7 +164,7 @@ Para poblar la base de datos sin necesidad de cargas manuales, se diseñó un sc
 
 ---
 
-## 6. Guía de Estilos e Identidad Visual (UI)
+## 7. Guía de Estilos e Identidad Visual (UI)
 
 Para garantizar una experiencia de usuario (UX) coherente, profesional y con alta legibilidad, se definió un sistema de diseño basado en una paleta cromática que evoca limpieza, frescura y confianza, alineada al rubro comercial de "Brillo Total".
 
@@ -171,7 +189,7 @@ Se seleccionó una familia tipográfica de tipo **Sans-serif (palo seco)** para 
 * 
 ---
 
-##  🎛️ 7. Panel de Administración y Seguridad
+##  🎛️ 8. Panel de Administración y Seguridad
 
 El sistema cuenta con un panel privado integrado de forma discreta en el pie de página (`Footer`), permitiendo la gestión total del negocio sin necesidad de alterar el código fuente.
 
@@ -182,7 +200,7 @@ El sistema cuenta con un panel privado integrado de forma discreta en el pie de 
 
 ---
 
- ## 🔗 8. Información de Entrega y Despliegue
+ ## 🔗 9. Información de Entrega y Despliegue
 
 A continuación se facilitan los accesos oficiales para la evaluación de la primera entrega del proyecto:
 
@@ -201,7 +219,7 @@ La plataforma ha superado la etapa de maquetación estática y se encuentra en u
 
 ---
 
-## 🚀 9. Plan de Escalabilidad y Trabajo Futuro
+## 🚀 10. Plan de Escalabilidad y Trabajo Futuro
 
 Como toda plataforma tecnológica en constante evolución, el sistema de **Brillo Total** está diseñado bajo una arquitectura modular que permitirá expandir sus capacidades en futuras fases de desarrollo:
 
@@ -212,6 +230,6 @@ Como toda plataforma tecnológica en constante evolución, el sistema de **Brill
 
 ---
 
-## 📷 10. Vista Previa de la Interfaz (Screenshots)
+## 📷 11. Vista Previa de la Interfaz (Screenshots)
 
 *Próximamente se anexarán capturas de pantalla de la interfaz pública responsiva y del Panel de Control de Inventario.*
