@@ -1,235 +1,148 @@
 # 🧼 Plataforma Digital Centralizada - Brillo Total La Rioja
 
-Solución técnico-digital integral para la gestión, visualización y automatización de pedidos del emprendimiento **Brillo Total**, optimizada para el comercio minorista y canales de distribución mayorista.
+Solución técnico-digital integral para la gestión, visualización y automatización de pedidos del emprendimiento **Brillo Total**, optimizada para el comercio minorista y canales de distribución mayorista en La Rioja Capital.
 
 ---
 
-## 📖 1. Guía de Configuración y Despliegue del Entorno
+## 📖 1. Guía de Configuración y Ejecución Local
 
-Estructura de comandos esenciales para inicializar, instalar dependencias y ejecutar el proyecto en un entorno de desarrollo local.
+Estructura de comandos esenciales para clonar, instalar dependencias y ejecutar el entorno de desarrollo de la aplicación.
 
 ### Comandos de Consola
 
 ```bash
-# Inicialización del proyecto con Vite y la arquitectura React + TypeScript
-npm create vite@latest brillo-total-web -- --template react-ts
+# 1. Clonar el repositorio (Asegúrate de colocar tu enlace correcto)
+git clone [https://github.com/tu-usuario/brillo-total-web.git](https://github.com/tu-usuario/brillo-total-web.git)
 
-# Instalación de los paquetes y dependencias base
+# 2. Ingresar al directorio del proyecto
+cd brillo-total-web
+
+# 3. Instalación de los paquetes y dependencias base
 npm install
 
-# Ejecución del servidor de desarrollo local
+# 4. Ejecución del servidor de desarrollo local (Vite)
 npm run dev
 ```
 ---
 
-### Arquitectura de Componentes según el Entorno
-
-A continuación se detalla cómo se distribuyen y operan los componentes del software entre la etapa de desarrollo y el despliegue final en producción, integrando los servicios en la nube de Google Firebase:
-
-| Componente Técnico         | Entorno de Desarrollo Local      | Entorno de Producción                            | Tipo de Recurso                    |
-| :------------------------- | :------------------------------- | :----------------------------------------------- | :--------------------------------- |
-| **Servidor de Aplicación** | Vite Dev Server (`localhost`)    | Netlify                                          | Hosting estático optimizado        |
-| **Manejo de Estado**       | LocalStorage / Mock Data         | Context API + `useEffect` (Sincronización Cloud) | Lógica de negocio y persistencia   |
-| **Persistencia de Datos**  | Memoria Local / Arrays estáticos | Cloud Firestore (Firebase)                       | Base de datos NoSQL en tiempo real |
-| **Proceso de Compilación** | Código TypeScript Nativo         | JavaScript Minificado (Build de producción)      | Distribución y performance         |
-
-> 🔄 **Nota sobre la persistencia:** Durante la fase inicial de desarrollo se utilizó un catálogo estático (`CATALOGO_PRUEBA`). En producción, los datos migran al ecosistema de Firebase, permitiendo que tanto el catálogo de clientes como el Panel de Administración consuman y actualicen la información mediante consultas dinámicas en tiempo real.
-
----
-
-## 🏪 2. Descripción del Comercio y Objetivos del Proyecto
+## 🏪 2. Descripción del Comercio y Contexto
 
 ### Datos del Emprendimiento
 * **Nombre Comercial:** Brillo Total
 * **Ubicación:** La Rioja Capital, Provincia de La Rioja, Argentina.
 * **Rubro:** Comercialización, fraccionamiento y distribución de productos de limpieza sueltos y envasados.
 
-### Objetivos Operativos de la Plataforma
-La implementación de esta web centralizada busca resolver las problemáticas de comunicación, stock y logística del negocio a través de tres metas principales:
-
-1. **Centralización del Catálogo:** Ofrecer un espacio digital único donde los clientes visualicen el stock disponible, variantes de fragancias y precios actualizados en tiempo real.
-2. **Automatización de la Preventa (Enlace a WhatsApp):** Optimizar la toma de pedidos permitiendo que el usuario arme su carrito de compras de manera interactiva. Al finalizar, el sistema genera un mensaje estructurado listo para enviar al WhatsApp del negocio, acelerando el tiempo de preparación del pedido.
-3. **Diferenciación de Canales comerciales:** Proveer una experiencia de usuario adaptada que permita tanto a los compradores del hogar (minoristas) como a los revendedores de la región (mayoristas) operar con las tarifas y escalas correspondientes.
+### Propósito del Proyecto
+La plataforma web centraliza el catálogo de productos de limpieza, automatiza el proceso de preventa mediante el despacho estructurado de pedidos hacia la API de WhatsApp y establece una clara diferenciación operativa entre los canales comerciales minorista (consumo del hogar) y mayorista (revendedores regionales).
 
 ---
-## 📝 3. Requerimientos del Sistema (SRS)
+## 📂 3. Centro de Documentación Centralizado (`/docs`)
 
-Para dar respuesta formal al alcance del proyecto solicitado por la cátedra, se detallan los requerimientos de software implementados en la plataforma:
+Toda la especificación formal de requerimientos, decisiones de ingeniería y el análisis de arquitectura exigidos por la cátedra para la **Etapa 2** han sido organizados en módulos independientes. Puede acceder a ellos a través de los siguientes enlaces internos:
 
-### A. Requerimientos Funcionales (RF)
-* **RF-01 (Gestión de Catálogo Público):** El sistema debe permitir a cualquier usuario visualizar la lista completa de productos disponibles filtrados de manera interactiva por categorías (*Línea Hogar*, *Línea Automotor*, *Insumos*).
-* **RF-02 (Persistencia Dinámica):** La visualización del stock y los precios minoristas/mayoristas debe sincronizarse de manera asíncrona directamente desde la base de datos distribuida en la nube.
-* **RF-03 (Módulo de Carrito de Compras):** El sistema debe permitir al usuario agregar, restar y eliminar unidades de productos por litro o presentación, calculando el subtotal instantáneamente.
-* **RF-04 (Pasarela de Despacho por WhatsApp):** El sistema debe procesar el estado del carrito, formatear un mensaje de texto plano con el desglose del pedido e interactuar con la API de WhatsApp para derivar la orden al operador comercial.
-* **RF-05 (Panel Administrativo CRUD):** El sistema debe proveer una interfaz privada para realizar altas de nuevos productos y modificaciones de los atributos de precio, presentación y estado de stock en caliente.
-* **RF-06 (Control de Acceso Básico):** La vista de administración debe estar protegida mediante un filtro por token de acceso del lado del cliente (Clave Maestra).
-
-### B. Requerimientos No Funcionales (RNF)
-* **RNF-01 (Responsividad Móvil):** La interfaz completa (interfaz pública y panel administrativo) debe ser 100% responsiva (Mobile-First), adaptando sus formularios y grillas mediante layouts flexibles o componentes de tarjetas independientes para evitar scrolls laterales defectuosos en smartphones.
-* **RNF-02 (Arquitectura PWA):** El sistema debe ser instalable en sistemas operativos Android e iOS mediante un archivo de manifiesto web y operar de forma fluida bajo redes móviles inestables gracias al almacenamiento en caché.
-* **RNF-03 (Velocidad de Respuesta):** El tiempo de renderizado de la interfaz ante el cambio de rutas o filtros debe ser inferior a 150ms gracias al motor de Single Page Application (SPA).
-* **RNF-04 (Mantenibilidad y Robustez):** El código debe estructurarse mediante componentes modulares fuertemente tipados utilizando TypeScript para minimizar fallos en tiempo de ejecución.
----
-
-## ⚙️ 4. Análisis Arquitectónico: SPA y PWA
-
-Para garantizar el rendimiento, la fluidez y la usabilidad de la plataforma en dispositivos móviles, el sistema se apoya en dos pilares tecnológicos:
-
-### A. SPA (Single Page Application)
-* **Fundamento Técnico:** A diferencia de los sitios web tradicionales multipágina que solicitan un archivo HTML completo al servidor ante cada navegación, una SPA descarga una única estructura inicial. El motor de React intercepta las interacciones del usuario y redibuja dinámicamente solo las secciones de la pantalla que cambiaron, sin recargar el navegador.
-* **Justificación:** El catálogo de productos requiere agilidad inmediata. Al interactuar con filtros de categorías (ej. *Línea Automotor*, *Suavizantes*) o modificar cantidades en el carrito, la interfaz responde al instante sin parpadeos ni tiempos muertos de carga, emulando la experiencia de una app nativa.
-
-### B. PWA (Progressive Web App)
-* **Fundamento Técnico:** Permite que una aplicación web aproveche capacidades nativas del dispositivo mediante el uso de un archivo de manifiesto (`manifest.json`) para la identidad visual y *Service Workers* que corren en segundo plano gestionando la caché y las peticiones de red.
-* **Justificación:** Esta tecnología responde de forma directa a las necesidades de conectividad del entorno:
-    1. **Instalación Directa:** Los clientes y revendedores frecuentes pueden añadir un acceso directo con el icono de *Brillo Total* en su pantalla de inicio directamente desde el navegador, sin necesidad de descargar ejecutables pesados desde tiendas de aplicaciones.
-    2. **Persistencia en Conexiones Lentas:** Al almacenar la estructura base de la web y los datos esenciales en la caché local del dispositivo, el catálogo se despliega de forma instantánea incluso si el usuario se encuentra en la vía pública con datos móviles inestables o de baja velocidad.
-    3. **Eficiencia de Mantenimiento:** Mantiene un único código fuente basado en tecnologías web estándar que funciona nativamente en Android, iOS y computadoras de escritorio.
+| Módulo Documental                   | Enlace Directo                                  | Contenido e Indicadores Evaluados                                                     |
+| :---------------------------------- | :---------------------------------------------- | :------------------------------------------------------------------------------------ |
+| **01. Planificación y Alcance**     | [Ver Documento](./docs/01-planificacion.md)     | Ciclo de vida del MVP, Roadmap y **Matriz Completa de Requerimientos (RF y RNF)**.    |
+| **02. Arquitectura de Información** | [Ver Documento](./docs/02-arquitectura-info.md) | Mapa del Sitio (Sitemap jerárquico) y Diagrama de Flujo (*User Flow*) en Mermaid.     |
+| **03. Maquetado e Interfaz**        | [Ver Documento](./docs/03-wireframes.md)        | Distribución de componentes y Wireframes de baja fidelidad (*Mobile-First*).          |
+| **04. Especificación del Stack**    | [Ver Documento](./docs/04-stack-tecnologico.md) | Justificación técnica del ecosistema, concurrencia asíncrona y esquema JSON base.     |
+| **05. Escalabilidad y Contexto**    | [Ver Documento](./docs/05-escalabilidad.md)     | Análisis técnico ante picos de tráfico (RPS), enfoque del Teorema CAP (AP) y Caching. |
+| **06. Historial de Cambios**        | [Ver Documento](./docs/06-changelog.md)         | Registro de versiones (*Keep a Changelog*) y evolución de commits significativos.     |
 
 ---
 
-## 📦 5. Entorno, Frameworks y Estructura del Proyecto
+## ⚙️ 4. Características Tecnológicas Destacadas
 
-### Inicialización del Entorno
-La base de la plataforma se construyó utilizando **React** junto con **TypeScript** sobre el motor de construcción **Vite**. Esta combinación garantiza un tipado estático seguro para evitar errores en el manejo del catálogo y una velocidad de refresco instantánea durante el desarrollo local.
+La plataforma ha sido diseñada combinando los patrones arquitectónicos de una **Single Page Application (SPA)** y las capacidades móviles de una **Progressive Web App (PWA)**, garantizando las siguientes ventajas operativas:
 
-### Componentización: Arquitectura de Carpetas
-Para mantener un código limpio, modular y mantenible a medida que el sistema crezca (canales mayoristas, manejo de stock), se definió la siguiente estructura organizativa dentro del directorio `src/`:
+*   **Navegación Fluida (SPA):** Renderizado dinámico de componentes y filtros en tiempo real sin recargas de página, emulando la experiencia de usuario de una aplicación nativa.
+*   **Instalación Directa (PWA):** Acceso directo directo en la pantalla de inicio del dispositivo móvil mediante configuración de `manifest.json`, omitiendo la descarga en tiendas de aplicaciones.
+*   **Resiliencia de Red:** Arquitectura preparada para el almacenamiento en caché de activos estáticos, reduciendo el consumo de datos móviles y permitiendo la consulta del catálogo bajo conexiones inestables.
+
+---
+
+## 📦 5. Estructura del Proyecto y Directorios
+
+Para dar cumplimiento a los criterios de componentización modular exigidos por la cátedra, el directorio de desarrollo `/src` alinea su organización interna con las pantallas definidas en el mapa de navegación del sistema:
 
 ```text
 src/
-├── assets/           # Imágenes de marca, iconos y recursos estáticos
-├── components/       # Componentes reutilizables de la interfaz (UI)
-│   ├── Header.tsx    # Barra de navegación superior
-│   ├── Footer.tsx    # Pie de página con datos de contacto y acceso admin
-│   └── Main.tsx      # Contenedor principal de la aplicación
-├── context/          # Estado global (Carrito de compras y tipo de tarifa)
-├── firebase/         # Configuración e inicialización del SDK de Google
-│   └── config.ts     # Conexión centralizada a Cloud Firestore
-├── hooks/            # Funciones lógicas personalizadas (Custom Hooks)
-├── info/             # Tipados y catálogos de respaldo
-└── views/            # Pantallas principales de la SPA (Vistas condicionales)
-    ├── Home.tsx      # Catálogo público del cliente (Con Banner del Perro Salchicha 🐕)
-    ├── CarritoView.tsx
-    ├── NosotrosView.tsx
-    ├── UbicacionView.tsx
-    └── Admin.tsx     # Panel de control CRUD de inventario responsivo por tarjetas
-├── App.tsx           # Componente raíz donde se orquestan las secciones
-└── main.tsx          # Punto de entrada de la aplicación para el DOM
+├── assets/           # Recursos estáticos, logotipos e iconos de la interfaz
+├── components/       # Componentes estructurales y de UI globalmente reutilizables
+│   ├── Header.tsx    # Barra de navegación superior y branding del comercio
+│   ├── Footer.tsx    # Pie de página con accesos informativos y enlace administrativo
+│   └── Main.tsx      # Contenedor dinámico principal de la aplicación
+├── context/          # Estados globales compartidos (Gestión del carrito y tipo de tarifa)
+├── firebase/         # Archivos de configuración e inicialización del SDK de Google
+│   └── config.ts     # Conexión centralizada hacia el motor Cloud Firestore
+├── hooks/            # Funciones y lógica personalizada (Custom Hooks de estado)
+├── info/             # Tipados estrictos de TypeScript y catálogos locales de respaldo
+└── views/            # Vistas independientes para el renderizado condicional de la SPA
+    ├── Home.tsx      # Pantalla de catálogo público y filtros interactivos de productos
+    ├── CarritoView.tsx # Desglose de ítems, cálculo de subtotales y CTA a WhatsApp
+    ├── NosotrosView.tsx # Sección informativa sobre la trayectoria de la empresa
+    ├── UbicacionView.tsx # Datos de geolocalización del comercio físico
+    └── Admin.tsx     # Panel CRUD privado para la gestión de inventario por tarjetas
+├── App.tsx           # Componente raíz encargado de la orquestación de las vistas
+└── main.tsx          # Punto de entrada de la aplicación hacia el DOM del navegador
 ```
----
-
-### HTML Semántico y Estructura Global
-El diseño del software implementa de forma estricta las etiquetas semánticas estándar de HTML5. Esto asegura una correcta interpretación por parte de los motores de búsqueda (SEO) y mejora la accesibilidad del sitio en dispositivos móviles.
-
-La distribución e infraestructura de bloques semánticos se organiza de la siguiente manera:
-
-* `<header>`: Contiene los elementos de identidad visual, logotipo de **Brillo Total** y las opciones de navegación del catálogo.
-* `<main>`: Actúa como el contenedor principal donde se inyecta dinámicamente la grilla de productos, el carrito de compras y los filtros de selección.
-* `<footer>`: Define el pie de página que aloja la información de contacto, horarios de atención y enlaces directos al soporte o redes comerciales del negocio.
-
 
 ---
 
+### Maquetación Estructural y Semántica (HTML5)
 
-## 6. Integración de Base de Datos NoSQL en Tiempo Real (Firebase Firestore)
+La distribución global de la interfaz implementa etiquetas semánticas estándar para optimizar la accesibilidad móvil y el procesamiento de la Single Page Application:
 
-Para garantizar la escalabilidad de la PWA "Brillo Total" y permitir la gestión dinámica de precios y stock por parte del administrador, se migró la arquitectura de datos de un estado estático (Hardcoded) a una solución de base de datos en la nube.
-
-### 1. Decisiones de Arquitectura y Configuración
-* **Tecnología Seleccionada:** Google Firebase Firestore.
-* **Modelo de Datos:** NoSQL orientado a documentos (Estructura flexible, ideal para sincronización offline en aplicaciones móviles y PWAs).
-* **Región de Servidor:** `us-central1` (Iowa, EE. UU.) seleccionada por sus bajos tiempos de latencia y óptimo rendimiento dentro de la capa gratuita (Spark Plan).
-* **Modo de Seguridad Inicial:** Modo de prueba (Permisos de lectura/escritura abiertos temporalmente en ambiente de desarrollo).
-
-### 2. Infraestructura del Código (Frontend en React + TypeScript)
-* Se instaló la dependencia oficial `firebase` a través del gestor de paquetes npm.
-* Se implementó el archivo de configuración centralizado en `src/firebase/config.ts` encargado de inicializar el SDK de Google y exportar la instancia de la base de datos (`db`) mediante el método `getFirestore()`.
-
-### 3. Proceso de Migración y Semillado (Seeding)
-Para poblar la base de datos sin necesidad de cargas manuales, se diseñó un script de migración asíncrono temporal en el ciclo de vida del componente principal (`useEffect`), estructurado bajo la siguiente interfaz de TypeScript:
-
-* **Estructura del Documento (`Producto`):**
-  * `id` (string)
-  * `nombre` (string)
-  * `descripcion` (string)
-  * `precioMinorista` (number)
-  * `precioMayorista` (number)
-  * `categoria` ('hogar' | 'automotor' | 'insumos')
-  * `presentacion` (string)
-  * `stock` (boolean)
-  * `imagenUrl` (string)
-
-**Resultado:** Se migraron con éxito los 7 productos iniciales del catálogo hacia la colección `"productos"` en la consola de Firebase, quedando la infraestructura lista para el consumo de datos en tiempo real.
+* **`<header>`:** Contiene los elementos de identidad visual, el logotipo central de **Brillo Total** y el menú de navegación adaptativo.
+* **`<main>`:** Actúa como el contenedor dinámico donde se inyectan las grillas de productos, filtros de categorías y la pasarela del carrito.
+* **`<footer>`:** Aloja los datos de contacto del comercio físico, horarios de atención y el control de acceso privado al panel administrativo.
 
 ---
 
-## 7. Guía de Estilos e Identidad Visual (UI)
+## 🎨 6. Interfaz y Lineamientos de Diseño (UI)
 
-Para garantizar una experiencia de usuario (UX) coherente, profesional y con alta legibilidad, se definió un sistema de diseño basado en una paleta cromática que evoca limpieza, frescura y confianza, alineada al rubro comercial de "Brillo Total".
+Para asegurar una experiencia de usuario (UX) homogénea, con alta legibilidad y adaptada a dispositivos móviles, la interfaz de la PWA implementa los siguientes tokens de diseño:
 
-### 1. Paleta de Colores (Design Tokens)
-La aplicación utiliza un esquema de colores controlado para mantener el contraste y cumplir con las pautas de accesibilidad web (WCAG):
+### Paleta de Colores
+* **Color Primario:** `#007BFF` (Azul). Aplicado en botones de acción principal (CTA), estados activos y elementos de interacción clave.
+* **Color Secundario:** `#0DCAF0` (Cian). Utilizado para etiquetas decorativas, insignias de estado y realce de categorías.
+* **Colores Neutros:** `#F8F9FA` para fondos de contenedor (sensación de pulcritud) y `#212529` para textos (garantizando un contraste óptimo de lectura).
+* **Estado Crítico:** `#DC3545` (Rojo). Reservado de forma exclusiva para indicadores de falta de stock o alertas del sistema.
 
-*   **Color Primario (Primary Blue):** `#007BFF` (o el azul que uses en tu Tailwind/CSS). Representa el agua, la tecnología y la confianza. Se utiliza en botones principales, llamados a la acción (CTA) y estados activos.
-*   **Color Secundario (Cyan/Teal):** `#0DCAF0` (o tu variante). Evoca frescura y limpieza profunda. Utilizado para destacar categorías (como "Automotor" o "Insumos") y elementos decorativos sutiles.
-*   **Colores Neutros (Grayscale):**
-    *   **Fondo Principal:** `#F8F9FA` / `#FFFFFF`. Blancos y grises muy claros para dar sensación de pulcritud, amplitud y espacio limpio.
-    *   **Texto Principal:** `#212529` (Gris oscuro/Casi negro). Garantiza un contraste óptimo sobre fondos claros, evitando la fatiga visual del usuario al leer el catálogo.
-    *   **Texto Secundario/Descripciones:** `#6C757D` (Gris medio). Para detalles de menor jerarquía como descripciones de productos o subtítulos.
-*   **Color de Alerta/Estado (Danger):** `#DC3545` (Rojo). Utilizado exclusivamente para indicar la falta de stock o errores en el sistema.
-
-### 2. Sistema Tipográfico
-Se seleccionó una familia tipográfica de tipo **Sans-serif (palo seco)** para priorizar la velocidad de lectura en pantallas de dispositivos móviles, factor crítico para una Progressive Web App (PWA):
-
-*   **Tipografía Principal:** `Inter` / `Roboto` (o `System-UI` según la que tengas configurada). 
-*   **Criterios de Aplicación:**
-    *   **Títulos y Encabezados (Headings):** Estilos en negrita (`Font-Bold`, pesos 700/800) para capturar la atención inmediata en nombres de productos y secciones del panel.
-    *   **Cuerpo de Texto y Precios (Body/Prices):** Pesos regulares y medianos (400/500) que optimizan el escaneo rápido de los importes minoristas y mayoristas.
-* 
----
-
-##  🎛️ 8. Panel de Administración y Seguridad
-
-El sistema cuenta con un panel privado integrado de forma discreta en el pie de página (`Footer`), permitiendo la gestión total del negocio sin necesidad de alterar el código fuente.
-
-* **Filtro de Seguridad (Llave Maestra):** El acceso al panel está blindado mediante un flujo de autenticación por *Admin Token* local, solicitando una contraseña cifrada del lado del cliente para habilitar las herramientas de edición.
-* **Operaciones CRUD en Tiempo Real:** * **Alta de Productos:** Formulario dinámico para registrar nuevos artículos con especificaciones de precio minorista, mayorista, categoría y presentación.
-  * **Modificación Express:** Tabla de inventario que permite seleccionar cualquier producto existente, autofiltrar el formulario y actualizar sus valores en la base de datos de forma inmediata.
-* 
+### Tipografía y Jerarquía
+* **Familia Tipográfica:** Sans-serif (`Inter` / `Roboto`), priorizando el escaneo rápido en pantallas móviles.
+* **Encabezados:** Pesos en negrita (`700/800`) para títulos de secciones y nombres de productos en el catálogo.
+* **Cuerpo y Precios:** Pesos regulares (`400/500`) enfocados en optimizar la visualización de los importes minoristas y mayoristas.
 
 ---
 
- ## 🔗 9. Información de Entrega y Despliegue
+## 🎛️ 7. Módulo Administrativo de Gestión
 
-A continuación se facilitan los accesos oficiales para la evaluación de la primera entrega del proyecto:
+La plataforma incorpora una sección privada accesible de forma estratégica desde el pie de página (`Footer`), orientada a facilitar la administración del negocio sin requerir modificaciones directas en el código fuente:
+
+* **Control de Acceso:** Restricción de la vista mediante validación por clave maestra (*Admin Token*), asegurando que solo el operador comercial acceda a las herramientas críticas.
+* **Operaciones CRUD de Inventario:**
+  * **Alta de Artículos:** Formulario estructurado para incorporar nuevos productos especificando categorías, precios diferenciales y presentaciones.
+  * **Modificación en Caliente:** Interfaz adaptativa que permite seleccionar cualquier producto existente para actualizar precios, descripción o alternar el estado de disponibilidad de stock al instante.
+
+---
+
+## 🔗 8. Información de Entrega y Despliegue
+
+A continuación se facilitan los accesos oficiales para la evaluación técnica correspondientes a la **Etapa 2**:
 
 * **Nombre del Repositorio:** `brillo-total-web`
-* **Enlace al Repositorio Remoto:** [Ver Código en GitHub](https://github.com/samelit-spect/brillo-total-web)
-* **Sitio Web en Producción (Despliegue):** [Visitar Plataforma En Vivo](brillo-total.netlify.app)
-
-### Estado Actual del Proyecto
-La plataforma ha superado la etapa de maquetación estática y se encuentra en una fase **completamente funcional e integrada (Full-Stack Frontend)**, consolidando los siguientes hitos de desarrollo:
-
-1. **Persistencia y Sincronización en la Nube:** Migración exitosa de un catálogo duro (hardcoded) a un consumo dinámico de datos mediante el SDK de Google Firebase Cloud Firestore, logrando actualizaciones de catálogo en tiempo real.
-2. **Entorno Administrativo Seguro (Admin CRUD):** Implementación de un panel de gestión privado con acceso controlado por clave maestra desde el pie de página. El panel permite realizar el alta de nuevos artículos y la modificación en caliente de precios (minorista/mayorista) y especificaciones desde la misma interfaz.
-3. **Arquitectura SPA/PWA Consolidada:** Rutas y renderizado condicional optimizados para una navegación fluida sin recargas de página, empaquetado bajo los estándares de una Progressive Web App para su instalación e interacción ágil en dispositivos móviles.
+* **Código Fuente:** [Ver Repositorio en GitHub](https://github.com/samelit-spect/brillo-total-web)
+* **Plataforma en Producción:** [Visitar Sitio Web en Vivo](https://brillo-total.netlify.app)
 
 ---
 
----
+## 🚀 9. Próximos Pasos e Integraciones Futuras
 
-## 🚀 10. Plan de Escalabilidad y Trabajo Futuro
+Como parte de la evolución modular planificada para el Producto Mínimo Viable (MVP), las fases posteriores contemplan:
 
-Como toda plataforma tecnológica en constante evolución, el sistema de **Brillo Total** está diseñado bajo una arquitectura modular que permitirá expandir sus capacidades en futuras fases de desarrollo:
-
-* **Autenticación Robusta:** Reemplazar el flujo actual de tokens locales por **Firebase Authentication**, permitiendo el registro e inicio de sesión seguro de clientes frecuentes y roles administrativos mediante correo/contraseña o Google Sign-In.
-* **Pasarela de Pagos Integrada:** Incorporación del SDK de **Mercado Pago** para automatizar el cobro electrónico de pedidos minoristas directo desde la aplicación antes de derivar al canal de distribución.
-* **Módulo de Analíticas y Reportes:** Creación de un dashboard estadístico dentro del panel admin utilizando gráficos interactivos (`Recharts`) para monitorear los productos más vendidos, ingresos mensuales y tendencias de compra entre canales mayoristas y minoristas.
-* **Persistencia Avanzada Offline:** Optimización de Service Workers para permitir el armado de carritos de preventa en zonas sin cobertura de red en el interior de la provincia, sincronizando el pedido automáticamente una vez recuperada la conexión a internet.
+1. **Autenticación Formal:** Reemplazar el acceso por token local mediante la integración de **Firebase Authentication** para la gestión de roles.
+2. **Pasarela de Pagos:** Incorporación del SDK de **Mercado Pago** para automatizar la recaudación electrónica directa en el canal minorista.
+3. **Persistencia Avanzada Offline:** Optimización de Service Workers para permitir el armado y sincronización diferida de pedidos en zonas con conectividad restringida.
 
 ---
-
-## 📷 11. Vista Previa de la Interfaz (Screenshots)
-
-*Próximamente se anexarán capturas de pantalla de la interfaz pública responsiva y del Panel de Control de Inventario.*
