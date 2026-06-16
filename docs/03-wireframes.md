@@ -21,14 +21,30 @@ El maquetado se divide en bloques semánticos estandarizados para asegurar consi
 *Nota: Las imágenes a continuación representan la disposición espacial de los elementos antes de la aplicación de estilos CSS definitivos.*
 
 ### A. Vista del Catálogo Público (Home)
-Se prioriza el acceso directo a las categorías y la visibilidad clara del precio de los productos de limpieza por litro. El Switch superior conmuta los valores de toda la grilla en un solo toque.
+Se prioriza el acceso directo a las categorías y la visibilidad clara del precio de los productos de limpieza por litro.
 
-![Wireframe del Catálogo Público](./assets/wireframe-home.png)
+<details>
+  <summary>🔍 Haz clic aquí para ver los 3 bocetos de la Home</summary>
+
+  #### 1. Vista Banner
+  ![Home General](../src/assets/wireframe-home-principal.png)
+
+  #### 2. Vista de los Productos
+  ![Home Filtros](../src/assets/wireframe-home-principal2.png)
+
+  #### 3. Pie de Página
+  ![Home Detalle](../src/assets/wireframe-home-principal3.png)
+</details>
 
 ### B. Vista del Carrito de Compras
 Permite verificar la lista de compras, ajustar las cantidades de cada producto y repasar los importes calculados antes de disparar el mensaje automatizado.
 
-![Wireframe del Carrito](./assets/wireframe-carrito.png)
+<details>
+  <summary>🛒 Haz clic aquí para ver el boceto del Carrito</summary>
+
+  #### Detalle de la Sección de Productos Seleccionados
+  ![Sección de Productos en el Carrito](../src/assets/1.png)
+</details>
 
 ### C. Vista del Panel de Administración (CRUD)
 Estructura limpia basada en tarjetas independientes para gestionar el inventario, editar precios y controlar el stock de manera táctil en pantallas chicas.
