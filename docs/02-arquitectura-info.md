@@ -93,6 +93,9 @@ graph LR
 ---
 
 ## 🔗 Enlaces Internos
-* 📌 Volver al [README.md](../README.md) principal.
-* 🗺️ Ir a [Arquitectura de la Información](./02-arquitectura-info.md).
-* ⚙️ Ir a [Especificación del Stack Tecnológico](./04-stack-tecnologico.md).
+* 📌 Volver al [README.md](../README.md) principal en la raíz.
+* 📋 Ir a [01. Planificación y Requerimientos](./01-planificacion.md).
+* 🎨 Ir a [03. Diseño de Interfaz (Wireframes)](./03-wireframes.md).
+* ⚙️ Ir a [04. Especificación del Stack Tecnológico](./04-stack-tecnologico.md).
+* 📈 Ir a [05. Escalabilidad y Rendimiento](./05-escalabilidad.md).
+* 📝 Ir a [06. Historial de Cambios (Changelog)](./06-changelog.md).

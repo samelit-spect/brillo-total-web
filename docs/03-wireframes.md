@@ -49,11 +49,22 @@ Permite verificar la lista de compras, ajustar las cantidades de cada producto y
 ### C. Vista del Panel de Administración (CRUD)
 Estructura limpia basada en tarjetas independientes para gestionar el inventario, editar precios y controlar el stock de manera táctil en pantallas chicas.
 
-![Wireframe del Panel Administrativo](./assets/wireframe-admin.png)
+<details>
+  <summary>🔐 Haz clic aquí para ver los 2 bocetos del Panel de Administración</summary>
+
+  #### 1. Formulario para Agregar Nuevos Productos
+  ![Formulario de Alta de Productos](../src/assets/a.png)
+
+  #### 2. Vista de los Productos en Tiempo Real (Módulo de Tarjetas)
+  ![Listado de Productos en Tiempo Real](../src/assets/b.png)
+</details>
 
 ---
 
 ## 🔗 Enlaces Internos
 * 📌 Volver al [README.md](../README.md) principal.
-* 🗺️ Ir a [Arquitectura de la Información](./02-arquitectura-info.md).
-* ⚙️ Ir a [Especificación del Stack Tecnológico](./04-stack-tecnologico.md).
+* 📋 Ir a [01. Planificación y Requerimientos](01-planificacion.md).
+* 🗺️ Ir a [02. Arquitectura de la Información](02-arquitectura-info.md).
+* ⚙️ Ir a [04. Especificación del Stack Tecnológico](04-stack-tecnologico.md).
+* 📈 Ir a [05. Escalabilidad y Rendimiento](05-escalabilidad.md).
+* 📝 Ir a [06. Historial de Cambios (Changelog)](06-changelog.md).

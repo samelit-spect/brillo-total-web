@@ -34,5 +34,9 @@ Todos los cambios notables y evoluciones del proyecto de la PWA para **Brillo To
 ---
 
 ## 🔗 Enlaces Internos
-* 📌 Volver al [README.md](../README.md) principal.
-* 📋 Ir a [Planificación y Requerimientos](./01-planificacion.md).
+* 📌 Volver al [README.md](../README.md) principal en la raíz.
+* 📋 Ir a [01. Planificación y Requerimientos](./01-planificacion.md).
+* 🗺️ Ir a [02. Arquitectura de la Información](./02-arquitectura-info.md).
+* 🎨 Ir a [03. Diseño de Interfaz (Wireframes)](./03-wireframes.md).
+* ⚙️ Ir a [04. Especificación del Stack Tecnológico](./04-stack-tecnologico.md).
+* 📈 Ir a [05. Escalabilidad y Rendimiento](./05-escalabilidad.md).

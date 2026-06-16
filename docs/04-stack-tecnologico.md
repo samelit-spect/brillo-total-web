@@ -11,10 +11,10 @@ Para garantizar una solución fluida y de código abierto que se adapte al conte
 | Capa del Software      | Tecnología Seleccionada                               | Tipo de Recurso y Licencia                         |
 | :--------------------- | :---------------------------------------------------- | :------------------------------------------------- |
 | **Frontend**           | React (v18+) + TypeScript + Vite                      | Framework de Código Abierto (Licencia MIT)         |
-| **Backend (Lógica)**   | Firebase SDK (Serverless / Cloud Functions)           | Arquitectura Asíncrona manejada por eventos        |
+| **Backend (Lógica)**   | Firebase SDK (Serverless / Web SDK Integrado)         | Arquitectura Asíncrona manejada por eventos        |
 | **Base de Datos**      | Google Cloud Firestore                                | Motor NoSQL orientado a documentos (Capa Gratuita) |
 | **Estrategia Caching** | Service Workers (Cache API) + Firestore Offline Cache | Persistencia e indexación local en el dispositivo  |
-| **Infraestructura**    | Netlify / Vercel                                      | Hosting estático optimizado con CDN global         |
+| **Infraestructura**    | Netlify                                               | Hosting estático optimizado con CDN global         |
 
 ---
 
@@ -28,47 +28,34 @@ Para garantizar una solución fluida y de código abierto que se adapte al conte
 * **Justificación:** Las consultas al catálogo o las peticiones de modificación del administrador se ejecutan mediante promesas asíncronas. Esto permite atender cientos de peticiones por segundo de clientes concurrentes sin congelar el renderizado de la interfaz de usuario, manteniendo la ligereza típica de una SPA.
 
 ### C. Base de Datos: Cloud Firestore (NoSQL)
-* **Estructura Flexible:** Al ser una base de datos orientada a documentos (JSON/BSON), permite que cada producto del catálogo de limpieza tenga atributos flexibles (variantes de fragancias, empaques sueltos por litro o envasados) sin las restricciones rígidas de esquemas de tablas relacionales (SQL).
-* **Sincronización en Tiempo Real:** Firestore incluye oyentes (*listeners*) nativos que actualizan automáticamente la pantalla de los clientes en cuanto el administrador modifica un precio desde el panel CRUD, sin obligar al usuario a recargar la página.
+* **Estructura Flexible:** Al ser una base de datos orientada a documentos, permite que cada producto del catálogo de limpieza tenga atributos flexibles (variantes de fragancias o empaques) sin las restricciones rígidas de esquemas de tablas relacionales (SQL).
+* **Sincronización en Tiempo Real:** Firestore incluye oyentes (*listeners*) nativos (`onSnapshot`) que actualizan automáticamente la pantalla de los clientes en cuanto el administrador modifica un precio desde el panel CRUD, sin obligar al usuario a recargar la página.
 
 ---
 
-## 💾 3. Persistencia de Datos y Esquema Base (JSON)
+## 💾 3. Persistencia de Datos y Esquema Base
 
-Para anticipar razonablemente cómo se almacenan y consumen los datos desde la nube, se define la estructura tipada del documento de la colección `productos` utilizando bloques de código:
+Para visualizar cómo se almacenan y consumen los datos en la nube, se detalla a continuación el modelado de un documento real dentro de la colección `productos` de Firestore:
 
 ```json
 {
-  "$schema": "[http://json-schema.org/draft-07/schema#](http://json-schema.org/draft-07/schema#)",
-  "title": "ProductoBrilloTotal",
-  "type": "object",
-  "required": [
-    "id",
-    "nombre",
-    "descripcion",
-    "precioMinorista",
-    "precioMayorista",
-    "categoria",
-    "presentacion",
-    "stock",
-    "imagenUrl"
-  ],
-  "properties": {
-    "id": { "type": "string", "description": "ID único generado por Firestore" },
-    "nombre": { "type": "string", "example": "Detergente Concentrado Ultra" },
-    "descripcion": { "type": "string", "example": "Fórmula desengrasante activa con aroma a limón" },
-    "precioMinorista": { "type": "number", "minimum": 0 },
-    "precioMayorista": { "type": "number", "minimum": 0 },
-    "categoria": { "type": "string", "enum": ["hogar", "automotor", "insumos"] },
-    "presentacion": { "type": "string", "example": "Bidón 5 Litros / Suelto por Litro" },
-    "stock": { "type": "boolean", "default": true },
-    "imagenUrl": { "type": "string", "format": "uri" }
-  }
+  "id": "prod_84f93a10",
+  "nombre": "Detergente Concentrado Ultra",
+  "descripcion": "Fórmula desengrasante activa con aroma a limón.",
+  "precioMinorista": 1200,
+  "precioMayorista": 950,
+  "categoria": "hogar",
+  "presentacion": "Bidón 5 Litros",
+  "stock": true,
+  "imagenUrl": "[https://firebasestorage.googleapis.com/.../detergente.png](https://firebasestorage.googleapis.com/.../detergente.png)"
 }
 ```
 ---
 
-### Enlaces Directos de Navegación:
+## 🔗 Enlaces Internos
 * 📌 Volver al [README.md](../README.md) principal en la raíz.
-* 📋 Ir a [Planificación y Requerimientos](./01-planificacion.md).
-* 🎨 Ir a [Estructura de Wireframes](./03-wireframes.md).
+* 📋 Ir a [01. Planificación y Requerimientos](./01-planificacion.md).
+* 🗺️ Ir a [02. Arquitectura de la Información](./02-arquitectura-info.md).
+* 🎨 Ir a [03. Diseño de Interfaz (Wireframes)](./03-wireframes.md).
+* 📈 Ir a [05. Escalabilidad y Rendimiento](./05-escalabilidad.md).
+* 📝 Ir a [06. Historial de Cambios (Changelog)](./06-changelog.md).

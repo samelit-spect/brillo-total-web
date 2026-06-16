@@ -54,3 +54,12 @@ A continuación, se especifican de forma medible y concreta las capacidades que 
 | **RNF-02** | Arquitectura PWA Instalable          | El sistema debe incluir un archivo de manifiesto web (`manifest.json`) y Service Workers que permitan su instalación directa en Android/iOS y garanticen un funcionamiento fluido bajo redes móviles inestables.              |
 | **RNF-03** | Velocidad de Respuesta (Performance) | El tiempo de renderizado de la interfaz ante el cambio de rutas, aplicaciones de filtros o mutaciones del carrito debe ser inferior a 150ms gracias al motor de renderizado de React (SPA).                                   |
 | **RNF-04** | Mantenibilidad y Fuertemente Tipado  | El código fuente de la aplicación debe estructurarse mediante componentes modulares fuertemente tipados utilizando **TypeScript**, minimizando fallos imprevistos en tiempo de ejecución.                                     |
+
+
+## 🔗 Enlaces Internos
+* 📌 Volver al [README.md](../README.md) principal en la raíz.
+* 🗺️ Ir a [02. Arquitectura de la Información](./02-arquitectura-info.md).
+* 🎨 Ir a [03. Diseño de Interfaz (Wireframes)](./03-wireframes.md).
+* ⚙️ Ir a [04. Especificación del Stack Tecnológico](./04-stack-tecnologico.md).
+* 📈 Ir a [05. Escalabilidad y Rendimiento](./05-escalabilidad.md).
+* 📝 Ir a [06. Historial de Cambios (Changelog)](./06-changelog.md).
