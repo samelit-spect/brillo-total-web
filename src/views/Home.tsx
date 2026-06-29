@@ -9,6 +9,7 @@ export const Home: React.FC = () => {
   // 1. Estados para la base de datos dinámica
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
+  const [errorFirebase, setErrorFirebase] = useState<string | null>(null);
   const [categoriaActual, setCategoriaActual] = useState<string>('todos');
 
   // Array de control para armar los botones del menú
@@ -19,17 +20,23 @@ export const Home: React.FC = () => {
     const obtenerProductos = async () => {
       try {
         setCargando(true);
+        setErrorFirebase(null);
         const productosRef = collection(db, "productos");
         const querySnapshot = await getDocs(productosRef);
 
         const listaProductos: Producto[] = [];
         querySnapshot.forEach((doc) => {
-          listaProductos.push({ ...doc.data() } as Producto);
+          listaProductos.push({ id: doc.id, ...doc.data() } as Producto);
         });
+
+        if (listaProductos.length === 0) {
+          setErrorFirebase("No hay productos cargados en la base de datos.");
+        }
 
         setProductos(listaProductos);
       } catch (error) {
         console.error("Error al traer los productos de Firebase:", error);
+        setErrorFirebase("Error de conexión con la base de datos. Verificá que Firebase esté configurado correctamente.");
       } finally {
         setCargando(false);
       }
@@ -135,6 +142,23 @@ export const Home: React.FC = () => {
           🐕
         </div>
       </div>
+
+      {/* Mensaje de error de Firebase */}
+      {errorFirebase && (
+        <div style={{
+          textAlign: 'center',
+          padding: '15px',
+          marginBottom: '20px',
+          borderRadius: '8px',
+          backgroundColor: '#fff5f5',
+          border: '1px solid #fed7d7',
+          color: '#c53030',
+          fontSize: '14px',
+          fontWeight: 'bold'
+        }}>
+          ⚠️ {errorFirebase}
+        </div>
+      )}
 
       {/* Botonera Interactiva de Filtros */}
       <div style={{
