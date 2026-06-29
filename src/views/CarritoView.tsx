@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { guardarPedido } from '../services/pedidos';
 
 export const CarritoView: React.FC = () => {
   const navigate = useNavigate();
@@ -40,6 +41,23 @@ export const CarritoView: React.FC = () => {
     mensaje += `-----------------------------------\n`;
     mensaje += `*Total Estimado: $${obtenerTotal()}*\n\n`;
     mensaje += `_Pedido generado desde la aplicación web._`;
+
+    guardarPedido({
+      nombre,
+      nota,
+      esMayorista,
+      items: cart.map((item) => {
+        const precio = esMayorista ? item.producto.precioMayorista : item.producto.precioMinorista;
+        return {
+          nombre: item.producto.nombre,
+          presentacion: item.producto.presentacion,
+          cantidad: item.cantidad,
+          precioUnitario: precio,
+          subtotal: precio * item.cantidad,
+        };
+      }),
+      total: obtenerTotal(),
+    }).catch((error) => console.error("Error al guardar pedido:", error));
 
     const mensajeCodificado = encodeURIComponent(mensaje);
     const numeroTelefono = '5493837402375';
