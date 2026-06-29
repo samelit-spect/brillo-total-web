@@ -50,7 +50,7 @@ export const Home: React.FC = () => {
         textAlign: 'center',
         padding: '100px 20px',
         fontSize: '18px',
-        color: '#3182ce',
+        color: 'var(--color-primary)',
         fontWeight: 'bold'
       }}>
         ✨ Cargando el catálogo de Brillo Total desde la nube...
@@ -63,7 +63,7 @@ export const Home: React.FC = () => {
 
       {/* 🐕 BANNER HERO - IDENTIDAD BRILLO TOTAL */}
       <div style={{
-        background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+        background: 'linear-gradient(135deg, var(--color-navy) 0%, var(--color-primary) 100%)',
         borderRadius: '16px',
         padding: '35px 25px',
         color: 'white',
@@ -153,9 +153,9 @@ export const Home: React.FC = () => {
               style={{
                 padding: '10px 22px',
                 borderRadius: '25px',
-                border: '1px solid #3182ce',
-                backgroundColor: esActivo ? '#3182ce' : '#ffffff',
-                color: esActivo ? '#ffffff' : '#3182ce',
+                border: '1px solid var(--color-primary)',
+                backgroundColor: esActivo ? 'var(--color-primary)' : 'var(--color-bg-card)',
+                color: esActivo ? '#ffffff' : 'var(--color-primary)',
                 fontWeight: 'bold',
                 fontSize: '14px',
                 cursor: 'pointer',
@@ -173,7 +173,7 @@ export const Home: React.FC = () => {
 
       {/* Grilla de Productos o Mensaje de Vacío */}
       {productosFiltrados.length === 0 ? (
-        <div style={{ textAlign: 'center', color: '#7f8c8d', marginTop: '50px', fontSize: '16px' }}>
+        <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', marginTop: '50px', fontSize: '16px' }}>
           ✨ Muy pronto sumaremos productos a la línea <span style={{ textTransform: 'capitalize', fontWeight: 'bold' }}>{categoriaActual}</span>.
         </div>
       ) : (

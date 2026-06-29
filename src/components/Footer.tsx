@@ -4,36 +4,23 @@ import React from 'react';
 // Definimos el tipo acá directamente para evitar problemas de importación cruzada
 interface FooterProps {
   vistaActual?: string;
-  alCambiarVista?: (vista: any) => void;
+  alCambiarVista?: (vista: string) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) => {
 
   const manejarAccesoAdmin = () => {
     if (!alCambiarVista) return;
-
-    if (vistaActual === 'admin') {
-      alCambiarVista('catalogo');
-      return;
-    }
-
-    const CLAVE_CORRECTA = 'BrilloAdmin2026';
-    const passwordIngresado = prompt('🔐 Ingrese la clave maestra de administrador:');
-
-    if (passwordIngresado === CLAVE_CORRECTA) {
-      alCambiarVista('admin');
-    } else if (passwordIngresado !== null) {
-      alert('❌ Clave incorrecta. Acceso denegado.');
-    }
+    alCambiarVista(vistaActual === 'admin' ? 'catalogo' : 'admin');
   };
 
   return (
     <footer style={{
-      backgroundColor: '#1a202c',
-      color: '#a0aec0',
+      backgroundColor: 'var(--color-footer-bg)',
+      color: 'var(--color-text-secondary)',
       padding: '40px 20px 20px 20px',
       marginTop: 'auto',
-      borderTop: '4px solid #3182ce',
+      borderTop: '4px solid var(--color-primary)',
       fontSize: '14px'
     }}>
       <div style={{
@@ -48,7 +35,7 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
 
         {/* Sección Comercial / Identidad */}
         <div style={{ flex: '1 1 300px' }}>
-          <h3 style={{ color: '#ffffff', margin: '0 0 10px 0', fontSize: '18px' }}>✨ Brillo Total</h3>
+          <h3 style={{ color: 'var(--color-navy)', margin: '0 0 10px 0', fontSize: '18px' }}>✨ Brillo Total</h3>
           <p style={{ lineHeight: '1.6', margin: 0 }}>
             Venta mayorista y minorista de productos de limpieza sueltos y envasados de alta calidad para el hogar y el automotor.
           </p>
@@ -56,7 +43,7 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
 
         {/* Sección Sucursal e Info de Contacto */}
         <div style={{ flex: '1 1 250px' }}>
-          <h4 style={{ color: '#ffffff', margin: '0 0 10px 0', fontSize: '16px' }}>📍 Sucursal Principal</h4>
+          <h4 style={{ color: 'var(--color-navy)', margin: '0 0 10px 0', fontSize: '16px' }}>📍 Sucursal Principal</h4>
           <p style={{ margin: '0 0 5px 0' }}>La Rioja Capital, Argentina</p>
           <p style={{ margin: '0 0 5px 0' }}>📦 <strong>Fraccionamiento por Litro</strong></p>
           <p style={{ margin: 0 }}>💬 Pedidos directos vía WhatsApp</p>
@@ -64,22 +51,53 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
 
         {/* Sección Horarios */}
         <div style={{ flex: '1 1 200px' }}>
-          <h4 style={{ color: '#ffffff', margin: '0 0 10px 0', fontSize: '16px' }}>⏰ Horarios de Atención</h4>
+          <h4 style={{ color: 'var(--color-navy)', margin: '0 0 10px 0', fontSize: '16px' }}>⏰ Horarios de Atención</h4>
           <p style={{ margin: '0 0 5px 0' }}>Lunes a Viernes:</p>
-          <p style={{ color: '#e2e8f0', margin: '0 0 10px 0', fontWeight: '500' }}>08:00 a 13:00 - 17:00 a 21:00 hs</p>
+          <p style={{ color: 'var(--color-text)', margin: '0 0 10px 0', fontWeight: '500' }}>08:00 a 13:00 - 17:00 a 21:00 hs</p>
           <p style={{ margin: '0 0 5px 0' }}>Sábados:</p>
-          <p style={{ color: '#e2e8f0', margin: 0, fontWeight: '500' }}>09:00 a 13:00 hs</p>
+          <p style={{ color: 'var(--color-text)', margin: 0, fontWeight: '500' }}>09:00 a 13:00 hs</p>
         </div>
 
       </div>
 
+      {/* Redes Sociales centradas entre info y copyright */}
+      <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '24px', padding: '20px 0', borderTop: '1px solid var(--color-border-light)' }}>
+        <a
+          href="https://www.instagram.com/brillototal.lr"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px' }}
+        >
+          <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'linear-gradient(135deg, #f58529, #dd2a7b, #8134af)', display: 'inline-block', flexShrink: 0 }} />
+          Instagram
+        </a>
+        <a
+          href="https://www.facebook.com/brillototal.lr"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px' }}
+        >
+          <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#1877f2', display: 'inline-block', flexShrink: 0 }} />
+          Facebook
+        </a>
+        <a
+          href="https://wa.me/5493837402375"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px', fontWeight: 'bold' }}
+        >
+          <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#25d366', display: 'inline-block', flexShrink: 0 }} />
+          WhatsApp
+        </a>
+      </div>
+
       {/* Separador inferior de Derechos */}
       <div style={{
-        borderTop: '1px solid #2d3748',
+        borderTop: '1px solid var(--color-border-light)',
         paddingTop: '20px',
         textAlign: 'center',
         fontSize: '12px',
-        color: '#718096',
+        color: 'var(--color-text-secondary)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -99,7 +117,7 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
             style={{
               background: 'none',
               border: 'none',
-              color: vistaActual === 'admin' ? '#3182ce' : '#4a5568',
+              color: vistaActual === 'admin' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
               cursor: 'pointer',
               fontSize: '11px',
               fontWeight: '500',
@@ -107,10 +125,10 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
               transition: 'color 0.2s',
               outline: 'none'
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#a0aec0')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = vistaActual === 'admin' ? '#3182ce' : '#4a5568')}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text-secondary)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = vistaActual === 'admin' ? 'var(--color-primary)' : 'var(--color-text-secondary)')}
           >
-            {vistaActual === 'admin' ? '⬅️ Salir de Administración' : '⚙️ Configuración del Sistema'}
+            {vistaActual === 'admin' ? '⬅️ Salir de Administración' : '🐾 Información del Sitio'}
           </button>
         )}
       </div>

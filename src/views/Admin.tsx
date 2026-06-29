@@ -1,10 +1,16 @@
 // src/views/Admin.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { db } from '../firebase/config';
 import { collection, getDocs, doc, updateDoc, addDoc } from 'firebase/firestore';
 import { type Producto } from '../info/productos';
+import { hashSHA256, HASH_CLAVE_MAESTRA } from '../utils/auth';
 
 export const Admin: React.FC = () => {
+    const [autenticado, setAutenticado] = useState(false);
+    const [claveIngresada, setClaveIngresada] = useState('');
+    const [errorClave, setErrorClave] = useState('');
+    const [verificando, setVerificando] = useState(false);
+
     const [productos, setProductos] = useState<Producto[]>([]);
     const [cargando, setCargando] = useState<boolean>(true);
     const [errorDb, setErrorDb] = useState<string | null>(null);
@@ -18,6 +24,29 @@ export const Admin: React.FC = () => {
 
     const [idEnEdicion, setIdEnEdicion] = useState<string | null>(null);
 
+    const manejarLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!claveIngresada.trim()) {
+            setErrorClave('Debe ingresar la clave de administrador.');
+            return;
+        }
+        setVerificando(true);
+        setErrorClave('');
+        try {
+            const hash = await hashSHA256(claveIngresada);
+            if (hash === HASH_CLAVE_MAESTRA) {
+                setAutenticado(true);
+                obtenerProductos();
+            } else {
+                setErrorClave('Clave incorrecta. Acceso denegado.');
+            }
+        } catch {
+            setErrorClave('Error al verificar la clave.');
+        } finally {
+            setVerificando(false);
+        }
+    };
+
     const obtenerProductos = async () => {
         try {
             setCargando(true);
@@ -30,17 +59,13 @@ export const Admin: React.FC = () => {
             });
 
             setProductos(lista);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error al traer productos: ", error);
-            setErrorDb(error.message || "No se pudo conectar con Firestore");
+            setErrorDb("No se pudo conectar con la base de datos.");
         } finally {
             setCargando(false);
         }
     };
-
-    useEffect(() => {
-        obtenerProductos();
-    }, []);
 
     const conmutarStock = async (id: string, stockActual: boolean) => {
         try {
@@ -113,12 +138,63 @@ export const Admin: React.FC = () => {
         }
     };
 
+    if (!autenticado) {
+        return (
+            <div style={{
+                display: 'flex', justifyContent: 'center', alignItems: 'center',
+                minHeight: '60vh', padding: '20px', boxSizing: 'border-box'
+            }}>
+                <div style={{
+                    backgroundColor: 'var(--color-bg-card)', padding: '35px', borderRadius: '12px',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px',
+                    boxSizing: 'border-box'
+                }}>
+                    <h2 style={{ margin: '0 0 8px 0', textAlign: 'center', color: 'var(--color-navy)', fontSize: '22px' }}>
+                        🔐 Acceso Administrador
+                    </h2>
+                    <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '14px', marginBottom: '25px' }}>
+                        Ingresá la clave maestra para administrar el catálogo.
+                    </p>
+                    <form onSubmit={manejarLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <input
+                            type="password"
+                            value={claveIngresada}
+                            onChange={(e) => { setClaveIngresada(e.target.value); setErrorClave(''); }}
+                            placeholder="Clave maestra"
+                            autoFocus
+                            style={{
+                                width: '100%', padding: '12px', borderRadius: '6px',
+                                border: `1px solid ${errorClave ? 'var(--color-danger)' : 'var(--color-border)'}`,
+                                boxSizing: 'border-box', fontSize: '15px'
+                            }}
+                        />
+                        {errorClave && (
+                            <p style={{ color: 'var(--color-danger)', fontSize: '13px', margin: 0 }}>{errorClave}</p>
+                        )}
+                        <button
+                            type="submit"
+                            disabled={verificando}
+                            style={{
+                                width: '100%', backgroundColor: 'var(--color-primary)', color: '#fff',
+                                border: 'none', padding: '12px', borderRadius: '6px',
+                                fontWeight: 'bold', fontSize: '15px', cursor: 'pointer',
+                                opacity: verificando ? 0.7 : 1
+                            }}
+                        >
+                            {verificando ? 'Verificando...' : 'Ingresar'}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div style={{ width: '100%', maxWidth: '900px', margin: '0 auto', padding: '15px', boxSizing: 'border-box' }}>
 
             {/* SECCIÓN 1: FORMULARIO ULTRA-RESPONSIVO (GRID AUTOMÁTICO) */}
-            <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', marginBottom: '25px', boxSizing: 'border-box' }}>
-                <h2 style={{ marginTop: 0, fontSize: '20px', color: idEnEdicion ? '#3182ce' : '#2d3748', marginBottom: '20px' }}>
+            <div style={{ backgroundColor: 'var(--color-bg-card)', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', marginBottom: '25px', boxSizing: 'border-box' }}>
+                <h2 style={{ marginTop: 0, fontSize: '20px', color: idEnEdicion ? 'var(--color-primary)' : '#2d3748', marginBottom: '20px' }}>
                     {idEnEdicion ? `✏️ Editando: ${nombre}` : '➕ Alta de Producto'}
                 </h2>
 
@@ -163,11 +239,11 @@ export const Admin: React.FC = () => {
                     </div>
 
                     <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
-                        <button type="submit" style={{ flex: '1 1 180px', backgroundColor: idEnEdicion ? '#3182ce' : '#48bb78', color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                        <button type="submit" style={{ flex: '1 1 180px', backgroundColor: idEnEdicion ? 'var(--color-primary)' : 'var(--color-success)', color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
                             {idEnEdicion ? '💾 Guardar Cambios' : '🚀 Registrar Producto'}
                         </button>
                         {idEnEdicion && (
-                            <button type="button" onClick={cancelarEdicion} style={{ flex: '1 1 100px', backgroundColor: '#e2e8f0', color: '#4a5568', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                            <button type="button" onClick={cancelarEdicion} style={{ flex: '1 1 100px', backgroundColor: 'var(--color-border-light)', color: 'var(--color-text-secondary)', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
                                 Cancelar
                             </button>
                         )}
@@ -180,13 +256,13 @@ export const Admin: React.FC = () => {
                 <h3 style={{ marginTop: 0, marginBottom: '15px', fontSize: '18px', color: '#2d3748' }}>📦 Inventario en Tiempo Real</h3>
 
                 {cargando ? (
-                    <p style={{ color: '#718096', textAlign: 'center' }}>Sincronizando con Firestore...</p>
+                    <p style={{ color: 'var(--color-text-secondary)', textAlign: 'center' }}>Sincronizando con Firestore...</p>
                 ) : errorDb ? (
-                    <div style={{ color: '#e53e3e', textAlign: 'center', padding: '10px', border: '1px solid #fed7d7', borderRadius: '6px', backgroundColor: '#fff5f5' }}>
-                        ⚠️ Error al conectar: {errorDb}
+                    <div style={{ color: 'var(--color-danger)', textAlign: 'center', padding: '10px', border: '1px solid #fed7d7', borderRadius: '6px', backgroundColor: '#fff5f5' }}>
+                        ⚠️ {errorDb}
                     </div>
                 ) : productos.length === 0 ? (
-                    <p style={{ color: '#718096', textAlign: 'center' }}>No hay productos cargados.</p>
+                    <p style={{ color: 'var(--color-text-secondary)', textAlign: 'center' }}>No hay productos cargados.</p>
                 ) : (
                     /* Contenedor Flex que acumula tarjetas ordenadas verticales */
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
@@ -194,11 +270,11 @@ export const Admin: React.FC = () => {
                             <div
                                 key={prod.id}
                                 style={{
-                                    backgroundColor: idEnEdicion === prod.id ? '#ebf8ff' : '#ffffff',
+                                    backgroundColor: idEnEdicion === prod.id ? '#ebf8ff' : 'var(--color-bg-card)',
                                     padding: '15px',
                                     borderRadius: '8px',
                                     boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
-                                    border: idEnEdicion === prod.id ? '1px solid #90cdf4' : '1px solid #edf2f7',
+                                    border: idEnEdicion === prod.id ? '1px solid var(--color-primary-light)' : '1px solid #edf2f7',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     gap: '8px',
@@ -208,17 +284,17 @@ export const Admin: React.FC = () => {
                             >
                                 {/* Fila superior: Nombre y Presentación */}
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '5px' }}>
-                                    <span style={{ fontWeight: 'bold', color: '#1a202c', fontSize: '15px' }}>{prod.nombre}</span>
-                                    <span style={{ fontSize: '12px', color: '#718096', backgroundColor: '#edf2f7', padding: '2px 8px', borderRadius: '4px' }}>
+                                    <span style={{ fontWeight: 'bold', color: 'var(--color-footer-bg)', fontSize: '15px' }}>{prod.nombre}</span>
+                                    <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', backgroundColor: '#edf2f7', padding: '2px 8px', borderRadius: '4px' }}>
                                         {prod.presentacion || 'Por Litro'}
                                     </span>
                                 </div>
 
                                 {/* Fila media: Precios */}
-                                <div style={{ fontSize: '13px', color: '#4a5568', padding: '4px 0' }}>
-                                    <span>Min: <strong style={{ color: '#2b6cb0' }}>${prod.precioMinorista}</strong></span>
-                                    <span style={{ margin: '0 10px', color: '#cbd5e0' }}>|</span>
-                                    <span>May: <strong style={{ color: '#38a169' }}>${prod.precioMayorista}</strong></span>
+                                <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', padding: '4px 0' }}>
+                                    <span>Min: <strong style={{ color: 'var(--color-primary-dark)' }}>${prod.precioMinorista}</strong></span>
+                                    <span style={{ margin: '0 10px', color: 'var(--color-border)' }}>|</span>
+                                    <span>May: <strong style={{ color: 'var(--color-success-dark)' }}>${prod.precioMayorista}</strong></span>
                                 </div>
 
                                 {/* Fila inferior: Acciones de Stock y Edición (Hacen wrap si no entran) */}
@@ -227,7 +303,7 @@ export const Admin: React.FC = () => {
                                         onClick={() => conmutarStock(prod.id, prod.stock)}
                                         style={{
                                             backgroundColor: prod.stock ? '#e6fffa' : '#fff5f5',
-                                            color: prod.stock ? '#319795' : '#e53e3e',
+                                            color: prod.stock ? '#319795' : 'var(--color-danger)',
                                             border: `1px solid ${prod.stock ? '#b2f5ea' : '#fed7d7'}`,
                                             padding: '6px 12px',
                                             borderRadius: '20px',
@@ -243,7 +319,7 @@ export const Admin: React.FC = () => {
                                         onClick={() => activarEdicion(prod)}
                                         style={{
                                             backgroundColor: '#edf2f7',
-                                            color: '#2b6cb0',
+                                            color: 'var(--color-primary-dark)',
                                             border: 'none',
                                             padding: '6px 16px',
                                             borderRadius: '6px',
@@ -271,15 +347,15 @@ const styles = {
         marginBottom: '5px',
         fontWeight: 'bold' as const,
         fontSize: '14px',
-        color: '#4a5568'
+        color: 'var(--color-text-secondary)'
     },
     input: {
         width: '100%',
         padding: '11px',
         borderRadius: '6px',
-        border: '1px solid #cbd5e0',
-        backgroundColor: '#ffffff',
-        color: '#1a202c',
+        border: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-bg-card)',
+        color: 'var(--color-footer-bg)',
         boxSizing: 'border-box' as const,
         fontSize: '14px'
     }

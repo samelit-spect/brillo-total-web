@@ -56,7 +56,7 @@ Toda la especificación formal de requerimientos, decisiones de ingeniería y el
 La plataforma ha sido diseñada combinando los patrones arquitectónicos de una **Single Page Application (SPA)** y las capacidades móviles de una **Progressive Web App (PWA)**, garantizando las siguientes ventajas operativas:
 
 *   **Navegación Fluida (SPA):** Renderizado dinámico de componentes y filtros en tiempo real sin recargas de página, emulando la experiencia de usuario de una aplicación nativa.
-*   **Instalación Directa (PWA):** Acceso directo directo en la pantalla de inicio del dispositivo móvil mediante configuración de `manifest.json`, omitiendo la descarga en tiendas de aplicaciones.
+*   **Instalación Directa (PWA):** Acceso directo en la pantalla de inicio del dispositivo móvil mediante configuración de `manifest.json`, omitiendo la descarga en tiendas de aplicaciones.
 *   **Resiliencia de Red:** Arquitectura preparada para el almacenamiento en caché de activos estáticos, reduciendo el consumo de datos móviles y permitiendo la consulta del catálogo bajo conexiones inestables.
 
 ---

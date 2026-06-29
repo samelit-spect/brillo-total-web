@@ -20,10 +20,10 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
 
   return (
     <div style={{
-      border: '1px solid #e0e0e0',
+      border: '1px solid var(--color-border)',
       borderRadius: '12px',
       padding: '20px',
-      backgroundColor: '#ffffff',
+      backgroundColor: 'var(--color-bg-card)',
       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
       display: 'flex',
       flexDirection: 'column',
@@ -35,6 +35,7 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
         <img
           src={producto.imagenUrl}
           alt={producto.nombre}
+          loading="lazy"
           style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px' }}
         />
       </div>
@@ -53,15 +54,15 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
           {producto.categoria === 'insumos' ? 'Insumo' : 'Línea Hogar'}
         </span>
 
-        <h3 style={{ margin: '10px 0 5px 0', fontSize: '18px', color: '#2c3e50' }}>
+        <h3 style={{ margin: '10px 0 5px 0', fontSize: '18px', color: 'var(--color-text)' }}>
           {producto.nombre}
         </h3>
 
-        <p style={{ fontSize: '13px', color: '#7f8c8d', margin: '0 0 10px 0', minHeight: '40px' }}>
+        <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', margin: '0 0 10px 0', minHeight: '40px' }}>
           {producto.descripcion}
         </p>
 
-        <p style={{ fontSize: '14px', fontWeight: '500', color: '#95a5a6', margin: '0 0 15px 0' }}>
+        <p style={{ fontSize: '14px', fontWeight: '500', color: 'var(--color-text-muted)', margin: '0 0 15px 0' }}>
           Presentación: <strong>{producto.presentacion}</strong>
         </p>
       </div>
@@ -69,18 +70,18 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
       {/* Precio y Acción */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px' }}>
         <div>
-          <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#2980b9' }}>
+          <span style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-primary)' }}>
             ${precioFormateado} {/* <-- Ahora usa el formato limpio con puntos */}
           </span>
-          {esMayorista && <span style={{ fontSize: '11px', color: '#27ae60', display: 'block', fontWeight: 'bold' }}>Precio Mayorista</span>}
+          {esMayorista && <span style={{ fontSize: '11px', color: 'var(--color-success-dark)', display: 'block', fontWeight: 'bold' }}>Precio Mayorista</span>}
         </div>
 
         <button
           disabled={!producto.stock}
           onClick={() => agregarAlCarrito(producto)}
           style={{
-            backgroundColor: producto.stock ? '#2980b9' : '#cbd5e0', // Gris más suave si está inactivo
-            color: producto.stock ? '#ffffff' : '#718096',         // Letra gris en lugar de blanca pura para dar efecto apagado
+            backgroundColor: producto.stock ? 'var(--color-primary)' : 'var(--color-border)', // Gris más suave si está inactivo
+            color: producto.stock ? '#ffffff' : 'var(--color-text-secondary)',         // Letra gris en lugar de blanca pura para dar efecto apagado
             border: 'none',
             padding: '10px 15px',
             borderRadius: '8px',

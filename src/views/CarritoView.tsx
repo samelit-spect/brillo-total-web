@@ -1,12 +1,10 @@
 // src/views/CarritoView.tsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
-interface CarritoViewProps {
-  alCambiarVista: (vista: 'catalogo') => void;
-}
-
-export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
+export const CarritoView: React.FC = () => {
+  const navigate = useNavigate();
   const { cart, esMayorista, removerDelCarrito, agregarAlCarrito, vaciarCarrito, obtenerTotal } = useCart();
   const [nombre, setNombre] = useState('');
   const [nota, setNota] = useState('');
@@ -46,7 +44,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
     const mensajeCodificado = encodeURIComponent(mensaje);
     const numeroTelefono = '5493837402375';
 
-    window.open(`https://wa.me/${numeroTelefono}?text=${mensajeCodificado}`, '_blank');
+    window.open(`https://wa.me/${numeroTelefono}?text=${mensajeCodificado}`, '_blank', 'noopener,noreferrer');
   };
 
   if (cart.length === 0) {
@@ -56,16 +54,16 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
         <div style={{ fontSize: '65px', marginBottom: '15px', display: 'inline-block', transform: 'scaleX(-1)' }}>
           🐕💨
         </div>
-        <h3 style={{ fontSize: '24px', color: '#1a365d', marginTop: '10px', fontWeight: 'bold' }}>
+        <h3 style={{ fontSize: '24px', color: 'var(--color-navy)', marginTop: '10px', fontWeight: 'bold' }}>
           ¡El perro salchicha vio tu carrito vacío!
         </h3>
-        <p style={{ color: '#7f8c8d', marginBottom: '25px', fontSize: '16px', lineHeight: '1.5' }}>
+        <p style={{ color: 'var(--color-text-muted)', marginBottom: '25px', fontSize: '16px', lineHeight: '1.5' }}>
           Ladra de tristeza porque todavía no sumaste ningún producto para fraccionar. ¡Dale una alegría y llenalo de brillo!
         </p>
         <button
-          onClick={() => alCambiarVista('catalogo')}
+          onClick={() => navigate('/catalogo')}
           style={{
-            backgroundColor: '#3182ce',
+            backgroundColor: 'var(--color-primary)',
             color: 'white',
             border: 'none',
             padding: '12px 24px',
@@ -85,17 +83,17 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
   const totalLitrosActuales = cart.reduce((acumulado, item) => acumulado + item.cantidad, 0);
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <h2 style={{ fontSize: '26px', color: '#2c3e50', marginBottom: '20px' }}>Resumen de tu Pedido</h2>
+      <h2 style={{ fontSize: '26px', color: 'var(--color-text)', marginBottom: '20px' }}>Resumen de tu Pedido</h2>
 
       {/* Lista de productos en el carrito */}
-      <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e0e0e0', padding: '20px', marginBottom: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+      <div style={{ backgroundColor: 'var(--color-bg-card)', borderRadius: '12px', border: '1px solid var(--color-border)', padding: '20px', marginBottom: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
         {cart.map((item) => {
           const precio = esMayorista ? item.producto.precioMayorista : item.producto.precioMinorista;
           return (
             <div key={item.producto.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0', borderBottom: '1px solid #f0f0f0' }}>
               <div>
-                <h4 style={{ margin: '0 0 5px 0', color: '#2c3e50' }}>{item.producto.nombre}</h4>
-                <span style={{ fontSize: '13px', color: '#7f8c8d' }}>Presentación: {item.producto.presentacion} | u: ${precio}</span>
+                <h4 style={{ margin: '0 0 5px 0', color: 'var(--color-text)' }}>{item.producto.nombre}</h4>
+                <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Presentación: {item.producto.presentacion} | u: ${precio}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                 <div style={{
@@ -115,7 +113,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
                       cursor: 'pointer',
                       fontWeight: 'bold',
                       padding: '4px 10px',
-                      color: '#2c3e50',
+                      color: 'var(--color-text)',
                       fontSize: '16px',
                       userSelect: 'none'
                     }}
@@ -128,7 +126,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
                     fontWeight: 'bold',
                     minWidth: '20px',
                     textAlign: 'center',
-                    color: '#2c3e50'
+                    color: 'var(--color-text)'
                   }}>
                     {item.cantidad}
                   </span>
@@ -142,7 +140,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
                       cursor: 'pointer',
                       fontWeight: 'bold',
                       padding: '4px 10px',
-                      color: '#2c3e50',
+                      color: 'var(--color-text)',
                       fontSize: '16px',
                       userSelect: 'none'
                     }}
@@ -150,7 +148,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
                     +
                   </button>
                 </div>
-                <span style={{ fontWeight: 'bold', color: '#2c3e50', minWidth: '70px', textAlign: 'right' }}>${precio * item.cantidad}</span>
+                <span style={{ fontWeight: 'bold', color: 'var(--color-text)', minWidth: '70px', textAlign: 'right' }}>${precio * item.cantidad}</span>
               </div>
             </div>
           );
@@ -158,8 +156,8 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: '20px', paddingTop: '15px', borderTop: '2px solid #e2e8f0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-            <button onClick={vaciarCarrito} style={{ color: '#e53e3e', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>Vaciar Carrito</button>
-            <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a365d' }}>Total: ${obtenerTotal()}</span>
+            <button onClick={vaciarCarrito} style={{ color: 'var(--color-danger)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>Vaciar Carrito</button>
+            <span style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-navy)' }}>Total: ${obtenerTotal()}</span>
           </div>
 
           {/* Cartel dinámico con la personalidad del Salchicha */}
@@ -173,11 +171,11 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
       </div>
 
       {/* Formulario de envío */}
-      <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e0e0e0', padding: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-        <h3 style={{ margin: '0 0 15px 0', color: '#2c3e50', fontSize: '18px' }}>Datos de Confirmación</h3>
+      <div style={{ backgroundColor: 'var(--color-bg-card)', borderRadius: '12px', border: '1px solid var(--color-border)', padding: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+        <h3 style={{ margin: '0 0 15px 0', color: 'var(--color-text)', fontSize: '18px' }}>Datos de Confirmación</h3>
 
         <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: '#4a5568' }}>Tu Nombre / Negocio *</label>
+          <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: 'var(--color-text-secondary)' }}>Tu Nombre / Negocio *</label>
           <input
             type="text"
             value={nombre}
@@ -188,7 +186,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
         </div>
 
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: '#4a5568' }}>Notas adicionales (Opcional)</label>
+          <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: 'var(--color-text-secondary)' }}>Notas adicionales (Opcional)</label>
           <textarea
             value={nota}
             onChange={(e) => setNota(e.target.value)}
@@ -199,7 +197,7 @@ export const CarritoView: React.FC<CarritoViewProps> = ({ alCambiarVista }) => {
 
         <button
           onClick={enviarWhatsApp}
-          style={{ width: '100%', backgroundColor: '#25D366', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', boxShadow: '0 4px 10px rgba(37,211,102,0.3)' }}
+          style={{ width: '100%', backgroundColor: 'var(--color-whatsapp)', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', boxShadow: '0 4px 10px rgba(37,211,102,0.3)' }}
         >
           <span>💬</span> Enviar Pedido por WhatsApp
         </button>

@@ -1,5 +1,5 @@
-// src/App.tsx
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Header } from './components/Header';
 import { Main } from './components/Main';
 import { Footer } from './components/Footer';
@@ -7,31 +7,47 @@ import { Home } from './views/Home';
 import { CarritoView } from './views/CarritoView';
 import { NosotrosView } from './views/NosotrosView';
 import { UbicacionView } from './views/UbicacionView';
-import { Admin } from './views/Admin'; // <-- Importamos la nueva vista
+import { Admin } from './views/Admin';
 import { CartProvider } from './context/CartContext';
 
-// 1. Sumamos 'admin' al tipo estricto de las secciones
-export type TipoVista = 'catalogo' | 'carrito' | 'nosotros' | 'ubicacion' | 'admin';
+const TITULOS: Record<string, string> = {
+  '/': 'Brillo Total — Catálogo de Productos de Limpieza',
+  '/catalogo': 'Brillo Total — Catálogo de Productos de Limpieza',
+  '/carrito': 'Tu Pedido — Brillo Total',
+  '/nosotros': 'Sobre Nosotros — Brillo Total',
+  '/ubicacion': 'Ubicación y Horarios — Brillo Total',
+  '/admin': 'Administración — Brillo Total',
+};
 
-function App() {
-  const [vistaActual, setVistaActual] = useState<TipoVista>('catalogo');
+const RUTA_A_VISTA: Record<string, string> = {
+  '/': 'catalogo',
+  '/catalogo': 'catalogo',
+  '/carrito': 'carrito',
+  '/nosotros': 'nosotros',
+  '/ubicacion': 'ubicacion',
+  '/admin': 'admin',
+};
 
-  // 2. Agregamos el caso 'admin' al switch renderizador
-  const renderizarVista = () => {
-    switch (vistaActual) {
-      case 'catalogo':
-        return <Home />;
-      case 'carrito':
-        return <CarritoView alCambiarVista={setVistaActual} />;
-      case 'nosotros':
-        return <NosotrosView />;
-      case 'ubicacion':
-        return <UbicacionView />;
-      case 'admin':
-        return <Admin />; // <-- Si la vista es admin, dibuja el panel
-      default:
-        return <Home />;
-    }
+function AppLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const rutaActual = location.pathname;
+  const vistaActual = RUTA_A_VISTA[rutaActual] || 'catalogo';
+
+  useEffect(() => {
+    document.title = TITULOS[rutaActual] || 'Brillo Total';
+  }, [rutaActual]);
+
+  const alCambiarVista = (vista: string) => {
+    const mapa: Record<string, string> = {
+      catalogo: '/catalogo',
+      carrito: '/carrito',
+      nosotros: '/nosotros',
+      ubicacion: '/ubicacion',
+      admin: '/admin',
+    };
+    navigate(mapa[vista] || '/catalogo');
   };
 
   return (
@@ -40,20 +56,33 @@ function App() {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        backgroundColor: '#f8f9fa',
-        fontFamily: 'system-ui, -apple-system, sans-serif'
+        backgroundColor: 'var(--color-bg-page)',
+        fontFamily: 'var(--sans)'
       }}>
-        {/* Pasamos setVistaActual al Header para que el cliente navegue normal */}
-        <Header vistaActual={vistaActual} alCambiarVista={setVistaActual} />
+        <Header vistaActual={vistaActual} alCambiarVista={alCambiarVista} />
 
         <Main>
-          {renderizarVista()}
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/catalogo" element={<Home />} />
+            <Route path="/carrito" element={<CarritoView />} />
+            <Route path="/nosotros" element={<NosotrosView />} />
+            <Route path="/ubicacion" element={<UbicacionView />} />
+            <Route path="/admin" element={<Admin />} />
+          </Routes>
         </Main>
 
-        {/* 3. Pasamos vistaActual y setVistaActual al Footer para activar el botón oculto */}
-        <Footer vistaActual={vistaActual} alCambiarVista={setVistaActual} />
+        <Footer vistaActual={vistaActual} alCambiarVista={alCambiarVista} />
       </div>
     </CartProvider>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppLayout />
+    </BrowserRouter>
   );
 }
 

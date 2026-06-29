@@ -1,11 +1,11 @@
 // src/components/Header.tsx
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { type TipoVista } from '../App';
+import { YOUTUBE_URL } from '../utils/constants';
 
 interface HeaderProps {
-  vistaActual: TipoVista;
-  alCambiarVista: (vista: TipoVista) => void;
+  vistaActual: string;
+  alCambiarVista: (vista: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) => {
@@ -13,19 +13,15 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [videoAbierto, setVideoAbierto] = useState(false); // Estado para el modal del tutorial
 
-  const navegarA = (vista: TipoVista) => {
+  const navegarA = (vista: string) => {
     alCambiarVista(vista);
     setMenuAbierto(false);
   };
 
-  // 📝 ACÁ VA EL LINK DE TU VIDEO DE YOUTUBE:
-  // Cuando subas el video, cambiá lo que va después de "embed/" por el ID de tu video.
-  // Ejemplo: https://www.youtube.com/embed/TU_ID_DE_VIDEO
-  const urlVideoYouTube = "https://www.youtube.com/embed/dQw4w9WgXcQ";
 
   return (
     <header style={{
-      backgroundColor: '#1a365d',
+      backgroundColor: 'var(--color-navy)',
       color: '#ffffff',
       padding: '15px 20px',
       boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
@@ -62,9 +58,9 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             />
           </div>
 
-          <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', letterSpacing: '0.5px' }}>
+          <span style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', letterSpacing: '0.5px' }}>
             Brillo Total
-          </h1>
+          </span>
         </div>
 
         {/* LADO DERECHO: Botón Tutorial + Switch + Carrito + MENÚ HAMBURGUESA NUEVO */}
@@ -116,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               />
               <span style={{
                 position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                backgroundColor: esMayorista ? '#38a169' : '#cbd5e0',
+                backgroundColor: esMayorista ? 'var(--color-success-dark)' : 'var(--color-border)',
                 borderRadius: '20px', transition: '0.3s',
               }}>
                 <span style={{
@@ -154,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           <button
             onClick={() => navegarA(vistaActual === 'carrito' ? 'catalogo' : 'carrito')}
             style={{
-              backgroundColor: vistaActual === 'carrito' ? '#e67e22' : '#3182ce',
+              backgroundColor: vistaActual === 'carrito' ? 'var(--color-warning)' : 'var(--color-primary)',
               color: '#ffffff', border: 'none', padding: '6px 12px', borderRadius: '8px',
               fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
               fontSize: '13px'
@@ -162,7 +158,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           >
             <span>🛒</span>
             <span style={{
-              backgroundColor: '#e53e3e', color: '#ffffff', fontSize: '10px',
+              backgroundColor: 'var(--color-danger)', color: '#ffffff', fontSize: '10px',
               padding: '1px 5px', borderRadius: '10px', fontWeight: 'bold'
             }}>
               {obtenerCantidadTotal()}
@@ -218,7 +214,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
                 <iframe
                   style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
-                  src={urlVideoYouTube}
+                  src={YOUTUBE_URL}
                   title="Tutorial Brillo Total"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
@@ -227,7 +223,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
 
               {/* Pie del Modal con Instrucciones Rápidas */}
               <div style={{ padding: '15px 20px', backgroundColor: '#f8fafc', fontSize: '13px', color: '#475569', lineHeight: '1.5' }}>
-                💡 <strong>Tip PWA:</strong> Podés instalar esta página como una application en tu celular tocando los tres puntitos del navegador de tu móvil y seleccionando <strong>"Agregar a la pantalla principal"</strong>.
+                💡 <strong>Tip PWA:</strong> Podés instalar esta página como una aplicación en tu celular tocando los tres puntitos del navegador de tu móvil y seleccionando <strong>"Agregar a la pantalla principal"</strong>.
               </div>
             </div>
           </div>
