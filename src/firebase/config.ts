@@ -1,18 +1,15 @@
-// src/firebase/config.ts
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore"; // <-- Sumamos esta importación para la base de datos
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_API_KEY,
-    authDomain: import.meta.env.VITE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_APP_ID,
+    apiKey: "AIzaSyDJ67pkpyhOPb4K0rm0S7IzZmfunlHMhPg",
+    authDomain: "brillo-total-27944.firebaseapp.com",
+    projectId: "brillo-total-27944",
+    storageBucket: "brillo-total-27944.firebasestorage.app",
+    messagingSenderId: "622768734843",
+    appId: "1:622768734843:web:efc280c42440b995c218de",
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Inicializamos y EXPORTAMOS Firestore para usar la DB en los componentes
 export const db = getFirestore(app);
