@@ -62,14 +62,16 @@ function AppLayout() {
         <Header vistaActual={vistaActual} alCambiarVista={alCambiarVista} />
 
         <Main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/catalogo" element={<Home />} />
-            <Route path="/carrito" element={<CarritoView />} />
-            <Route path="/nosotros" element={<NosotrosView />} />
-            <Route path="/ubicacion" element={<UbicacionView />} />
-            <Route path="/admin" element={<Admin />} />
-          </Routes>
+          <div key={rutaActual} className="page-transition">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/catalogo" element={<Home />} />
+              <Route path="/carrito" element={<CarritoView />} />
+              <Route path="/nosotros" element={<NosotrosView />} />
+              <Route path="/ubicacion" element={<UbicacionView />} />
+              <Route path="/admin" element={<Admin />} />
+            </Routes>
+          </div>
         </Main>
 
         <Footer vistaActual={vistaActual} alCambiarVista={alCambiarVista} />

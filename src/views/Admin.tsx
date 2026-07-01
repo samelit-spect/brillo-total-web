@@ -21,6 +21,7 @@ export const Admin: React.FC = () => {
     const [precioMayorista, setPrecioMayorista] = useState('');
     const [categoria, setCategoria] = useState<string>('hogar');
     const [presentacion, setPresentacion] = useState('Por Litro');
+    const [imagenUrl, setImagenUrl] = useState('');
 
     const [idEnEdicion, setIdEnEdicion] = useState<string | null>(null);
 
@@ -86,6 +87,7 @@ export const Admin: React.FC = () => {
         setPrecioMayorista(producto.precioMayorista.toString());
         setCategoria(producto.categoria);
         setPresentacion(producto.presentacion || 'Por Litro');
+        setImagenUrl(producto.imagenUrl || '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -97,6 +99,7 @@ export const Admin: React.FC = () => {
         setPrecioMayorista('');
         setCategoria('hogar');
         setPresentacion('Por Litro');
+        setImagenUrl('');
     };
 
     const manejarEnvio = async (e: React.FormEvent) => {
@@ -107,13 +110,21 @@ export const Admin: React.FC = () => {
             return;
         }
 
-        const datosProducto = {
+        const min = Number(precioMinorista);
+        const may = Number(precioMayorista);
+        if (isNaN(min) || isNaN(may) || min <= 0 || may <= 0) {
+            alert("Los precios deben ser números válidos mayores a cero.");
+            return;
+        }
+
+        const datosProducto: Record<string, unknown> = {
             nombre,
             descripcion,
-            precioMinorista: Number(precioMinorista),
-            precioMayorista: Number(precioMayorista),
+            precioMinorista: min,
+            precioMayorista: may,
             categoria,
             presentacion,
+            imagenUrl: imagenUrl.trim() || 'https://via.placeholder.com/180',
         };
 
         try {
@@ -125,7 +136,6 @@ export const Admin: React.FC = () => {
                 await addDoc(collection(db, "productos"), {
                     ...datosProducto,
                     stock: true,
-                    imagenUrl: 'https://via.placeholder.com/180'
                 });
                 alert("✅ ¡Producto creado con éxito!");
             }
@@ -194,7 +204,7 @@ export const Admin: React.FC = () => {
 
             {/* SECCIÓN 1: FORMULARIO ULTRA-RESPONSIVO (GRID AUTOMÁTICO) */}
             <div style={{ backgroundColor: 'var(--color-bg-card)', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', marginBottom: '25px', boxSizing: 'border-box' }}>
-                <h2 style={{ marginTop: 0, fontSize: '20px', color: idEnEdicion ? 'var(--color-primary)' : '#2d3748', marginBottom: '20px' }}>
+                <h2 style={{ marginTop: 0, fontSize: '20px', color: idEnEdicion ? 'var(--color-primary)' : 'var(--color-text)', marginBottom: '20px' }}>
                     {idEnEdicion ? `✏️ Editando: ${nombre}` : '➕ Alta de Producto'}
                 </h2>
 
@@ -238,6 +248,64 @@ export const Admin: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* URL de la imagen + subir archivo + previsualización */}
+                    <div style={{ width: '100%' }}>
+                        <label style={styles.label}>Imagen del Producto</label>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                            <div style={{ flex: '1 1 240px', display: 'flex', gap: '8px' }}>
+                                <input
+                                    type="text"
+                                    value={imagenUrl}
+                                    onChange={e => setImagenUrl(e.target.value)}
+                                    style={{ ...styles.input, flex: '1' }}
+                                    placeholder="https://ejemplo.com/imagen.jpg"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => document.getElementById('input-imagen')?.click()}
+                                    style={{
+                                        padding: '11px 14px', borderRadius: '6px', border: '1px solid var(--color-border)',
+                                        backgroundColor: 'var(--color-bg-card)', cursor: 'pointer',
+                                        fontSize: '18px', lineHeight: 1, flexShrink: 0
+                                    }}
+                                    title="Subir imagen del dispositivo"
+                                >
+                                    📁
+                                </button>
+                            </div>
+                            {imagenUrl.trim() && (
+                                <div style={{
+                                    width: '60px', height: '60px', borderRadius: '8px', overflow: 'hidden',
+                                    border: '1px solid var(--color-border)', flexShrink: 0,
+                                    backgroundColor: '#f8f8f8', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                    <img
+                                        src={imagenUrl.trim()}
+                                        alt="Preview"
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                        <input
+                            id="input-imagen"
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const reader = new FileReader();
+                                reader.onload = (ev) => {
+                                    const dataUrl = ev.target?.result as string;
+                                    if (dataUrl) setImagenUrl(dataUrl);
+                                };
+                                reader.readAsDataURL(file);
+                            }}
+                        />
+                    </div>
+
                     <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
                         <button type="submit" style={{ flex: '1 1 180px', backgroundColor: idEnEdicion ? 'var(--color-primary)' : 'var(--color-success)', color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
                             {idEnEdicion ? '💾 Guardar Cambios' : '🚀 Registrar Producto'}
@@ -253,7 +321,7 @@ export const Admin: React.FC = () => {
 
             {/* SECCIÓN 2: LISTADO DE INVENTARIO EN TARJETAS PARA CELULAR */}
             <div>
-                <h3 style={{ marginTop: 0, marginBottom: '15px', fontSize: '18px', color: '#2d3748' }}>📦 Inventario en Tiempo Real</h3>
+                <h3 style={{ marginTop: 0, marginBottom: '15px', fontSize: '18px', color: 'var(--color-text)' }}>📦 Inventario en Tiempo Real</h3>
 
                 {cargando ? (
                     <p style={{ color: 'var(--color-text-secondary)', textAlign: 'center' }}>Sincronizando con Firestore...</p>
@@ -269,12 +337,13 @@ export const Admin: React.FC = () => {
                         {productos.map((prod) => (
                             <div
                                 key={prod.id}
+                                className="card-hover"
                                 style={{
                                     backgroundColor: idEnEdicion === prod.id ? '#ebf8ff' : 'var(--color-bg-card)',
                                     padding: '15px',
                                     borderRadius: '8px',
                                     boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
-                                    border: idEnEdicion === prod.id ? '1px solid var(--color-primary-light)' : '1px solid #edf2f7',
+                                    border: idEnEdicion === prod.id ? '1px solid var(--color-primary-light)' : '1px solid var(--color-border-light)',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     gap: '8px',
@@ -284,8 +353,8 @@ export const Admin: React.FC = () => {
                             >
                                 {/* Fila superior: Nombre y Presentación */}
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '5px' }}>
-                                    <span style={{ fontWeight: 'bold', color: 'var(--color-footer-bg)', fontSize: '15px' }}>{prod.nombre}</span>
-                                    <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', backgroundColor: '#edf2f7', padding: '2px 8px', borderRadius: '4px' }}>
+                                    <span style={{ fontWeight: 'bold', color: 'var(--color-text)', fontSize: '15px' }}>{prod.nombre}</span>
+                                    <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-border-light)', padding: '2px 8px', borderRadius: '4px' }}>
                                         {prod.presentacion || 'Por Litro'}
                                     </span>
                                 </div>
@@ -303,7 +372,7 @@ export const Admin: React.FC = () => {
                                         onClick={() => conmutarStock(prod.id, prod.stock)}
                                         style={{
                                             backgroundColor: prod.stock ? '#e6fffa' : '#fff5f5',
-                                            color: prod.stock ? '#319795' : 'var(--color-danger)',
+                                            color: prod.stock ? 'var(--color-success-dark)' : 'var(--color-danger)',
                                             border: `1px solid ${prod.stock ? '#b2f5ea' : '#fed7d7'}`,
                                             padding: '6px 12px',
                                             borderRadius: '20px',
@@ -318,7 +387,7 @@ export const Admin: React.FC = () => {
                                     <button
                                         onClick={() => activarEdicion(prod)}
                                         style={{
-                                            backgroundColor: '#edf2f7',
+                                            backgroundColor: 'var(--color-border-light)',
                                             color: 'var(--color-primary-dark)',
                                             border: 'none',
                                             padding: '6px 16px',
@@ -355,7 +424,7 @@ const styles = {
         borderRadius: '6px',
         border: '1px solid var(--color-border)',
         backgroundColor: 'var(--color-bg-card)',
-        color: 'var(--color-footer-bg)',
+        color: 'var(--color-text)',
         boxSizing: 'border-box' as const,
         fontSize: '14px'
     }

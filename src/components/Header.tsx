@@ -1,5 +1,5 @@
 // src/components/Header.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { YOUTUBE_URL } from '../utils/constants';
 
@@ -11,7 +11,18 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) => {
   const { esMayorista, setEsMayorista, obtenerCantidadTotal } = useCart();
   const [menuAbierto, setMenuAbierto] = useState(false);
-  const [videoAbierto, setVideoAbierto] = useState(false); // Estado para el modal del tutorial
+  const [videoAbierto, setVideoAbierto] = useState(false);
+  const [badgePulse, setBadgePulse] = useState(false);
+
+  const cantidadTotal = obtenerCantidadTotal();
+
+  useEffect(() => {
+    if (cantidadTotal > 0) {
+      setBadgePulse(true);
+      const t = setTimeout(() => setBadgePulse(false), 300);
+      return () => clearTimeout(t);
+    }
+  }, [cantidadTotal]);
 
   const navegarA = (vista: string) => {
     alCambiarVista(vista);
@@ -76,9 +87,9 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           <button
             onClick={() => setVideoAbierto(true)}
             style={{
-              backgroundColor: '#2d3748',
+              backgroundColor: 'var(--color-primary-dark)',
               color: '#ffffff',
-              border: '1px solid #4a5568',
+              border: '1px solid var(--color-primary-light)',
               padding: '6px 10px',
               borderRadius: '20px',
               cursor: 'pointer',
@@ -98,10 +109,10 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            backgroundColor: '#2d3748',
+            backgroundColor: 'var(--color-primary-dark)',
             padding: '5px 10px',
             borderRadius: '20px',
-            border: '1px solid #4a5568'
+            border: '1px solid var(--color-primary-light)'
           }}>
             <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
               <input
@@ -122,7 +133,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
                 }} />
               </span>
             </label>
-            <span style={{ fontSize: '11px', marginLeft: '6px', color: esMayorista ? '#48bb78' : '#cbd5e0', fontWeight: 'bold' }}>
+            <span style={{ fontSize: '11px', marginLeft: '6px', color: esMayorista ? 'var(--color-success)' : 'var(--color-text-muted)', fontWeight: 'bold' }}>
               {esMayorista ? 'May.' : 'Min.'}
             </span>
           </div>
@@ -159,9 +170,12 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             <span>🛒</span>
             <span style={{
               backgroundColor: 'var(--color-danger)', color: '#ffffff', fontSize: '10px',
-              padding: '1px 5px', borderRadius: '10px', fontWeight: 'bold'
+              padding: '1px 5px', borderRadius: '10px', fontWeight: 'bold',
+              transform: badgePulse ? 'scale(1.3)' : 'scale(1)',
+              transition: 'transform 0.15s ease',
+              display: 'inline-block'
             }}>
-              {obtenerCantidadTotal()}
+              {cantidadTotal}
             </span>
           </button>
         </div>
@@ -172,18 +186,18 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             position: 'absolute',
             top: '55px',
             right: 0,
-            backgroundColor: '#1a202c',
+            backgroundColor: 'var(--color-navy)',
             width: '260px',
             boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
             borderRadius: '8px 0 8px 8px',
             padding: '10px 0',
             zIndex: 200,
-            borderRight: '4px solid #3182ce'
+            borderRight: '4px solid var(--color-primary)'
           }}>
-            <div onClick={() => navegarA('catalogo')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'catalogo' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'catalogo' ? '#2d3748' : 'transparent' }}>🛍️ Catálogo de Productos</div>
-            <div onClick={() => navegarA('carrito')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'carrito' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'carrito' ? '#2d3748' : 'transparent' }}>🛒 Mi Pedido ({obtenerCantidadTotal()})</div>
-            <div onClick={() => navegarA('nosotros')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'nosotros' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'nosotros' ? '#2d3748' : 'transparent' }}>✨ Sobre Nosotros</div>
-            <div onClick={() => navegarA('ubicacion')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'ubicacion' ? '#3182ce' : '#ffffff', backgroundColor: vistaActual === 'ubicacion' ? '#2d3748' : 'transparent' }}>📍 Ubicación y Horarios</div>
+            <div onClick={() => navegarA('catalogo')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'catalogo' ? 'var(--color-primary)' : '#ffffff', backgroundColor: vistaActual === 'catalogo' ? '#2d3748' : 'transparent' }}>🛍️ Catálogo de Productos</div>
+            <div onClick={() => navegarA('carrito')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'carrito' ? 'var(--color-primary)' : '#ffffff', backgroundColor: vistaActual === 'carrito' ? '#2d3748' : 'transparent' }}>🛒 Mi Pedido ({cantidadTotal})</div>
+            <div onClick={() => navegarA('nosotros')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'nosotros' ? 'var(--color-primary)' : '#ffffff', backgroundColor: vistaActual === 'nosotros' ? '#2d3748' : 'transparent' }}>✨ Sobre Nosotros</div>
+            <div onClick={() => navegarA('ubicacion')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'ubicacion' ? 'var(--color-primary)' : '#ffffff', backgroundColor: vistaActual === 'ubicacion' ? '#2d3748' : 'transparent' }}>📍 Ubicación y Horarios</div>
           </div>
         )}
 
@@ -200,11 +214,11 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               position: 'relative', display: 'flex', flexDirection: 'column'
             }}>
               {/* Encabezado del Modal */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px', backgroundColor: '#f1f5f9', borderBottom: '1px solid #e2e8f0', color: '#1a365d' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px', backgroundColor: '#f1f5f9', borderBottom: '1px solid var(--color-border-light)', color: 'var(--color-navy)' }}>
                 <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>📺 ¿Cómo usar e instalar la App?</h3>
                 <button
                   onClick={() => setVideoAbierto(false)}
-                  style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}
+                  style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: 'var(--color-text-muted)', fontWeight: 'bold' }}
                 >
                   ✕
                 </button>
@@ -222,7 +236,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               </div>
 
               {/* Pie del Modal con Instrucciones Rápidas */}
-              <div style={{ padding: '15px 20px', backgroundColor: '#f8fafc', fontSize: '13px', color: '#475569', lineHeight: '1.5' }}>
+              <div style={{ padding: '15px 20px', backgroundColor: 'var(--color-bg-page)', fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
                 💡 <strong>Tip PWA:</strong> Podés instalar esta página como una aplicación en tu celular tocando los tres puntitos del navegador de tu móvil y seleccionando <strong>"Agregar a la pantalla principal"</strong>.
               </div>
             </div>

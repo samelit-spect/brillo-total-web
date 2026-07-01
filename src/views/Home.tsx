@@ -50,17 +50,29 @@ export const Home: React.FC = () => {
     ? productos
     : productos.filter((prod) => prod.categoria === categoriaActual);
 
-  // 4. Pantalla de carga integrada estéticamente
+  // 4. Pantalla de carga con skeleton
   if (cargando) {
     return (
-      <div style={{
-        textAlign: 'center',
-        padding: '100px 20px',
-        fontSize: '18px',
-        color: 'var(--color-primary)',
-        fontWeight: 'bold'
-      }}>
-        ✨ Cargando el catálogo de Brillo Total desde la nube...
+      <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: '25px',
+          padding: '10px 0'
+        }}>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="skeleton-wrapper">
+              <div className="skeleton skeleton-img" />
+              <div className="skeleton skeleton-tag" />
+              <div className="skeleton skeleton-title" />
+              <div className="skeleton skeleton-text" />
+              <div className="skeleton-price-row">
+                <div className="skeleton skeleton-price" />
+                <div className="skeleton skeleton-btn" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -126,21 +138,17 @@ export const Home: React.FC = () => {
         </div>
 
         {/* 🐕 El Verdadero Perro Salchicha de Brillo Total */}
-        <div style={{
-          fontSize: '75px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          userSelect: 'none',
-          zIndex: 1,
-          backgroundColor: 'rgba(255,255,255,0.15)',
-          padding: '10px 20px',
-          borderRadius: '50px',
-          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)',
-          margin: '0 auto'
-        }}>
-          🐕
-        </div>
+        <img
+          src="/perro-header-transparente.png"
+          alt="Mascota Brillo Total"
+          style={{
+            height: '90px',
+            objectFit: 'contain',
+            zIndex: 1,
+            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+            userSelect: 'none'
+          }}
+        />
       </div>
 
       {/* Mensaje de error de Firebase */}
@@ -174,6 +182,7 @@ export const Home: React.FC = () => {
             <button
               key={cat}
               onClick={() => setCategoriaActual(cat)}
+              className={esActivo ? '' : 'btn-filter'}
               style={{
                 padding: '10px 22px',
                 borderRadius: '25px',

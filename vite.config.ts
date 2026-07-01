@@ -8,15 +8,16 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate', // Aplica actualizaciones de código automáticamente sin molestar al usuario
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Brillo Total Web',
         short_name: 'Brillo Total',
         description: 'Venta y distribución de productos de limpieza por litro',
-        theme_color: '#1a365d',      // Color azul oscuro de tu Header para la barra de notificaciones superior del celu
-        background_color: '#f8f9fa', // Color gris claro de fondo de tu App para evitar parpadeos blancos al abrirse
-        display: 'standalone',       // Esconde la barra del navegador para que se vea como una app nativa
-        orientation: 'portrait',     // Fuerza la pantalla en modo vertical optimizado para móviles
+        lang: 'es-AR',
+        theme_color: '#1a365d',
+        background_color: '#f8f9fa',
+        display: 'standalone',
+        orientation: 'portrait',
         start_url: '/',
         icons: [
           {

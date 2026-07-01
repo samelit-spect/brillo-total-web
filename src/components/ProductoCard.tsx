@@ -1,5 +1,5 @@
 // src/components/ProductoCard.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { type Producto } from '../info/productos';
 import { useCart } from '../context/CartContext';
 
@@ -9,17 +9,23 @@ interface ProductoCardProps {
 
 export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
   const { esMayorista, agregarAlCarrito } = useCart();
+  const [showToast, setShowToast] = useState(false);
 
   const precioMostrar = esMayorista ? producto.precioMayorista : producto.precioMinorista;
 
-  // 🔥 OPTIMIZACIÓN DE PRECIOS: Formateo con separador de miles para Argentina
   const precioFormateado = precioMostrar.toLocaleString('es-AR', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   });
 
+  const handleAdd = () => {
+    agregarAlCarrito(producto);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 1500);
+  };
+
   return (
-    <div style={{
+    <div className="card-hover" style={{
       border: '1px solid var(--color-border)',
       borderRadius: '12px',
       padding: '20px',
@@ -28,7 +34,7 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      transition: 'transform 0.2s',
+      position: 'relative',
     }}>
       {/* Contenedor de la Imagen */}
       <div style={{ textAlign: 'center', marginBottom: '15px' }}>
@@ -46,12 +52,12 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
           fontSize: '12px',
           fontWeight: 'bold',
           textTransform: 'uppercase',
-          color: producto.categoria === 'insumos' ? '#e67e22' : '#2ecc71',
-          backgroundColor: producto.categoria === 'insumos' ? '#fdf2e9' : '#e8f8f5',
+          color: producto.categoria === 'insumos' ? '#e67e22' : producto.categoria === 'automotor' ? '#2563eb' : '#2ecc71',
+          backgroundColor: producto.categoria === 'insumos' ? '#fdf2e9' : producto.categoria === 'automotor' ? '#dbeafe' : '#e8f8f5',
           padding: '4px 8px',
           borderRadius: '20px'
         }}>
-          {producto.categoria === 'insumos' ? 'Insumo' : 'Línea Hogar'}
+          {producto.categoria === 'insumos' ? 'Insumo' : producto.categoria === 'automotor' ? 'Automotor' : 'Línea Hogar'}
         </span>
 
         <h3 style={{ margin: '10px 0 5px 0', fontSize: '18px', color: 'var(--color-text)' }}>
@@ -78,10 +84,11 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
 
         <button
           disabled={!producto.stock}
-          onClick={() => agregarAlCarrito(producto)}
+          onClick={handleAdd}
+          className="btn-primary"
           style={{
-            backgroundColor: producto.stock ? 'var(--color-primary)' : 'var(--color-border)', // Gris más suave si está inactivo
-            color: producto.stock ? '#ffffff' : 'var(--color-text-secondary)',         // Letra gris en lugar de blanca pura para dar efecto apagado
+            backgroundColor: producto.stock ? 'var(--color-primary)' : 'var(--color-border)',
+            color: producto.stock ? '#ffffff' : 'var(--color-text-secondary)',
             border: 'none',
             padding: '10px 15px',
             borderRadius: '8px',
@@ -94,6 +101,12 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
           {producto.stock ? 'Agregar' : 'Sin Stock'}
         </button>
       </div>
+
+      {showToast && (
+        <div className="toast-container">
+          <span>✓</span> {producto.nombre} agregado
+        </div>
+      )}
     </div>
   );
 };

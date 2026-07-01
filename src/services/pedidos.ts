@@ -25,5 +25,6 @@ export const guardarPedido = async (datos: DatosPedido): Promise<void> => {
     });
   } catch (error) {
     console.error("Error al guardar el pedido en Firestore:", error);
+    throw error;
   }
 };

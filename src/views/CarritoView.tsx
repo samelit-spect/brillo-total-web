@@ -9,6 +9,7 @@ export const CarritoView: React.FC = () => {
   const { cart, esMayorista, removerDelCarrito, agregarAlCarrito, vaciarCarrito, obtenerTotal } = useCart();
   const [nombre, setNombre] = useState('');
   const [nota, setNota] = useState('');
+  const [enviando, setEnviando] = useState(false);
 
   const enviarWhatsApp = () => {
     if (!nombre.trim()) {
@@ -16,20 +17,19 @@ export const CarritoView: React.FC = () => {
       return;
     }
 
-    // Calculamos el total de litros/unidades que lleva acumulados en el carrito
     const totalLitros = cart.reduce((acumulado, item) => acumulado + item.cantidad, 0);
 
-    // CONTROL MAYORISTA: Si está en modo mayorista pero no llega a los 20 litros
     if (esMayorista && totalLitros < 20) {
       alert(`⚠️ Para acceder a la tarifa Mayorista tenés que sumar al menos 20 litros/unidades al carrito. ¡Actualmente llevás ${totalLitros}! Podés sumar más productos o cambiar la tarifa a Minorista.`);
       return;
     }
 
-    // Estructuramos el mensaje de texto de forma pro
+    setEnviando(true);
+
     let mensaje = `*Nuevo Pedido - Brillo Total* ✨🪣\n`;
     mensaje += `*Cliente:* ${nombre}\n`;
     mensaje += `*Tipo de Tarifa:* ${esMayorista ? 'Mayorista' : 'Minorista'}\n`;
-    mensaje += `*Total de Litros/Unidades:* ${totalLitros}\n`; // Sumamos este dato útil para el negocio
+    mensaje += `*Total de Litros/Unidades:* ${totalLitros}\n`;
     if (nota.trim()) mensaje += `*Notas:* ${nota}\n`;
     mensaje += `-----------------------------------\n`;
 
@@ -57,7 +57,9 @@ export const CarritoView: React.FC = () => {
         };
       }),
       total: obtenerTotal(),
-    }).catch((error) => console.error("Error al guardar pedido:", error));
+    })
+      .catch(() => alert("Hubo un error al guardar el pedido. Intentalo de nuevo."))
+      .finally(() => setTimeout(() => setEnviando(false), 3000));
 
     const mensajeCodificado = encodeURIComponent(mensaje);
     const numeroTelefono = '5493837402375';
@@ -108,20 +110,20 @@ export const CarritoView: React.FC = () => {
         {cart.map((item) => {
           const precio = esMayorista ? item.producto.precioMayorista : item.producto.precioMinorista;
           return (
-            <div key={item.producto.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0', borderBottom: '1px solid #f0f0f0' }}>
+            <div key={item.producto.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0', borderBottom: '1px solid var(--color-border-light)' }}>
               <div>
                 <h4 style={{ margin: '0 0 5px 0', color: 'var(--color-text)' }}>{item.producto.nombre}</h4>
                 <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Presentación: {item.producto.presentacion} | u: ${precio}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  backgroundColor: '#f1f5f9',
-                  borderRadius: '6px',
-                  padding: '4px'
-                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    backgroundColor: 'var(--color-bg-page)',
+                    borderRadius: '6px',
+                    padding: '4px'
+                  }}>
                   {/* Botón Restar (-) */}
                   <button
                     onClick={() => removerDelCarrito(item.producto.id)}
@@ -172,7 +174,7 @@ export const CarritoView: React.FC = () => {
           );
         })}
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: '20px', paddingTop: '15px', borderTop: '2px solid #e2e8f0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: '20px', paddingTop: '15px', borderTop: '2px solid var(--color-border-light)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
             <button onClick={vaciarCarrito} style={{ color: 'var(--color-danger)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>Vaciar Carrito</button>
             <span style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-navy)' }}>Total: ${obtenerTotal()}</span>
@@ -182,7 +184,7 @@ export const CarritoView: React.FC = () => {
           <div style={{ marginTop: '10px', fontSize: '14px', color: totalLitrosActuales >= 20 ? '#2f855a' : '#c53030', fontWeight: '600', textAlign: 'right' }}>
             {totalLitrosActuales >= 20
               ? `🐕 ¡Guau! Tu pedido ya es tan largo como yo. ¡Destrabaste la tarifa Mayorista! (Llevás ${totalLitrosActuales}L)`
-              : `ℹ️ Llevás ${totalLitrosActuales}L. El salchicha necesita un pedido de 20 litros para habilitarte los precios de Revendedor (Faltan ${20 - totalLitrosActuales}L) 🐾`
+              : `ℹ️ Llevás ${totalLitrosActuales}L. El salchicha espera 20 litros para habilitar precio Mayorista (Faltan ${20 - totalLitrosActuales}L) 🐾`
             }
           </div>
         </div>
@@ -199,7 +201,7 @@ export const CarritoView: React.FC = () => {
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Ej: María José o Minimarket San Cayetano"
-            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e0', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', boxSizing: 'border-box' }}
           />
         </div>
 
@@ -209,15 +211,17 @@ export const CarritoView: React.FC = () => {
             value={nota}
             onChange={(e) => setNota(e.target.value)}
             placeholder="Ej: Llevo los envases vacíos para fraccionar..."
-            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e0', minHeight: '80px', boxSizing: 'border-box', fontFamily: 'inherit' }}
+            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--color-border)', minHeight: '80px', boxSizing: 'border-box', fontFamily: 'inherit' }}
           />
         </div>
 
         <button
           onClick={enviarWhatsApp}
-          style={{ width: '100%', backgroundColor: 'var(--color-whatsapp)', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', boxShadow: '0 4px 10px rgba(37,211,102,0.3)' }}
+          disabled={enviando}
+          className={enviando ? '' : 'btn-whatsapp'}
+          style={{ width: '100%', backgroundColor: enviando ? 'var(--color-text-muted)' : 'var(--color-whatsapp)', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: enviando ? 'not-allowed' : 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', boxShadow: enviando ? 'none' : '0 4px 10px rgba(37,211,102,0.3)', transition: 'all 0.2s', opacity: enviando ? 0.7 : 1 }}
         >
-          <span>💬</span> Enviar Pedido por WhatsApp
+          {enviando ? <>⏳ Enviando...</> : <><span>💬</span> Enviar Pedido por WhatsApp</>}
         </button>
       </div>
     </div>
