@@ -1,4 +1,3 @@
-// src/views/Admin.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { db, storage, auth } from '../firebase/config';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
@@ -44,7 +43,6 @@ export const Admin: React.FC = () => {
 
     const [idEnEdicion, setIdEnEdicion] = useState<string | null>(null);
 
-    // Activa bloqueo cuando se superan los intentos
     useEffect(() => {
         if (intentosFallidos >= 5) {
             const espera = Math.min(60, Math.pow(2, intentosFallidos - 5) * 10);
@@ -55,7 +53,6 @@ export const Admin: React.FC = () => {
         }
     }, [intentosFallidos]);
 
-    // Efecto de cuenta regresiva para el bloqueo
     useEffect(() => {
         if (!bloqueado) return;
         const inicio = Date.now();
@@ -101,9 +98,7 @@ export const Admin: React.FC = () => {
             setBloqueado(false);
             setSegundosRestantes(0);
             setErrorClave('');
-
             await signInWithEmailAndPassword(auth, email, password);
-
             setAutenticado(true);
             setErrorAuthFirebase(null);
             cargarProductos();
@@ -182,24 +177,20 @@ export const Admin: React.FC = () => {
 
     const manejarEnvio = async (e: React.FormEvent) => {
         e.preventDefault();
-
         if (!nombre || !precioMinorista || !precioMayorista) {
             mostrarToast("Completá los campos obligatorios (Nombre y Precios).", 'error');
             return;
         }
-
         const min = Number(precioMinorista);
         const may = Number(precioMayorista);
         if (isNaN(min) || isNaN(may) || min <= 0 || may <= 0) {
             mostrarToast("Los precios deben ser números válidos mayores a cero.", 'error');
             return;
         }
-
         if (min < may) {
             mostrarToast("El precio minorista no puede ser menor al mayorista.", 'error');
             return;
         }
-
         const datosProducto: Record<string, unknown> = {
             nombre,
             descripcion,
@@ -209,7 +200,6 @@ export const Admin: React.FC = () => {
             presentacion,
             imagenUrl: imagenUrl.trim() || 'https://via.placeholder.com/180',
         };
-
         setGuardando(true);
         try {
             if (idEnEdicion) {
@@ -217,13 +207,9 @@ export const Admin: React.FC = () => {
                 await updateDoc(productoRef, datosProducto);
                 mostrarToast("✨ ¡Producto actualizado con éxito!", 'exito');
             } else {
-                await addDoc(collection(db, "productos"), {
-                    ...datosProducto,
-                    stock: true,
-                });
+                await addDoc(collection(db, "productos"), { ...datosProducto, stock: true, });
                 mostrarToast("✅ ¡Producto creado con éxito!", 'exito');
             }
-
             cancelarEdicion();
             cargarProductos();
         } catch (error) {
@@ -238,20 +224,23 @@ export const Admin: React.FC = () => {
         return (
             <div style={{
                 display: 'flex', justifyContent: 'center', alignItems: 'center',
-                minHeight: '60vh', padding: '20px', boxSizing: 'border-box'
+                minHeight: '60vh', padding: 'var(--space-5)', boxSizing: 'border-box'
             }}>
                 <div style={{
-                    backgroundColor: 'var(--color-bg-card)', padding: '35px', borderRadius: '12px',
-                    boxShadow: '0 4px 10px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px',
-                    boxSizing: 'border-box'
+                    backgroundColor: 'var(--color-bg-card)', padding: 'var(--space-8)',
+                    borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-lg)',
+                    width: '100%', maxWidth: '400px', boxSizing: 'border-box',
                 }}>
-                    <h2 style={{ margin: '0 0 8px 0', textAlign: 'center', color: 'var(--color-navy)', fontSize: '22px' }}>
-                        🔐 Acceso Administrador
-                    </h2>
-                    <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '14px', marginBottom: '25px' }}>
-                        Ingresá tus credenciales de Firebase y la clave maestra.
-                    </p>
-                    <form onSubmit={manejarLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
+                        <div style={{ fontSize: '48px', marginBottom: 'var(--space-2)' }}>🔐</div>
+                        <h2 style={{ margin: '0 0 var(--space-1)', color: 'var(--color-text)', fontSize: '22px' }}>
+                            Acceso Administrador
+                        </h2>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '14px', margin: 0 }}>
+                            Ingresá tus credenciales de Firebase y la clave maestra.
+                        </p>
+                    </div>
+                    <form onSubmit={manejarLogin} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                         <input
                             type="email"
                             value={email}
@@ -260,10 +249,11 @@ export const Admin: React.FC = () => {
                             autoFocus
                             disabled={bloqueado}
                             style={{
-                                width: '100%', padding: '12px', borderRadius: '6px',
+                                width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)',
                                 border: `1px solid ${errorClave ? 'var(--color-danger)' : 'var(--color-border)'}`,
                                 boxSizing: 'border-box', fontSize: '15px',
-                                opacity: bloqueado ? 0.6 : 1
+                                opacity: bloqueado ? 0.6 : 1,
+                                fontFamily: 'inherit',
                             }}
                         />
                         <input
@@ -273,10 +263,11 @@ export const Admin: React.FC = () => {
                             placeholder="Contraseña"
                             disabled={bloqueado}
                             style={{
-                                width: '100%', padding: '12px', borderRadius: '6px',
+                                width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)',
                                 border: `1px solid ${errorClave ? 'var(--color-danger)' : 'var(--color-border)'}`,
                                 boxSizing: 'border-box', fontSize: '15px',
-                                opacity: bloqueado ? 0.6 : 1
+                                opacity: bloqueado ? 0.6 : 1,
+                                fontFamily: 'inherit',
                             }}
                         />
                         <input
@@ -286,10 +277,11 @@ export const Admin: React.FC = () => {
                             placeholder="Clave maestra"
                             disabled={bloqueado}
                             style={{
-                                width: '100%', padding: '12px', borderRadius: '6px',
+                                width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)',
                                 border: `1px solid ${errorClave ? 'var(--color-danger)' : 'var(--color-border)'}`,
                                 boxSizing: 'border-box', fontSize: '15px',
-                                opacity: bloqueado ? 0.6 : 1
+                                opacity: bloqueado ? 0.6 : 1,
+                                fontFamily: 'inherit',
                             }}
                         />
                         {errorClave && (
@@ -300,9 +292,10 @@ export const Admin: React.FC = () => {
                             disabled={verificando || bloqueado}
                             style={{
                                 width: '100%', backgroundColor: 'var(--color-primary)', color: '#fff',
-                                border: 'none', padding: '12px', borderRadius: '6px',
-                                fontWeight: 'bold', fontSize: '15px', cursor: 'pointer',
-                                opacity: (verificando || bloqueado) ? 0.7 : 1
+                                border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)',
+                                fontWeight: 600, fontSize: '15px', cursor: 'pointer',
+                                opacity: (verificando || bloqueado) ? 0.7 : 1,
+                                fontFamily: 'inherit',
                             }}
                         >
                             {verificando ? 'Verificando...' : bloqueado ? `⏳ Bloqueado (${segundosRestantes}s)` : 'Ingresar'}
@@ -314,11 +307,7 @@ export const Admin: React.FC = () => {
     }
 
     const cerrarSesion = async () => {
-        try {
-            await signOut(auth);
-        } catch (e) {
-            console.error("Error al cerrar sesión:", e);
-        }
+        try { await signOut(auth); } catch (e) { console.error("Error al cerrar sesión:", e); }
         setAutenticado(false);
         setClaveIngresada('');
         setEmail('');
@@ -327,9 +316,21 @@ export const Admin: React.FC = () => {
     };
 
     return (
-        <div style={{ width: '100%', maxWidth: '900px', margin: '0 auto', padding: '15px', boxSizing: 'border-box', position: 'relative' }}>
+        <div style={{
+            width: '100%', maxWidth: '900px', margin: '0 auto',
+            padding: 'var(--space-4)', boxSizing: 'border-box',
+            position: 'relative',
+        }}>
             {errorAuthFirebase && (
-                <div style={{ color: 'var(--color-danger)', textAlign: 'center', padding: '10px', border: '1px solid #fed7d7', borderRadius: '6px', backgroundColor: '#fff5f5', marginBottom: '15px' }}>
+                <div style={{
+                    textAlign: 'center', padding: 'var(--space-4)',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--color-danger-light)',
+                    border: '1px solid var(--color-danger)',
+                    color: 'var(--color-danger-dark)',
+                    fontSize: '14px', fontWeight: 600,
+                    marginBottom: 'var(--space-4)',
+                }}>
                     ⚠️ {errorAuthFirebase}
                 </div>
             )}
@@ -337,74 +338,112 @@ export const Admin: React.FC = () => {
             {toast && (
                 <div style={{
                     position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)',
-                    backgroundColor: toast.tipo === 'exito' ? '#2d3748' : '#e53e3e',
-                    color: 'white', padding: '12px 24px', borderRadius: '10px',
-                    fontSize: '14px', fontWeight: '600', zIndex: 9999,
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                    backgroundColor: toast.tipo === 'exito' ? 'var(--color-navy-light)' : 'var(--color-danger-dark)',
+                    color: 'white', padding: 'var(--space-3) var(--space-6)',
+                    borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 600,
+                    zIndex: 9999, boxShadow: 'var(--shadow-xl)',
                     animation: 'fadeInUp 0.25s ease',
-                    display: 'flex', alignItems: 'center', gap: '8px',
-                    whiteSpace: 'nowrap'
+                    display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
+                    whiteSpace: 'nowrap', backdropFilter: 'blur(8px)',
                 }}>
                     {toast.mensaje}
                 </div>
             )}
 
-            {/* SECCIÓN 1: FORMULARIO ULTRA-RESPONSIVO (GRID AUTOMÁTICO) */}
-            <div style={{ backgroundColor: 'var(--color-bg-card)', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', marginBottom: '25px', boxSizing: 'border-box' }}>
-                <h2 style={{ marginTop: 0, fontSize: '20px', color: idEnEdicion ? 'var(--color-primary)' : 'var(--color-text)', marginBottom: '20px' }}>
+            {/* Formulario */}
+            <div style={{
+                backgroundColor: 'var(--color-bg-card)', padding: 'var(--space-5)',
+                borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)',
+                marginBottom: 'var(--space-6)', boxSizing: 'border-box',
+                border: '1px solid var(--color-border)',
+            }}>
+                <h2 style={{
+                    marginTop: 0, fontSize: '20px',
+                    color: idEnEdicion ? 'var(--color-primary)' : 'var(--color-text)',
+                    marginBottom: 'var(--space-5)',
+                }}>
                     {idEnEdicion ? `✏️ Editando: ${nombre}` : '➕ Alta de Producto'}
                 </h2>
 
-                <form onSubmit={manejarEnvio} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    <div style={{ width: '100%' }}>
-                        <label style={styles.label}>Nombre del Producto *</label>
-                        <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} style={styles.input} placeholder="Ej: Jabón Líquido Premium" />
+                <form onSubmit={manejarEnvio} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: 'var(--space-1)', fontWeight: 600, fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                            Nombre del Producto *
+                        </label>
+                        <input type="text" value={nombre} onChange={e => setNombre(e.target.value)}
+                            style={{ width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text)', boxSizing: 'border-box', fontSize: '14px', fontFamily: 'inherit' }}
+                            placeholder="Ej: Jabón Líquido Premium" />
                     </div>
 
-                    <div style={{ width: '100%' }}>
-                        <label style={styles.label}>Descripción</label>
-                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} style={{ ...styles.input, minHeight: '60px' }} placeholder="Detalles del producto..." />
+                    <div>
+                        <label style={{ display: 'block', marginBottom: 'var(--space-1)', fontWeight: 600, fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                            Descripción
+                        </label>
+                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)}
+                            style={{ width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text)', boxSizing: 'border-box', fontSize: '14px', fontFamily: 'inherit', minHeight: '60px', resize: 'vertical' }}
+                            placeholder="Detalles del producto..." />
                     </div>
 
-                    {/* CSS Grid adaptativo: 1 columna en celus, 2 en pantallas más grandes */}
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                        gap: '15px',
-                        width: '100%'
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                        gap: 'var(--space-4)',
                     }}>
                         <div>
-                            <label style={styles.label}>Precio Minorista ($) *</label>
-                            <input type="number" value={precioMinorista} onChange={e => setPrecioMinorista(e.target.value)} style={styles.input} placeholder="Ej: 1500" />
+                            <label style={{ display: 'block', marginBottom: 'var(--space-1)', fontWeight: 600, fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                                Precio Minorista ($) *
+                            </label>
+                            <input type="number" value={precioMinorista} onChange={e => setPrecioMinorista(e.target.value)}
+                                style={{ width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text)', boxSizing: 'border-box', fontSize: '14px', fontFamily: 'inherit' }}
+                                placeholder="Ej: 1500" />
                         </div>
                         <div>
-                            <label style={styles.label}>Precio Mayorista ($) *</label>
-                            <input type="number" value={precioMayorista} onChange={e => setPrecioMayorista(e.target.value)} style={styles.input} placeholder="Ej: 1200" />
+                            <label style={{ display: 'block', marginBottom: 'var(--space-1)', fontWeight: 600, fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                                Precio Mayorista ($) *
+                            </label>
+                            <input type="number" value={precioMayorista} onChange={e => setPrecioMayorista(e.target.value)}
+                                style={{ width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text)', boxSizing: 'border-box', fontSize: '14px', fontFamily: 'inherit' }}
+                                placeholder="Ej: 1200" />
                         </div>
                         <div>
-                            <label style={styles.label}>Categoría</label>
-                            <select value={categoria} onChange={e => setCategoria(e.target.value)} style={styles.input}>
+                            <label style={{ display: 'block', marginBottom: 'var(--space-1)', fontWeight: 600, fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                                Categoría
+                            </label>
+                            <select value={categoria} onChange={e => setCategoria(e.target.value)}
+                                style={{ width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text)', boxSizing: 'border-box', fontSize: '14px', fontFamily: 'inherit' }}>
                                 <option value="hogar">🏡 Línea Hogar</option>
                                 <option value="automotor">🚗 Línea Automotor</option>
                                 <option value="insumos">📦 Insumos</option>
                             </select>
                         </div>
                         <div>
-                            <label style={styles.label}>Presentación</label>
-                            <input type="text" value={presentacion} onChange={e => setPresentacion(e.target.value)} style={styles.input} placeholder="Por Litro, Bidón 5L, etc." />
+                            <label style={{ display: 'block', marginBottom: 'var(--space-1)', fontWeight: 600, fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                                Presentación
+                            </label>
+                            <input type="text" value={presentacion} onChange={e => setPresentacion(e.target.value)}
+                                style={{ width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text)', boxSizing: 'border-box', fontSize: '14px', fontFamily: 'inherit' }}
+                                placeholder="Por Litro, Bidón 5L, etc." />
                         </div>
                     </div>
 
-                    {/* URL de la imagen + subir archivo + previsualización */}
-                    <div style={{ width: '100%' }}>
-                        <label style={styles.label}>Imagen del Producto</label>
-                        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                            <div style={{ flex: '1 1 240px', display: 'flex', gap: '8px' }}>
+                    {/* Imagen */}
+                    <div>
+                        <label style={{ display: 'block', marginBottom: 'var(--space-1)', fontWeight: 600, fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                            Imagen del Producto
+                        </label>
+                        <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                            <div style={{ flex: '1 1 240px', display: 'flex', gap: 'var(--space-2)' }}>
                                 <input
                                     type="text"
                                     value={imagenUrl}
                                     onChange={e => setImagenUrl(e.target.value)}
-                                    style={{ ...styles.input, flex: '1' }}
+                                    style={{
+                                        flex: '1', padding: '10px 12px', borderRadius: 'var(--radius-sm)',
+                                        border: '1px solid var(--color-border)',
+                                        backgroundColor: 'var(--color-bg-card)',
+                                        color: 'var(--color-text)',
+                                        fontSize: '14px', fontFamily: 'inherit',
+                                    }}
                                     placeholder="https://ejemplo.com/imagen.jpg"
                                 />
                                 <button
@@ -412,9 +451,12 @@ export const Admin: React.FC = () => {
                                     onClick={() => document.getElementById('input-imagen')?.click()}
                                     disabled={subiendoImagen}
                                     style={{
-                                        padding: '11px 14px', borderRadius: '6px', border: '1px solid var(--color-border)',
-                                        backgroundColor: 'var(--color-bg-card)', cursor: subiendoImagen ? 'not-allowed' : 'pointer',
-                                        fontSize: '18px', lineHeight: 1, flexShrink: 0, opacity: subiendoImagen ? 0.6 : 1
+                                        padding: '10px 14px', borderRadius: 'var(--radius-sm)',
+                                        border: '1px solid var(--color-border)',
+                                        backgroundColor: 'var(--color-bg-card)',
+                                        cursor: subiendoImagen ? 'not-allowed' : 'pointer',
+                                        fontSize: '18px', lineHeight: 1, flexShrink: 0,
+                                        opacity: subiendoImagen ? 0.6 : 1,
                                     }}
                                     title={subiendoImagen ? 'Subiendo...' : 'Subir imagen del dispositivo'}
                                 >
@@ -423,16 +465,13 @@ export const Admin: React.FC = () => {
                             </div>
                             {imagenUrl.trim() && (
                                 <div style={{
-                                    width: '120px', height: '120px', borderRadius: '8px', overflow: 'hidden',
-                                    border: '1px solid var(--color-border)', flexShrink: 0,
-                                    backgroundColor: '#f8f8f8', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    width: '100px', height: '100px', borderRadius: 'var(--radius-sm)',
+                                    overflow: 'hidden', border: '1px solid var(--color-border)',
+                                    flexShrink: 0, backgroundColor: 'var(--color-border-light)',
                                 }}>
-                                    <img
-                                        src={imagenUrl.trim()}
-                                        alt="Preview"
+                                    <img src={imagenUrl.trim()} alt="Preview"
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                    />
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                                 </div>
                             )}
                         </div>
@@ -463,12 +502,25 @@ export const Admin: React.FC = () => {
                         />
                     </div>
 
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
-                        <button type="submit" disabled={guardando} style={{ flex: '1 1 180px', backgroundColor: guardando ? 'var(--color-text-muted)' : (idEnEdicion ? 'var(--color-primary)' : 'var(--color-success)'), color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: guardando ? 'not-allowed' : 'pointer', opacity: guardando ? 0.7 : 1 }}>
+                    <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-2)', flexWrap: 'wrap' }}>
+                        <button type="submit" disabled={guardando}
+                            style={{
+                                flex: '1 1 160px',
+                                backgroundColor: guardando ? 'var(--color-text-muted)' : (idEnEdicion ? 'var(--color-primary)' : 'var(--color-success)'),
+                                color: '#fff', border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)',
+                                fontWeight: 600, cursor: guardando ? 'not-allowed' : 'pointer',
+                                opacity: guardando ? 0.7 : 1, fontFamily: 'inherit',
+                            }}>
                             {guardando ? '⏳ Guardando...' : (idEnEdicion ? '💾 Guardar Cambios' : '🚀 Registrar Producto')}
                         </button>
                         {idEnEdicion && (
-                            <button type="button" onClick={cancelarEdicion} disabled={guardando} style={{ flex: '1 1 100px', backgroundColor: 'var(--color-border-light)', color: 'var(--color-text-secondary)', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: guardando ? 'not-allowed' : 'pointer', opacity: guardando ? 0.5 : 1 }}>
+                            <button type="button" onClick={cancelarEdicion} disabled={guardando}
+                                style={{
+                                    flex: '1 1 100px', backgroundColor: 'var(--color-border)', color: 'var(--color-text-secondary)',
+                                    border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)',
+                                    fontWeight: 600, cursor: guardando ? 'not-allowed' : 'pointer',
+                                    opacity: guardando ? 0.5 : 1, fontFamily: 'inherit',
+                                }}>
                                 Cancelar
                             </button>
                         )}
@@ -476,105 +528,123 @@ export const Admin: React.FC = () => {
                 </form>
             </div>
 
-            {/* SECCIÓN 2: LISTADO DE INVENTARIO EN TARJETAS PARA CELULAR */}
+            {/* Listado de inventario */}
             <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
+                <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)',
+                }}>
                     <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--color-text)' }}>
-                        📦 Inventario {productos.length > 0 && <span style={{ fontSize: '14px', fontWeight: 'normal', color: 'var(--color-text-secondary)' }}>({productos.length} productos)</span>}
+                        📦 Inventario {productos.length > 0 && (
+                            <span style={{ fontSize: '14px', fontWeight: 'normal', color: 'var(--color-text-muted)' }}>
+                                ({productos.length} productos)
+                            </span>
+                        )}
                     </h3>
-                    <button onClick={cerrarSesion} style={{ backgroundColor: 'transparent', color: 'var(--color-danger)', border: '1px solid var(--color-danger)', padding: '5px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}>
+                    <button onClick={cerrarSesion}
+                        style={{
+                            backgroundColor: 'transparent', color: 'var(--color-danger)',
+                            border: '1px solid var(--color-danger)', padding: '6px 14px',
+                            borderRadius: 'var(--radius-sm)', fontSize: '12px',
+                            cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit',
+                            transition: 'all 0.2s',
+                        }}>
                         🔒 Cerrar Sesión
                     </button>
                 </div>
 
                 {cargando ? (
-                    <p style={{ color: 'var(--color-text-secondary)', textAlign: 'center' }}>Sincronizando con Firestore...</p>
+                    <p style={{ color: 'var(--color-text-muted)', textAlign: 'center' }}>Sincronizando con Firestore...</p>
                 ) : errorDb ? (
-                    <div style={{ color: 'var(--color-danger)', textAlign: 'center', padding: '10px', border: '1px solid #fed7d7', borderRadius: '6px', backgroundColor: '#fff5f5' }}>
+                    <div style={{
+                        textAlign: 'center', padding: 'var(--space-4)',
+                        borderRadius: 'var(--radius-sm)',
+                        backgroundColor: 'var(--color-danger-light)',
+                        border: '1px solid var(--color-danger)',
+                        color: 'var(--color-danger-dark)',
+                        fontSize: '14px', fontWeight: 600,
+                    }}>
                         ⚠️ {errorDb}
                     </div>
                 ) : productos.length === 0 ? (
-                    <p style={{ color: 'var(--color-text-secondary)', textAlign: 'center' }}>No hay productos cargados.</p>
+                    <p style={{ color: 'var(--color-text-muted)', textAlign: 'center' }}>No hay productos cargados.</p>
                 ) : (
-                    /* Contenedor Flex que acumula tarjetas ordenadas verticales */
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                         {productos.map((prod) => (
                             <div
                                 key={prod.id}
                                 className="card-hover"
                                 style={{
-                                    backgroundColor: idEnEdicion === prod.id ? '#ebf8ff' : 'var(--color-bg-card)',
-                                    padding: '15px',
-                                    borderRadius: '8px',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
-                                    border: idEnEdicion === prod.id ? '1px solid var(--color-primary-light)' : '1px solid var(--color-border-light)',
+                                    backgroundColor: idEnEdicion === prod.id ? 'var(--color-primary-lighter)' : 'var(--color-bg-card)',
+                                    padding: 'var(--space-4)',
+                                    borderRadius: 'var(--radius-md)',
+                                    border: idEnEdicion === prod.id
+                                        ? '1.5px solid var(--color-primary)'
+                                        : '1px solid var(--color-border)',
                                     display: 'flex',
                                     flexDirection: 'row',
-                                    gap: '12px',
-                                    boxSizing: 'border-box',
-                                    width: '100%',
-                                    alignItems: 'center'
+                                    gap: 'var(--space-3)',
+                                    alignItems: 'center',
                                 }}
                             >
-                                {/* Miniatura */}
                                 <div style={{
-                                    width: '48px', height: '48px', borderRadius: '8px', overflow: 'hidden',
-                                    backgroundColor: '#f8f8f8', flexShrink: 0, border: '1px solid var(--color-border-light)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    width: '48px', height: '48px', borderRadius: 'var(--radius-sm)',
+                                    overflow: 'hidden', flexShrink: 0,
+                                    border: '1px solid var(--color-border-light)',
+                                    backgroundColor: 'var(--color-border-light)',
                                 }}>
-                                    <img
-                                        src={prod.imagenUrl}
-                                        alt={prod.nombre}
+                                    <img src={prod.imagenUrl} alt={prod.nombre}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                    />
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                                 </div>
 
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                    {/* Fila superior: Nombre y Presentación */}
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '5px' }}>
-                                        <span style={{ fontWeight: 'bold', color: 'var(--color-text)', fontSize: '15px' }}>{prod.nombre}</span>
-                                        <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-border-light)', padding: '2px 8px', borderRadius: '4px' }}>
+                                    <div style={{
+                                        display: 'flex', justifyContent: 'space-between',
+                                        alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-1)',
+                                    }}>
+                                        <span style={{ fontWeight: 600, color: 'var(--color-text)', fontSize: '15px' }}>
+                                            {prod.nombre}
+                                        </span>
+                                        <span style={{
+                                            fontSize: '11px', color: 'var(--color-text-muted)',
+                                            backgroundColor: 'var(--color-border-light)',
+                                            padding: '2px 8px', borderRadius: 'var(--radius-full)',
+                                        }}>
                                             {prod.presentacion || 'Por Litro'}
                                         </span>
                                     </div>
 
-                                    {/* Fila media: Precios */}
-                                    <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', padding: '4px 0' }}>
-                                        <span>Min: <strong style={{ color: 'var(--color-primary-dark)' }}>${formatearPrecio(prod.precioMinorista)}</strong></span>
-                                        <span style={{ margin: '0 10px', color: 'var(--color-border)' }}>|</span>
+                                    <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', padding: 'var(--space-1) 0' }}>
+                                        <span>Min: <strong style={{ color: 'var(--color-primary)' }}>${formatearPrecio(prod.precioMinorista)}</strong></span>
+                                        <span style={{ margin: '0 8px', color: 'var(--color-border)' }}>|</span>
                                         <span>May: <strong style={{ color: 'var(--color-success-dark)' }}>${formatearPrecio(prod.precioMayorista)}</strong></span>
                                     </div>
 
-                                    {/* Fila inferior: Acciones */}
-                                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
                                         <button
                                             onClick={() => conmutarStock(prod.id, prod.stock)}
                                             style={{
-                                                backgroundColor: prod.stock ? '#e6fffa' : '#fff5f5',
+                                                backgroundColor: prod.stock ? '#f0fdf4' : '#fef2f2',
                                                 color: prod.stock ? 'var(--color-success-dark)' : 'var(--color-danger)',
-                                                border: `1px solid ${prod.stock ? '#b2f5ea' : '#fed7d7'}`,
-                                                padding: '4px 12px',
-                                                borderRadius: '20px',
-                                                fontSize: '12px',
-                                                fontWeight: 'bold',
-                                                cursor: 'pointer'
+                                                border: `1px solid ${prod.stock ? '#bbf7d0' : '#fecaca'}`,
+                                                padding: '4px 12px', borderRadius: 'var(--radius-full)',
+                                                fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+                                                fontFamily: 'inherit',
                                             }}
                                         >
                                             {prod.stock ? '🟢 Disponible' : '🔴 Sin Stock'}
                                         </button>
-
                                         <button
                                             onClick={() => activarEdicion(prod)}
                                             style={{
                                                 backgroundColor: 'var(--color-border-light)',
-                                                color: 'var(--color-primary-dark)',
-                                                border: 'none',
-                                                padding: '4px 14px',
-                                                borderRadius: '6px',
-                                                fontWeight: 'bold',
-                                                fontSize: '12px',
-                                                cursor: 'pointer'
+                                                color: 'var(--color-primary)',
+                                                border: 'none', padding: '4px 14px',
+                                                borderRadius: 'var(--radius-sm)',
+                                                fontWeight: 600, fontSize: '12px', cursor: 'pointer',
+                                                fontFamily: 'inherit',
+                                                transition: 'background-color 0.2s',
                                             }}
                                         >
                                             ✏️ Editar
@@ -586,27 +656,6 @@ export const Admin: React.FC = () => {
                     </div>
                 )}
             </div>
-
         </div>
     );
-};
-
-const styles = {
-    label: {
-        display: 'block',
-        marginBottom: '5px',
-        fontWeight: 'bold' as const,
-        fontSize: '14px',
-        color: 'var(--color-text-secondary)'
-    },
-    input: {
-        width: '100%',
-        padding: '11px',
-        borderRadius: '6px',
-        border: '1px solid var(--color-border)',
-        backgroundColor: 'var(--color-bg-card)',
-        color: 'var(--color-text)',
-        boxSizing: 'border-box' as const,
-        fontSize: '14px'
-    }
 };

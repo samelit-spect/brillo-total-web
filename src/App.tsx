@@ -108,8 +108,8 @@ function AppLayout() {
       }}>
         {offline && (
           <div style={{
-            backgroundColor: '#e53e3e', color: 'white', textAlign: 'center',
-            padding: '8px 16px', fontSize: '13px', fontWeight: 'bold'
+            backgroundColor: 'var(--color-danger-dark)', color: 'white', textAlign: 'center',
+            padding: '8px 16px', fontSize: '13px', fontWeight: 700
           }}>
             📡 Sin conexión a internet — los datos pueden estar desactualizados
           </div>
@@ -120,8 +120,8 @@ function AppLayout() {
           <ErrorBoundary>
             <Suspense fallback={
               <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--color-text-secondary)' }}>
-                <div style={{ fontSize: '32px', marginBottom: '12px' }}>⏳</div>
-                <p>Cargando...</p>
+                <div style={{ fontSize: '48px', marginBottom: 'var(--space-4)', animation: 'pulse 1.5s infinite' }}>🐕</div>
+                <p style={{ fontSize: '16px' }}>Cargando...</p>
               </div>
             }>
               <Routes>

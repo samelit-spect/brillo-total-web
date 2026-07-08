@@ -6,7 +6,14 @@ interface MainProps {
 
 export const Main = ({ children }: MainProps) => {
  return (
-  <main style={{ padding: '2rem 1rem', maxWidth: '1200px', margin: '0 auto', minHeight: '70vh' }}>
+  <main style={{
+    padding: 'var(--space-4) var(--space-4)',
+    maxWidth: '1200px',
+    width: '100%',
+    margin: '0 auto',
+    minHeight: '70vh',
+    boxSizing: 'border-box',
+  }}>
    {children}
   </main>
  );

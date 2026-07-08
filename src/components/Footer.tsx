@@ -1,4 +1,3 @@
-// src/components/Footer.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { WHATSAPP_NUMBER, UBICACION } from '../utils/constants';
@@ -10,101 +9,149 @@ export const Footer: React.FC = () => {
     <footer style={{
       backgroundColor: 'var(--color-footer-bg)',
       color: 'var(--color-text-secondary)',
-      padding: '40px 20px 20px 20px',
+      padding: 'var(--space-10) var(--space-5) var(--space-5)',
       marginTop: 'auto',
-      borderTop: '4px solid var(--color-primary)',
-      fontSize: '14px'
+      borderTop: '1px solid var(--color-border)',
+      fontSize: '14px',
     }}>
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        display: 'flex',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '30px',
-        marginBottom: '30px'
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: 'var(--space-6)',
+        marginBottom: 'var(--space-8)',
       }}>
-
-        {/* Sección Comercial / Identidad */}
-        <div style={{ flex: '1 1 300px' }}>
-          <h3 style={{ color: 'var(--color-navy)', margin: '0 0 10px 0', fontSize: '18px' }}>✨ Brillo Total</h3>
-          <p style={{ lineHeight: '1.6', margin: 0 }}>
+        {/* Sección Comercial */}
+        <div>
+          <h3 style={{
+            color: 'var(--color-text)',
+            margin: '0 0 var(--space-3)',
+            fontSize: '18px',
+            fontWeight: 700,
+          }}>✨ Brillo Total</h3>
+          <p style={{ lineHeight: '1.7', margin: 0, fontSize: '14px' }}>
             Venta mayorista y minorista de productos de limpieza sueltos y envasados de alta calidad para el hogar y el automotor.
           </p>
         </div>
 
-        {/* Sección Sucursal e Info de Contacto */}
-        <div style={{ flex: '1 1 250px' }}>
-          <h4 style={{ color: 'var(--color-navy)', margin: '0 0 10px 0', fontSize: '16px' }}>📍 Sucursal Principal</h4>
-          <p style={{ margin: '0 0 5px 0' }}>{UBICACION.direccion}</p>
-          <p style={{ margin: '0 0 5px 0' }}>📦 <strong>Fraccionamiento por Litro</strong></p>
-          <p style={{ margin: 0 }}>💬 Pedidos directos vía WhatsApp</p>
+        {/* Contacto */}
+        <div>
+          <h4 style={{
+            color: 'var(--color-text)',
+            margin: '0 0 var(--space-3)',
+            fontSize: '15px',
+            fontWeight: 600,
+          }}>📍 Contacto</h4>
+          <p style={{ margin: '0 0 var(--space-1)', fontSize: '14px' }}>{UBICACION.direccion}</p>
+          <p style={{ margin: '0 0 var(--space-1)', fontSize: '14px' }}>📦 Fraccionamiento por Litro</p>
+          <p style={{ margin: 0, fontSize: '14px' }}>💬 Pedidos por WhatsApp</p>
         </div>
 
-        {/* Sección Horarios */}
-        <div style={{ flex: '1 1 200px' }}>
-          <h4 style={{ color: 'var(--color-navy)', margin: '0 0 10px 0', fontSize: '16px' }}>⏰ Horarios de Atención</h4>
-          <p style={{ margin: '0 0 5px 0' }}>Lunes a Viernes:</p>
-          <p style={{ color: 'var(--color-text)', margin: '0 0 10px 0', fontWeight: '500' }}>{UBICACION.horarios.semana}</p>
-          <p style={{ margin: '0 0 5px 0' }}>Sábados:</p>
-          <p style={{ color: 'var(--color-text)', margin: 0, fontWeight: '500' }}>{UBICACION.horarios.sabado}</p>
+        {/* Horarios */}
+        <div>
+          <h4 style={{
+            color: 'var(--color-text)',
+            margin: '0 0 var(--space-3)',
+            fontSize: '15px',
+            fontWeight: 600,
+          }}>⏰ Horarios</h4>
+          <p style={{ margin: '0 0 var(--space-1)', fontSize: '14px' }}>Lun a Vie:</p>
+          <p style={{ color: 'var(--color-text)', margin: '0 0 var(--space-2)', fontWeight: 500, fontSize: '14px' }}>
+            {UBICACION.horarios.semana}
+          </p>
+          <p style={{ margin: '0 0 var(--space-1)', fontSize: '14px' }}>Sábados:</p>
+          <p style={{ color: 'var(--color-text)', margin: 0, fontWeight: 500, fontSize: '14px' }}>
+            {UBICACION.horarios.sabado}
+          </p>
         </div>
-
       </div>
 
-      {/* Redes Sociales centradas entre info y copyright */}
-      <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '24px', padding: '20px 0', borderTop: '1px solid var(--color-border-light)' }}>
+      {/* Redes Sociales */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: 'var(--space-6)',
+        padding: 'var(--space-5) 0',
+        borderTop: '1px solid var(--color-border-light)',
+        borderBottom: '1px solid var(--color-border-light)',
+      }}>
         <a
           href={`https://www.instagram.com/${UBICACION.instagram}`}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px' }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
+            color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px',
+            fontWeight: 500, transition: 'color 0.2s',
+          }}
         >
-          <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'linear-gradient(135deg, #f58529, #dd2a7b, #8134af)', display: 'inline-block', flexShrink: 0 }} />
+          <span style={{
+            width: '12px', height: '12px', borderRadius: '50%',
+            background: 'linear-gradient(135deg, #f58529, #dd2a7b, #8134af)',
+            display: 'inline-block', flexShrink: 0,
+          }} />
           Instagram
         </a>
         <a
           href={`https://www.facebook.com/${UBICACION.facebook}`}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px' }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
+            color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px',
+            fontWeight: 500, transition: 'color 0.2s',
+          }}
         >
-          <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#1877f2', display: 'inline-block', flexShrink: 0 }} />
+          <span style={{
+            width: '12px', height: '12px', borderRadius: '50%',
+            backgroundColor: '#1877f2', display: 'inline-block', flexShrink: 0,
+          }} />
           Facebook
         </a>
         <a
           href={`https://wa.me/${WHATSAPP_NUMBER}`}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px', fontWeight: 'bold' }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
+            color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px',
+            fontWeight: 600, transition: 'color 0.2s',
+          }}
         >
-          <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#25d366', display: 'inline-block', flexShrink: 0 }} />
+          <span style={{
+            width: '12px', height: '12px', borderRadius: '50%',
+            backgroundColor: '#25d366', display: 'inline-block', flexShrink: 0,
+          }} />
           WhatsApp
         </a>
       </div>
 
-      {/* Separador inferior de Derechos */}
+      {/* Copyright */}
       <div style={{
-        borderTop: '1px solid var(--color-border-light)',
-        paddingTop: '20px',
+        paddingTop: 'var(--space-4)',
         textAlign: 'center',
         fontSize: '12px',
-        color: 'var(--color-text-secondary)',
+        color: 'var(--color-text-muted)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '5px'
+        gap: 'var(--space-1)',
       }}>
         <p style={{ margin: 0 }}>
           &copy; {new Date().getFullYear()} Brillo Total. Todos los derechos reservados.
         </p>
         <p style={{ margin: 0, fontSize: '11px' }}>
-          Desarrollado con React & TypeScript.
+          Hecho con 🐾 en La Rioja, Argentina
         </p>
-
         <span
           onClick={() => navigate('/terminos')}
-          style={{ color: 'var(--color-text-muted)', fontSize: '11px', textDecoration: 'underline', marginTop: '5px', cursor: 'pointer' }}
+          style={{
+            color: 'var(--color-text-muted)', fontSize: '12px',
+            textDecoration: 'underline', marginTop: 'var(--space-1)',
+            cursor: 'pointer', transition: 'color 0.2s',
+          }}
           role="link"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter') navigate('/terminos'); }}

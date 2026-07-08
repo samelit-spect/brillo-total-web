@@ -1,4 +1,3 @@
-// src/components/Header.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useCart } from '../hooks/useCart';
 import { YOUTUBE_URL } from '../utils/constants';
@@ -12,24 +11,22 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
   const { esMayorista, setEsMayorista, obtenerCantidadTotal } = useCart();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [videoAbierto, setVideoAbierto] = useState(false);
-  const [badgePulse, setBadgePulse] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
-  const tutorialBtnRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
   const cantidadTotal = obtenerCantidadTotal();
 
   useEffect(() => {
-    if (cantidadTotal === 0) return;
-    const frame = requestAnimationFrame(() => setBadgePulse(true));
-    return () => cancelAnimationFrame(frame);
-  }, [cantidadTotal]);
-
-  useEffect(() => {
-    if (!badgePulse) return;
-    const t = setTimeout(() => setBadgePulse(false), 300);
-    return () => clearTimeout(t);
-  }, [badgePulse]);
+    if (!menuAbierto) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuAbierto(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menuAbierto]);
 
   const navegarA = (vista: string) => {
     alCambiarVista(vista);
@@ -38,7 +35,6 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
 
   const cerrarVideo = useCallback(() => {
     setVideoAbierto(false);
-    tutorialBtnRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -55,7 +51,8 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
     <header style={{
       backgroundColor: 'var(--color-navy)',
       color: '#ffffff',
-      padding: '15px 20px',
+      padding: '0 20px',
+      height: '64px',
       boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
       position: 'sticky',
       top: 0,
@@ -67,18 +64,20 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        position: 'relative'
+        height: '100%',
+        position: 'relative',
+        gap: 'var(--space-4)',
       }}>
 
-        {/* LADO IZQUIERDO: Logo + Nombre */}
+        {/* Logo + Nombre */}
         <div
           onClick={() => navegarA('catalogo')}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter') navegarA('catalogo'); }}
-          style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', flexShrink: 0 }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', height: '48px', width: '70px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', height: '40px', width: '56px', justifyContent: 'center' }}>
             <img
               src="/perro-header-transparente.png"
               alt="Mascota Oficial Brillo Total"
@@ -86,61 +85,51 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                transform: 'scale(1.5)',
+                transform: 'scale(1.3)',
                 transformOrigin: 'center'
               }}
             />
           </div>
-
-          <span style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', letterSpacing: '0.5px' }}>
+          <span style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.3px', whiteSpace: 'nowrap' }}>
             Brillo Total
           </span>
         </div>
 
-        {/* LADO DERECHO */}
+        {/* Lado derecho */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
-          flexWrap: 'wrap',
-          justifyContent: 'flex-end'
+          gap: '8px',
+          flexShrink: 0,
         }}>
-
-          {/* Botón de Ayuda / Video Tutorial */}
-          <button
-            ref={tutorialBtnRef}
-            onClick={() => setVideoAbierto(true)}
-            aria-label="Abrir tutorial de la aplicación"
-            style={{
-              backgroundColor: 'var(--color-primary-dark)',
-              color: '#ffffff',
-              border: '1px solid var(--color-primary-light)',
-              padding: '6px 10px',
-              borderRadius: '20px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              fontSize: '12px',
-              transition: 'background-color 0.2s'
-            }}
-            title="¿Cómo usar la App?"
-          >
-            <span>📺</span>
-            <span style={{ display: 'inline', whiteSpace: 'nowrap' }}>Tutorial</span>
-          </button>
 
           {/* Switch Mayorista / Minorista */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            backgroundColor: 'var(--color-primary-dark)',
-            padding: '5px 10px',
-            borderRadius: '20px',
-            border: '1px solid var(--color-primary-light)'
+            gap: '6px',
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            padding: '4px 10px 4px 12px',
+            borderRadius: 'var(--radius-full)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            height: '34px',
           }}>
-            <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
+            <span style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              color: esMayorista ? 'rgba(255,255,255,0.5)' : '#ffffff',
+              transition: 'color 0.3s',
+              userSelect: 'none',
+            }}>
+              Min
+            </span>
+            <label style={{
+              position: 'relative',
+              display: 'inline-block',
+              width: '32px',
+              height: '18px',
+              cursor: 'pointer',
+            }}>
               <input
                 type="checkbox"
                 checked={esMayorista}
@@ -148,26 +137,71 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
                 role="switch"
                 aria-checked={esMayorista}
                 aria-label="Alternar precio mayorista o minorista"
-                style={{ opacity: 0, width: 0, height: 0 }}
+                style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }}
               />
               <span style={{
                 position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                backgroundColor: esMayorista ? 'var(--color-success-dark)' : 'var(--color-border)',
-                borderRadius: '20px', transition: '0.3s',
+                backgroundColor: esMayorista ? 'var(--color-accent)' : 'rgba(255,255,255,0.25)',
+                borderRadius: 'var(--radius-full)', transition: 'background-color 0.3s',
               }}>
                 <span style={{
-                  position: 'absolute', height: '10px', width: '10px',
-                  left: esMayorista ? '17px' : '3px', bottom: '3px',
-                  backgroundColor: '#ffffff', borderRadius: '50%', transition: '0.3s'
+                  position: 'absolute', height: '14px', width: '14px',
+                  left: esMayorista ? '16px' : '2px', top: '2px',
+                  backgroundColor: '#ffffff', borderRadius: '50%', transition: 'left 0.3s, transform 0.3s',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
                 }} />
               </span>
             </label>
-            <span style={{ fontSize: '11px', marginLeft: '6px', color: esMayorista ? 'var(--color-success)' : 'var(--color-text-muted)', fontWeight: 'bold' }}>
-              {esMayorista ? 'May.' : 'Min.'}
+            <span style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              color: esMayorista ? 'var(--color-accent)' : 'rgba(255,255,255,0.5)',
+              transition: 'color 0.3s',
+              userSelect: 'none',
+            }}>
+              May
             </span>
           </div>
 
-          {/* ☰ MENÚ HAMBURGUESA */}
+          {/* Carrito */}
+          <button
+            onClick={() => navegarA(vistaActual === 'carrito' ? 'catalogo' : 'carrito')}
+            aria-label={`Carrito de compras, ${cantidadTotal} productos`}
+            style={{
+              backgroundColor: vistaActual === 'carrito' ? 'var(--color-accent)' : 'rgba(255,255,255,0.1)',
+              color: '#ffffff',
+              border: '1px solid rgba(255,255,255,0.15)',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-full)',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '13px',
+              height: '34px',
+              transition: 'all 0.2s',
+            }}
+          >
+            <span style={{ fontSize: '16px', lineHeight: 1 }}>🛒</span>
+            {cantidadTotal > 0 && (
+              <span style={{
+                backgroundColor: 'var(--color-accent)',
+                color: '#000000',
+                fontSize: '10px',
+                fontWeight: 800,
+                padding: '1px 6px',
+                borderRadius: 'var(--radius-full)',
+                minWidth: '18px',
+                textAlign: 'center',
+                lineHeight: '16px',
+              }}>
+                {cantidadTotal}
+              </span>
+            )}
+          </button>
+
+          {/* Hamburger */}
           <button
             onClick={() => setMenuAbierto(!menuAbierto)}
             aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
@@ -176,61 +210,48 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               background: 'none',
               border: 'none',
               color: 'white',
-              fontSize: '26px',
+              fontSize: '22px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              padding: '5px',
-              userSelect: 'none',
-              marginRight: '2px'
+              justifyContent: 'center',
+              padding: '6px',
+              width: '34px',
+              height: '34px',
+              borderRadius: 'var(--radius-sm)',
+              transition: 'background-color 0.2s',
             }}
           >
             {menuAbierto ? '✕' : '☰'}
           </button>
-
-          {/* Botón Carrito */}
-          <button
-            onClick={() => navegarA(vistaActual === 'carrito' ? 'catalogo' : 'carrito')}
-            aria-label={`Carrito de compras, ${cantidadTotal} productos`}
-            style={{
-              backgroundColor: vistaActual === 'carrito' ? 'var(--color-warning)' : 'var(--color-primary)',
-              color: '#ffffff', border: 'none', padding: '6px 12px', borderRadius: '8px',
-              fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
-              fontSize: '13px'
-            }}
-          >
-            <span>🛒</span>
-            <span style={{
-              backgroundColor: 'var(--color-danger)', color: '#ffffff', fontSize: '10px',
-              padding: '1px 5px', borderRadius: '10px', fontWeight: 'bold',
-              transform: badgePulse ? 'scale(1.3)' : 'scale(1)',
-              transition: 'transform 0.15s ease',
-              display: 'inline-block'
-            }}>
-              {cantidadTotal}
-            </span>
-          </button>
         </div>
 
-        {/* 🍔 MENÚ HAMBURGUESA DESPLEGABLE */}
+        {/* Menú hamburguesa desplegable */}
         {menuAbierto && (
-          <div role="menu" style={{
-            position: 'absolute',
-            top: '55px',
-            right: 0,
-            backgroundColor: 'var(--color-navy)',
-            width: '260px',
-            boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
-            borderRadius: '8px 0 8px 8px',
-            padding: '10px 0',
-            zIndex: 200,
-            borderRight: '4px solid var(--color-primary)'
-          }}>
+          <div
+            ref={menuRef}
+            role="menu"
+            style={{
+              position: 'absolute',
+              top: '100%',
+              right: '-4px',
+              backgroundColor: 'var(--color-navy-light)',
+              minWidth: '240px',
+              boxShadow: 'var(--shadow-xl)',
+              borderRadius: '0 0 var(--radius-md) var(--radius-md)',
+              padding: 'var(--space-2) 0',
+              zIndex: 200,
+              animation: 'slideDown 0.2s ease',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderTop: '2px solid var(--color-accent)',
+            }}
+          >
             {[
-              { vista: 'catalogo', label: '🛍️ Catálogo de Productos' },
-              { vista: 'carrito', label: `🛒 Mi Pedido (${cantidadTotal})` },
+              { vista: 'catalogo', label: '🛍️ Catálogo' },
+              { vista: 'carrito', label: `🛒 Mi Pedido${cantidadTotal > 0 ? ` (${cantidadTotal})` : ''}` },
               { vista: 'nosotros', label: '✨ Sobre Nosotros' },
-              { vista: 'ubicacion', label: '📍 Ubicación y Horarios' },
+              { vista: 'ubicacion', label: '📍 Ubicación' },
+              { vista: 'admin', label: '🔐 Admin' },
             ].map(({ vista, label }) => (
               <div
                 key={vista}
@@ -239,18 +260,42 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
                 onClick={() => navegarA(vista)}
                 onKeyDown={(e) => { if (e.key === 'Enter') navegarA(vista); }}
                 style={{
-                  padding: '12px 20px', cursor: 'pointer',
-                  color: vistaActual === vista ? 'var(--color-primary)' : '#ffffff',
-                  backgroundColor: vistaActual === vista ? '#2d3748' : 'transparent'
+                  padding: '10px 20px',
+                  cursor: 'pointer',
+                  color: vistaActual === vista ? 'var(--color-accent)' : 'rgba(255,255,255,0.85)',
+                  backgroundColor: vistaActual === vista ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  fontSize: '14px',
+                  fontWeight: vistaActual === vista ? 600 : 400,
+                  transition: 'background-color 0.15s, color 0.15s',
+                  borderLeft: vistaActual === vista ? '3px solid var(--color-accent)' : '3px solid transparent',
                 }}
               >
                 {label}
               </div>
             ))}
+            {YOUTUBE_URL && (
+              <div
+                role="menuitem"
+                tabIndex={0}
+                onClick={() => { setVideoAbierto(true); setMenuAbierto(false); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') { setVideoAbierto(true); setMenuAbierto(false); } }}
+                style={{
+                  padding: '10px 20px',
+                  cursor: 'pointer',
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '13px',
+                  borderTop: '1px solid rgba(255,255,255,0.08)',
+                  marginTop: 'var(--space-1)',
+                  transition: 'color 0.15s',
+                }}
+              >
+                📺 Tutorial
+              </div>
+            )}
           </div>
         )}
 
-        {/* 📺 MODAL FLOTANTE DEL TUTORIAL */}
+        {/* Modal del tutorial */}
         {videoAbierto && (
           <div
             ref={modalRef}
@@ -261,29 +306,43 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             style={{
               position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
               backgroundColor: 'rgba(0, 0, 0, 0.75)', display: 'flex', justifyContent: 'center',
-              alignItems: 'center', zIndex: 300, padding: '20px', boxSizing: 'border-box'
+              alignItems: 'center', zIndex: 300, padding: '20px', boxSizing: 'border-box',
+              animation: 'fadeIn 0.2s ease',
             }}
           >
             <div style={{
-              backgroundColor: '#ffffff', width: '100%', maxWidth: '640px',
-              borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.3)',
-              position: 'relative', display: 'flex', flexDirection: 'column'
+              backgroundColor: 'var(--color-bg-card)', width: '100%', maxWidth: '640px',
+              borderRadius: 'var(--radius-lg)', overflow: 'hidden',
+              boxShadow: '0 20px 25px -5px rgba(0,0,0,0.3)',
+              position: 'relative', display: 'flex', flexDirection: 'column',
+              animation: 'scaleIn 0.2s ease',
             }}>
-              {/* Encabezado del Modal */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px', backgroundColor: '#f1f5f9', borderBottom: '1px solid var(--color-border-light)', color: 'var(--color-navy)' }}>
-                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>📺 ¿Cómo usar e instalar la App?</h3>
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '16px 20px', borderBottom: '1px solid var(--color-border)',
+              }}>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--color-text)' }}>
+                  📺 ¿Cómo usar e instalar la App?
+                </h3>
                 <button
                   ref={closeBtnRef}
                   onClick={cerrarVideo}
                   aria-label="Cerrar tutorial"
-                  style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: 'var(--color-text-muted)', fontWeight: 'bold' }}
+                  style={{
+                    background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer',
+                    color: 'var(--color-text-muted)', fontWeight: 700, padding: '4px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    transition: 'background-color 0.2s',
+                  }}
                 >
                   ✕
                 </button>
               </div>
 
-              {/* Contenedor Responsivo del Video */}
-              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{
+                position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden',
+                backgroundColor: 'var(--color-border-light)',
+              }}>
                 {YOUTUBE_URL ? (
                   <iframe
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
@@ -291,18 +350,26 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
                     title="Tutorial Brillo Total"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
-                  ></iframe>
+                  />
                 ) : (
-                  <div style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)' }}>
-                    <p style={{ fontSize: '14px', margin: 0 }}>🎬 Tutorial no disponible</p>
-                    <p style={{ fontSize: '12px', margin: '8px 0 0' }}>Configurá la URL del video tutorial en <code>src/utils/constants.ts</code></p>
+                  <div style={{
+                    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: 'var(--color-text-muted)', fontSize: '14px',
+                  }}>
+                    🎬 Tutorial no disponible
                   </div>
                 )}
               </div>
 
-              {/* Pie del Modal con Instrucciones Rápidas */}
-              <div style={{ padding: '15px 20px', backgroundColor: 'var(--color-bg-page)', fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
-                💡 <strong>Tip PWA:</strong> Podés instalar esta página como una aplicación en tu celular tocando los tres puntitos del navegador de tu móvil y seleccionando <strong>"Agregar a la pantalla principal"</strong>.
+              <div style={{
+                padding: '14px 20px',
+                fontSize: '13px',
+                color: 'var(--color-text-muted)',
+                lineHeight: '1.5',
+                backgroundColor: 'var(--color-border-light)',
+              }}>
+                💡 <strong>Tip PWA:</strong> Podés instalar esta página como una aplicación en tu celular tocando los tres puntitos del navegador y seleccionando <strong>"Agregar a la pantalla principal"</strong>.
               </div>
             </div>
           </div>

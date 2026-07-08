@@ -1,18 +1,22 @@
-// src/views/Home.tsx
 import React, { useState, useEffect } from 'react';
 import { type Producto } from '../info/productos';
 import { ProductoCard } from '../components/ProductoCard';
 import { obtenerProductos } from '../services/productos';
 import { CATEGORIAS } from '../utils/constants';
 
+const CAT_ICONS: Record<string, string> = {
+  todos: '✨',
+  hogar: '🏡',
+  automotor: '🚗',
+  insumos: '📦',
+};
+
 export const Home: React.FC = () => {
-  // 1. Estados para la base de datos dinámica
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
   const [errorFirebase, setErrorFirebase] = useState<string | null>(null);
   const [categoriaActual, setCategoriaActual] = useState<string>('todos');
 
-  // 2. Efecto para ir a buscar los productos a internet apenas abra la pantalla
   useEffect(() => {
     const cargarProductos = async () => {
       try {
@@ -30,17 +34,13 @@ export const Home: React.FC = () => {
         setCargando(false);
       }
     };
-
     cargarProductos();
   }, []);
 
-  // Schema.org JSON-LD para SEO
   useEffect(() => {
     const existing = document.getElementById('schema-productos');
     if (existing) existing.remove();
-
     if (productos.length === 0) return;
-
     const itemList = {
       '@context': 'https://schema.org',
       '@type': 'ItemList',
@@ -64,30 +64,26 @@ export const Home: React.FC = () => {
         },
       })),
     };
-
     const script = document.createElement('script');
     script.id = 'schema-productos';
     script.type = 'application/ld+json';
     script.textContent = JSON.stringify(itemList);
     document.head.appendChild(script);
-
     return () => { script.remove(); };
   }, [productos]);
 
-  // 3. Lógica de filtrado usando el estado dinámico "productos" en vez del archivo estático
   const productosFiltrados = categoriaActual === 'todos'
     ? productos
     : productos.filter((prod) => prod.categoria === categoriaActual);
 
-  // 4. Pantalla de carga con skeleton
   if (cargando) {
     return (
-      <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ padding: 'var(--space-5)', maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '25px',
-          padding: '10px 0'
+          gap: 'var(--space-6)',
+          padding: 'var(--space-3) 0'
         }}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="skeleton-wrapper">
@@ -107,103 +103,125 @@ export const Home: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ padding: 'var(--space-5)', maxWidth: '1200px', margin: '0 auto' }}>
 
-      {/* 🐕 BANNER HERO - IDENTIDAD BRILLO TOTAL */}
+      {/* Hero Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, var(--color-navy) 0%, var(--color-primary) 100%)',
-        borderRadius: '16px',
-        padding: '35px 25px',
+        background: 'linear-gradient(135deg, var(--color-navy) 0%, #1e40af 50%, var(--color-primary) 100%)',
+        borderRadius: 'var(--radius-lg)',
+        padding: 'var(--space-8) var(--space-6)',
         color: 'white',
-        marginTop: '10px',
-        marginBottom: '35px',
+        marginTop: 'var(--space-2)',
+        marginBottom: 'var(--space-8)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '20px',
-        boxShadow: '0 10px 20px rgba(59, 130, 246, 0.15)',
+        gap: 'var(--space-5)',
         position: 'relative',
         overflow: 'hidden',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
       }}>
-        {/* Efecto de fondo brillante decorativo */}
+        {/* Círculo decorativo */}
         <div style={{
           position: 'absolute',
-          top: '-50px',
-          right: '-50px',
-          width: '150px',
-          height: '150px',
-          background: 'rgba(255, 255, 255, 0.1)',
+          top: '-60px',
+          right: '-40px',
+          width: '200px',
+          height: '200px',
+          background: 'rgba(255, 255, 255, 0.06)',
           borderRadius: '50%',
-          filter: 'blur(20px)'
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-30px',
+          left: '10%',
+          width: '120px',
+          height: '120px',
+          background: 'rgba(255, 255, 255, 0.04)',
+          borderRadius: '50%',
         }} />
 
-        {/* Textos del Banner */}
         <div style={{ flex: '1', minWidth: '280px', zIndex: 1 }}>
           <span style={{
-            backgroundColor: '#25d366',
-            color: 'white',
-            padding: '4px 12px',
-            borderRadius: '20px',
+            backgroundColor: 'var(--color-accent)',
+            color: '#000000',
+            padding: '4px 14px',
+            borderRadius: 'var(--radius-full)',
             fontSize: '12px',
-            fontWeight: 'bold',
+            fontWeight: 700,
             textTransform: 'uppercase',
             letterSpacing: '0.5px',
             display: 'inline-block',
-            marginBottom: '12px'
+            marginBottom: 'var(--space-3)',
           }}>
             🐾 Traé tu Envase y Ahorrá
           </span>
-          <h1 style={{ margin: '0 0 10px 0', fontSize: '30px', fontWeight: '800', lineHeight: '1.2' }}>
+          <h1 style={{
+            margin: '0 0 var(--space-2)',
+            fontSize: 'clamp(26px, 4vw, 36px)',
+            fontWeight: 800,
+            lineHeight: '1.15',
+            color: '#ffffff',
+          }}>
             ¡Llená de Brillo tu Hogar! ✨
           </h1>
-          <p style={{ margin: '0', fontSize: '15px', opacity: '0.94', lineHeight: '1.5', maxWidth: '550px' }}>
+          <p style={{
+            margin: '0',
+            fontSize: '15px',
+            opacity: '0.92',
+            lineHeight: '1.6',
+            maxWidth: '540px',
+          }}>
             Elegí los mejores productos de limpieza sueltos para fraccionar por litro.
             Armá tu carrito rápido y envialo directo por WhatsApp.
-            <strong style={{ display: 'block', marginTop: '8px', color: '#fef08a', fontSize: '14px' }}>
-              🐕 ¡Si tu pedido es tan largo como yo y supera los 20L, accedés a tarifa Mayorista!
-            </strong>
+          </p>
+          <p style={{
+            marginTop: 'var(--space-3)',
+            color: '#fde68a',
+            fontSize: '14px',
+            fontWeight: 600,
+          }}>
+            🐕 ¡Si tu pedido supera los 20L, accedés a tarifa Mayorista!
           </p>
         </div>
 
-        {/* 🐕 El Verdadero Perro Salchicha de Brillo Total */}
         <img
           src="/perro-header-transparente.png"
           alt="Mascota Brillo Total"
           style={{
-            height: '90px',
+            height: '100px',
             objectFit: 'contain',
             zIndex: 1,
-            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
-            userSelect: 'none'
+            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
+            userSelect: 'none',
           }}
         />
       </div>
 
-      {/* Mensaje de error de Firebase */}
+      {/* Error de Firebase */}
       {errorFirebase && (
         <div style={{
           textAlign: 'center',
-          padding: '15px',
-          marginBottom: '20px',
-          borderRadius: '8px',
-          backgroundColor: '#fff5f5',
-          border: '1px solid #fed7d7',
-          color: '#c53030',
+          padding: 'var(--space-4)',
+          marginBottom: 'var(--space-5)',
+          borderRadius: 'var(--radius-sm)',
+          backgroundColor: 'var(--color-danger-light)',
+          border: '1px solid var(--color-danger)',
+          color: 'var(--color-danger-dark)',
           fontSize: '14px',
-          fontWeight: 'bold'
+          fontWeight: 600,
         }}>
           ⚠️ {errorFirebase}
         </div>
       )}
 
-      {/* Botonera Interactiva de Filtros */}
+      {/* Filtros con íconos */}
       <div style={{
         display: 'flex',
         justifyContent: 'center',
-        gap: '12px',
-        marginBottom: '40px',
-        flexWrap: 'wrap'
+        gap: 'var(--space-2)',
+        marginBottom: 'var(--space-8)',
+        flexWrap: 'wrap',
       }}>
         {CATEGORIAS.map((cat) => {
           const esActivo = categoriaActual === cat;
@@ -211,46 +229,54 @@ export const Home: React.FC = () => {
             <button
               key={cat}
               onClick={() => setCategoriaActual(cat)}
-              className={esActivo ? '' : 'btn-filter'}
               style={{
-                padding: '10px 22px',
-                borderRadius: '25px',
-                border: '1px solid var(--color-primary)',
+                padding: '8px 18px',
+                borderRadius: 'var(--radius-full)',
+                border: `1.5px solid ${esActivo ? 'var(--color-primary)' : 'var(--color-border)'}`,
                 backgroundColor: esActivo ? 'var(--color-primary)' : 'var(--color-bg-card)',
-                color: esActivo ? '#ffffff' : 'var(--color-primary)',
-                fontWeight: 'bold',
-                fontSize: '14px',
+                color: esActivo ? '#ffffff' : 'var(--color-text-secondary)',
+                fontWeight: esActivo ? 700 : 500,
+                fontSize: '13px',
                 cursor: 'pointer',
                 textTransform: 'capitalize',
                 transition: 'all 0.2s ease',
-                boxShadow: esActivo ? '0 4px 10px rgba(49, 130, 206, 0.25)' : 'none',
-                outline: 'none'
+                boxShadow: esActivo ? 'var(--shadow-md)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
               }}
             >
+              <span>{CAT_ICONS[cat]}</span>
               {cat}
             </button>
           );
         })}
       </div>
 
-      {/* Grilla de Productos o Mensaje de Vacío */}
+      {/* Grilla de productos */}
       {productosFiltrados.length === 0 ? (
-        <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', marginTop: '50px', fontSize: '16px' }}>
-          ✨ Muy pronto sumaremos productos a la línea <span style={{ textTransform: 'capitalize', fontWeight: 'bold' }}>{categoriaActual}</span>.
+        <div style={{
+          textAlign: 'center',
+          color: 'var(--color-text-muted)',
+          marginTop: 'var(--space-12)',
+          fontSize: '16px',
+          padding: 'var(--space-8)',
+        }}>
+          <div style={{ fontSize: '48px', marginBottom: 'var(--space-4)' }}>✨</div>
+          <p>Muy pronto sumaremos productos a la línea <strong style={{ textTransform: 'capitalize' }}>{categoriaActual}</strong>.</p>
         </div>
       ) : (
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '25px',
-          padding: '10px 0'
+          gap: 'var(--space-6)',
+          padding: 'var(--space-3) 0',
         }}>
           {productosFiltrados.map((producto) => (
             <ProductoCard key={producto.id} producto={producto} />
           ))}
         </div>
       )}
-
     </div>
   );
 };
