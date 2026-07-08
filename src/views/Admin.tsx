@@ -32,6 +32,13 @@ export const Admin: React.FC = () => {
     const [imagenUrl, setImagenUrl] = useState('');
     const [subiendoImagen, setSubiendoImagen] = useState(false);
     const [errorAuthFirebase, setErrorAuthFirebase] = useState<string | null>(null);
+    const [guardando, setGuardando] = useState(false);
+    const [toast, setToast] = useState<{ mensaje: string; tipo: 'exito' | 'error' } | null>(null);
+
+    const mostrarToast = (mensaje: string, tipo: 'exito' | 'error') => {
+        setToast({ mensaje, tipo });
+        setTimeout(() => setToast(null), 3000);
+    };
 
     const [idEnEdicion, setIdEnEdicion] = useState<string | null>(null);
 
@@ -133,9 +140,10 @@ export const Admin: React.FC = () => {
             const productoRef = doc(db, "productos", id);
             await updateDoc(productoRef, { stock: !stockActual });
             setProductos(prev => prev.map(p => p.id === id ? { ...p, stock: !stockActual } : p));
+            mostrarToast(`Stock cambiado a ${!stockActual ? 'disponible' : 'sin stock'}`, 'exito');
         } catch (error) {
             console.error("Error al cambiar stock: ", error);
-            alert("No se pudo actualizar el stock en Firebase.");
+            mostrarToast("No se pudo actualizar el stock.", 'error');
         }
     };
 
@@ -166,14 +174,19 @@ export const Admin: React.FC = () => {
         e.preventDefault();
 
         if (!nombre || !precioMinorista || !precioMayorista) {
-            alert("Por favor completá los campos obligatorios (Nombre y Precios).");
+            mostrarToast("Completá los campos obligatorios (Nombre y Precios).", 'error');
             return;
         }
 
         const min = Number(precioMinorista);
         const may = Number(precioMayorista);
         if (isNaN(min) || isNaN(may) || min <= 0 || may <= 0) {
-            alert("Los precios deben ser números válidos mayores a cero.");
+            mostrarToast("Los precios deben ser números válidos mayores a cero.", 'error');
+            return;
+        }
+
+        if (min < may) {
+            mostrarToast("El precio minorista no puede ser menor al mayorista.", 'error');
             return;
         }
 
@@ -187,24 +200,27 @@ export const Admin: React.FC = () => {
             imagenUrl: imagenUrl.trim() || 'https://via.placeholder.com/180',
         };
 
+        setGuardando(true);
         try {
             if (idEnEdicion) {
                 const productoRef = doc(db, "productos", idEnEdicion);
                 await updateDoc(productoRef, datosProducto);
-                alert("✨ ¡Producto actualizado con éxito!");
+                mostrarToast("✨ ¡Producto actualizado con éxito!", 'exito');
             } else {
                 await addDoc(collection(db, "productos"), {
                     ...datosProducto,
                     stock: true,
                 });
-                alert("✅ ¡Producto creado con éxito!");
+                mostrarToast("✅ ¡Producto creado con éxito!", 'exito');
             }
 
             cancelarEdicion();
             cargarProductos();
         } catch (error) {
             console.error("Error al guardar en Firebase: ", error);
-            alert("Hubo un error al procesar la operación.");
+            mostrarToast("Hubo un error al procesar la operación.", 'error');
+        } finally {
+            setGuardando(false);
         }
     };
 
@@ -273,10 +289,25 @@ export const Admin: React.FC = () => {
     };
 
     return (
-        <div style={{ width: '100%', maxWidth: '900px', margin: '0 auto', padding: '15px', boxSizing: 'border-box' }}>
+        <div style={{ width: '100%', maxWidth: '900px', margin: '0 auto', padding: '15px', boxSizing: 'border-box', position: 'relative' }}>
             {errorAuthFirebase && (
                 <div style={{ color: 'var(--color-danger)', textAlign: 'center', padding: '10px', border: '1px solid #fed7d7', borderRadius: '6px', backgroundColor: '#fff5f5', marginBottom: '15px' }}>
                     ⚠️ {errorAuthFirebase}
+                </div>
+            )}
+
+            {toast && (
+                <div style={{
+                    position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)',
+                    backgroundColor: toast.tipo === 'exito' ? '#2d3748' : '#e53e3e',
+                    color: 'white', padding: '12px 24px', borderRadius: '10px',
+                    fontSize: '14px', fontWeight: '600', zIndex: 9999,
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                    animation: 'fadeInUp 0.25s ease',
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    whiteSpace: 'nowrap'
+                }}>
+                    {toast.mensaje}
                 </div>
             )}
 
@@ -354,7 +385,7 @@ export const Admin: React.FC = () => {
                             </div>
                             {imagenUrl.trim() && (
                                 <div style={{
-                                    width: '60px', height: '60px', borderRadius: '8px', overflow: 'hidden',
+                                    width: '120px', height: '120px', borderRadius: '8px', overflow: 'hidden',
                                     border: '1px solid var(--color-border)', flexShrink: 0,
                                     backgroundColor: '#f8f8f8', display: 'flex', alignItems: 'center', justifyContent: 'center'
                                 }}>
@@ -395,11 +426,11 @@ export const Admin: React.FC = () => {
                     </div>
 
                     <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
-                        <button type="submit" style={{ flex: '1 1 180px', backgroundColor: idEnEdicion ? 'var(--color-primary)' : 'var(--color-success)', color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
-                            {idEnEdicion ? '💾 Guardar Cambios' : '🚀 Registrar Producto'}
+                        <button type="submit" disabled={guardando} style={{ flex: '1 1 180px', backgroundColor: guardando ? 'var(--color-text-muted)' : (idEnEdicion ? 'var(--color-primary)' : 'var(--color-success)'), color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: guardando ? 'not-allowed' : 'pointer', opacity: guardando ? 0.7 : 1 }}>
+                            {guardando ? '⏳ Guardando...' : (idEnEdicion ? '💾 Guardar Cambios' : '🚀 Registrar Producto')}
                         </button>
                         {idEnEdicion && (
-                            <button type="button" onClick={cancelarEdicion} style={{ flex: '1 1 100px', backgroundColor: 'var(--color-border-light)', color: 'var(--color-text-secondary)', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                            <button type="button" onClick={cancelarEdicion} disabled={guardando} style={{ flex: '1 1 100px', backgroundColor: 'var(--color-border-light)', color: 'var(--color-text-secondary)', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: guardando ? 'not-allowed' : 'pointer', opacity: guardando ? 0.5 : 1 }}>
                                 Cancelar
                             </button>
                         )}
@@ -410,7 +441,9 @@ export const Admin: React.FC = () => {
             {/* SECCIÓN 2: LISTADO DE INVENTARIO EN TARJETAS PARA CELULAR */}
             <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
-                    <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--color-text)' }}>📦 Inventario en Tiempo Real</h3>
+                    <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--color-text)' }}>
+                        📦 Inventario {productos.length > 0 && <span style={{ fontSize: '14px', fontWeight: 'normal', color: 'var(--color-text-secondary)' }}>({productos.length} productos)</span>}
+                    </h3>
                     <button onClick={cerrarSesion} style={{ backgroundColor: 'transparent', color: 'var(--color-danger)', border: '1px solid var(--color-danger)', padding: '5px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}>
                         🔒 Cerrar Sesión
                     </button>
@@ -438,60 +471,77 @@ export const Admin: React.FC = () => {
                                     boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
                                     border: idEnEdicion === prod.id ? '1px solid var(--color-primary-light)' : '1px solid var(--color-border-light)',
                                     display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '8px',
+                                    flexDirection: 'row',
+                                    gap: '12px',
                                     boxSizing: 'border-box',
-                                    width: '100%'
+                                    width: '100%',
+                                    alignItems: 'center'
                                 }}
                             >
-                                {/* Fila superior: Nombre y Presentación */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '5px' }}>
-                                    <span style={{ fontWeight: 'bold', color: 'var(--color-text)', fontSize: '15px' }}>{prod.nombre}</span>
-                                    <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-border-light)', padding: '2px 8px', borderRadius: '4px' }}>
-                                        {prod.presentacion || 'Por Litro'}
-                                    </span>
+                                {/* Miniatura */}
+                                <div style={{
+                                    width: '48px', height: '48px', borderRadius: '8px', overflow: 'hidden',
+                                    backgroundColor: '#f8f8f8', flexShrink: 0, border: '1px solid var(--color-border-light)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                    <img
+                                        src={prod.imagenUrl}
+                                        alt={prod.nombre}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                    />
                                 </div>
 
-                                {/* Fila media: Precios */}
-                                <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', padding: '4px 0' }}>
-                                    <span>Min: <strong style={{ color: 'var(--color-primary-dark)' }}>${formatearPrecio(prod.precioMinorista)}</strong></span>
-                                    <span style={{ margin: '0 10px', color: 'var(--color-border)' }}>|</span>
-                                    <span>May: <strong style={{ color: 'var(--color-success-dark)' }}>${formatearPrecio(prod.precioMayorista)}</strong></span>
-                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    {/* Fila superior: Nombre y Presentación */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '5px' }}>
+                                        <span style={{ fontWeight: 'bold', color: 'var(--color-text)', fontSize: '15px' }}>{prod.nombre}</span>
+                                        <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-border-light)', padding: '2px 8px', borderRadius: '4px' }}>
+                                            {prod.presentacion || 'Por Litro'}
+                                        </span>
+                                    </div>
 
-                                {/* Fila inferior: Acciones de Stock y Edición (Hacen wrap si no entran) */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '5px', flexWrap: 'wrap', gap: '10px' }}>
-                                    <button
-                                        onClick={() => conmutarStock(prod.id, prod.stock)}
-                                        style={{
-                                            backgroundColor: prod.stock ? '#e6fffa' : '#fff5f5',
-                                            color: prod.stock ? 'var(--color-success-dark)' : 'var(--color-danger)',
-                                            border: `1px solid ${prod.stock ? '#b2f5ea' : '#fed7d7'}`,
-                                            padding: '6px 12px',
-                                            borderRadius: '20px',
-                                            fontSize: '12px',
-                                            fontWeight: 'bold',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        {prod.stock ? '🟢 Disponible' : '🔴 Sin Stock'}
-                                    </button>
+                                    {/* Fila media: Precios */}
+                                    <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', padding: '4px 0' }}>
+                                        <span>Min: <strong style={{ color: 'var(--color-primary-dark)' }}>${formatearPrecio(prod.precioMinorista)}</strong></span>
+                                        <span style={{ margin: '0 10px', color: 'var(--color-border)' }}>|</span>
+                                        <span>May: <strong style={{ color: 'var(--color-success-dark)' }}>${formatearPrecio(prod.precioMayorista)}</strong></span>
+                                    </div>
 
-                                    <button
-                                        onClick={() => activarEdicion(prod)}
-                                        style={{
-                                            backgroundColor: 'var(--color-border-light)',
-                                            color: 'var(--color-primary-dark)',
-                                            border: 'none',
-                                            padding: '6px 16px',
-                                            borderRadius: '6px',
-                                            fontWeight: 'bold',
-                                            fontSize: '12px',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        ✏️ Editar
-                                    </button>
+                                    {/* Fila inferior: Acciones */}
+                                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                        <button
+                                            onClick={() => conmutarStock(prod.id, prod.stock)}
+                                            style={{
+                                                backgroundColor: prod.stock ? '#e6fffa' : '#fff5f5',
+                                                color: prod.stock ? 'var(--color-success-dark)' : 'var(--color-danger)',
+                                                border: `1px solid ${prod.stock ? '#b2f5ea' : '#fed7d7'}`,
+                                                padding: '4px 12px',
+                                                borderRadius: '20px',
+                                                fontSize: '12px',
+                                                fontWeight: 'bold',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            {prod.stock ? '🟢 Disponible' : '🔴 Sin Stock'}
+                                        </button>
+
+                                        <button
+                                            onClick={() => activarEdicion(prod)}
+                                            style={{
+                                                backgroundColor: 'var(--color-border-light)',
+                                                color: 'var(--color-primary-dark)',
+                                                border: 'none',
+                                                padding: '4px 14px',
+                                                borderRadius: '6px',
+                                                fontWeight: 'bold',
+                                                fontSize: '12px',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            ✏️ Editar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         ))}
