@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { type Producto } from '../info/productos';
 import { useCart } from '../hooks/useCart';
-import { formatearPrecio } from '../utils/constants';
+import { formatearPrecio, CATEGORY_STYLES } from '../utils/constants';
+import styles from './ProductoCard.module.css';
 
 interface ProductoCardProps {
   producto: Producto;
 }
 
-const CATEGORY_STYLES: Record<string, { color: string; bg: string; label: string; icon: string }> = {
-  hogar: { color: '#16a34a', bg: '#dcfce7', label: 'Línea Hogar', icon: '🏡' },
-  automotor: { color: '#2563eb', bg: '#dbeafe', label: 'Automotor', icon: '🚗' },
-  insumos: { color: '#d97706', bg: '#fef3c7', label: 'Insumo', icon: '📦' },
-};
-
 export const ProductoCard: React.FC<ProductoCardProps> = React.memo(({ producto }) => {
-  const { esMayorista, agregarAlCarrito } = useCart();
+  const { cart, esMayorista, agregarAlCarrito, removerDelCarrito } = useCart();
+  const navigate = useNavigate();
   const [showToast, setShowToast] = useState(false);
 
   const precioMostrar = esMayorista ? producto.precioMayorista : producto.precioMinorista;
   const precioFormateado = formatearPrecio(precioMostrar);
   const catStyle = CATEGORY_STYLES[producto.categoria] || CATEGORY_STYLES.hogar;
+
+  const itemEnCarrito = cart.find((i) => i.producto.id === producto.id);
+  const cantidadEnCarrito = itemEnCarrito?.cantidad ?? 0;
 
   const handleAdd = () => {
     agregarAlCarrito(producto);
@@ -29,165 +29,88 @@ export const ProductoCard: React.FC<ProductoCardProps> = React.memo(({ producto 
 
   return (
     <div
-      className="card-hover"
-      style={{
-        border: '1px solid var(--color-border)',
-        borderRadius: 'var(--radius-lg)',
-        backgroundColor: 'var(--color-bg-card)',
-        boxShadow: 'var(--shadow-sm)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        position: 'relative',
-      }}
+      className={`${styles.card} card-hover`}
+      onClick={() => navigate(`/producto/${producto.id}`)}
+      role="link"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/producto/${producto.id}`); }}
     >
-      {/* Imagen */}
-      <div style={{
-        position: 'relative',
-        width: '100%',
-        aspectRatio: '16 / 9',
-        overflow: 'hidden',
-        backgroundColor: 'var(--color-border-light)',
-      }}>
-        <img
-          src={producto.imagenUrl}
-          alt={producto.nombre}
-          loading="lazy"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            transition: 'transform 0.3s ease',
-          }}
-          onMouseOver={(e) => { (e.target as HTMLImageElement).style.transform = 'scale(1.05)'; }}
-          onMouseOut={(e) => { (e.target as HTMLImageElement).style.transform = 'scale(1)'; }}
-        />
-        {/* Badge de categoría sobre la imagen */}
-        <span style={{
-          position: 'absolute',
-          top: 'var(--space-2)',
-          left: 'var(--space-2)',
-          fontSize: '10px',
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          color: catStyle.color,
-          backgroundColor: catStyle.bg,
-          padding: '3px 10px',
-          borderRadius: 'var(--radius-full)',
-          letterSpacing: '0.3px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        }}>
+      <div className={styles.imageWrapper}>
+          <img
+            src={producto.imagenUrl}
+            alt={producto.nombre}
+            loading="lazy"
+            decoding="async"
+            width="320"
+            height="180"
+            className={styles.image}
+            onMouseOver={(e) => { (e.target as HTMLImageElement).style.transform = 'scale(1.05)'; }}
+            onMouseOut={(e) => { (e.target as HTMLImageElement).style.transform = 'scale(1)'; }}
+          />
+        <span
+          className={styles.categoryBadge}
+          style={{ color: catStyle.color, backgroundColor: catStyle.bg }}
+        >
           {catStyle.icon} {catStyle.label}
         </span>
         {!producto.stock && (
-          <div style={{
-            position: 'absolute',
-            top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#ffffff',
-            fontWeight: 700,
-            fontSize: '14px',
-            letterSpacing: '1px',
-            textTransform: 'uppercase',
-          }}>
+          <div className={styles.stockOverlay}>
             Sin Stock
           </div>
         )}
       </div>
 
-      {/* Contenido */}
-      <div style={{
-        padding: 'var(--space-4)',
-        display: 'flex',
-        flexDirection: 'column',
-        flex: 1,
-      }}>
-        <h3 style={{
-          margin: '0 0 var(--space-1)',
-          fontSize: '17px',
-          fontWeight: 600,
-          color: 'var(--color-text)',
-          lineHeight: '1.3',
-        }}>
-          {producto.nombre}
-        </h3>
+      <div className={styles.content}>
+        <h3 className={styles.productName}>{producto.nombre}</h3>
 
-        <p style={{
-          fontSize: '13px',
-          color: 'var(--color-text-muted)',
-          margin: '0 0 var(--space-2)',
-          lineHeight: '1.4',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }}>
-          {producto.descripcion}
-        </p>
+        <p className={styles.description}>{producto.descripcion}</p>
 
-        <p style={{
-          fontSize: '12px',
-          color: 'var(--color-text-muted)',
-          margin: '0 0 var(--space-3)',
-        }}>
-          {producto.presentacion}
-        </p>
+        <p className={styles.presentation}>{producto.presentacion}</p>
 
-        <div style={{
-          marginTop: 'auto',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 'var(--space-2)',
-        }}>
+        <div className={styles.footer}>
           <div>
-            <span style={{
-              fontSize: '22px',
-              fontWeight: 700,
-              color: 'var(--color-primary)',
-              letterSpacing: '-0.5px',
-            }}>
-              ${precioFormateado}
-            </span>
+            <span className={styles.price}>${precioFormateado}</span>
             {esMayorista && (
-              <span style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                color: 'var(--color-accent-dark)',
-                display: 'block',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-              }}>
-                Mayoreo
-              </span>
+              <span className={styles.mayoristaTag}>Mayoreo</span>
             )}
           </div>
 
-          <button
-            disabled={!producto.stock}
-            onClick={handleAdd}
-            className="btn-primary"
-            style={{
-              backgroundColor: producto.stock ? 'var(--color-primary)' : 'var(--color-border)',
-              color: producto.stock ? '#ffffff' : 'var(--color-text-muted)',
-              border: 'none',
-              padding: '10px 16px',
-              borderRadius: 'var(--radius-sm)',
-              cursor: producto.stock ? 'pointer' : 'not-allowed',
-              fontWeight: 600,
-              fontSize: '13px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.2s',
-            }}
-          >
-            <span>+</span>
-            <span>Agregar</span>
-          </button>
+          {cantidadEnCarrito > 0 ? (
+            <div
+              className={styles.stepper}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => removerDelCarrito(producto.id)}
+                aria-label="Reducir cantidad"
+                className={styles.stepperBtn}
+              >
+                −
+              </button>
+              <span className={styles.stepperValue}>{cantidadEnCarrito}</span>
+              <button
+                onClick={() => { agregarAlCarrito(producto); setShowToast(true); setTimeout(() => setShowToast(false), 1500); }}
+                aria-label="Aumentar cantidad"
+                className={styles.stepperBtn}
+              >
+                +
+              </button>
+            </div>
+          ) : (
+            <button
+              disabled={!producto.stock}
+              onClick={(e) => { e.stopPropagation(); handleAdd(); }}
+              className={styles.addButton}
+              style={{
+                backgroundColor: producto.stock ? 'var(--color-primary)' : 'var(--color-border)',
+                color: producto.stock ? '#ffffff' : 'var(--color-text-muted)',
+                cursor: producto.stock ? 'pointer' : 'not-allowed',
+              }}
+            >
+              <span>+</span>
+              <span>Agregar</span>
+            </button>
+          )}
         </div>
       </div>
 

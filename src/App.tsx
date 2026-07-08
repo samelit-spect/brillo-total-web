@@ -13,6 +13,8 @@ const UbicacionView = lazy(() => import('./views/UbicacionView').then(m => ({ de
 const Admin = lazy(() => import('./views/Admin').then(m => ({ default: m.Admin })));
 const NotFoundView = lazy(() => import('./views/NotFoundView').then(m => ({ default: m.NotFoundView })));
 const TerminosView = lazy(() => import('./views/TerminosView').then(m => ({ default: m.TerminosView })));
+const ProductoView = lazy(() => import('./views/ProductoView').then(m => ({ default: m.ProductoView })));
+const MisPedidosView = lazy(() => import('./views/MisPedidosView').then(m => ({ default: m.MisPedidosView })));
 
 const TITULOS: Record<string, string> = {
   '/': 'Brillo Total — Catálogo de Productos de Limpieza',
@@ -22,6 +24,7 @@ const TITULOS: Record<string, string> = {
   '/ubicacion': 'Ubicación y Horarios — Brillo Total',
   '/salchi': 'Administración — Brillo Total',
   '/terminos': 'Términos y Condiciones — Brillo Total',
+  '/mis-pedidos': 'Mis Pedidos — Brillo Total',
 };
 
 const RUTA_A_VISTA: Record<string, string> = {
@@ -32,6 +35,7 @@ const RUTA_A_VISTA: Record<string, string> = {
   '/ubicacion': 'ubicacion',
   '/salchi': 'admin',
   '/terminos': 'terminos',
+  '/mis-pedidos': 'mis-pedidos',
 };
 
 const OG_TAGS: Record<string, { title: string; description: string }> = {
@@ -42,6 +46,7 @@ const OG_TAGS: Record<string, { title: string; description: string }> = {
   '/ubicacion': { title: 'Ubicación y Horarios — Brillo Total', description: 'Visitanos en La Rioja Capital. Conocé nuestros horarios de atención.' },
   '/salchi': { title: 'Administración — Brillo Total', description: 'Panel de administración del catálogo Brillo Total.' },
   '/terminos': { title: 'Términos y Condiciones — Brillo Total', description: 'Términos y condiciones de uso de la plataforma Brillo Total.' },
+  '/mis-pedidos': { title: 'Mis Pedidos — Brillo Total', description: 'Historial de pedidos realizados en Brillo Total.' },
 };
 
 function actualizarMetaTags(ruta: string) {
@@ -93,6 +98,7 @@ function AppLayout() {
       nosotros: '/nosotros',
       ubicacion: '/ubicacion',
       admin: '/salchi',
+      'mis-pedidos': '/mis-pedidos',
     };
     navigate(mapa[vista] || '/catalogo');
   };
@@ -132,6 +138,8 @@ function AppLayout() {
                 <Route path="/ubicacion" element={<UbicacionView />} />
                 <Route path="/salchi" element={<Admin />} />
                 <Route path="/terminos" element={<TerminosView />} />
+                <Route path="/producto/:id" element={<ProductoView />} />
+                <Route path="/mis-pedidos" element={<MisPedidosView />} />
                 <Route path="*" element={<NotFoundView />} />
               </Routes>
             </Suspense>

@@ -1,0 +1,222 @@
+.wrapper {
+  padding: var(--space-5);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--color-navy) 0%, #1e40af 50%, var(--color-primary) 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8) var(--space-6);
+  color: white;
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  position: relative;
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+
+.heroCircle1 {
+  position: absolute;
+  top: -60px;
+  right: -40px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+}
+
+.heroCircle2 {
+  position: absolute;
+  bottom: -30px;
+  left: 10%;
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 50%;
+}
+
+.heroContent {
+  flex: 1;
+  min-width: 280px;
+  z-index: 1;
+}
+
+.heroTag {
+  background-color: var(--color-accent);
+  color: #000000;
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-bottom: var(--space-3);
+}
+
+.heroTitle {
+  margin: 0 0 var(--space-2);
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 800;
+  line-height: 1.15;
+  color: #ffffff;
+}
+
+.heroText {
+  margin: 0;
+  font-size: 15px;
+  opacity: 0.92;
+  line-height: 1.6;
+  max-width: 540px;
+}
+
+.heroMayorista {
+  margin-top: var(--space-3);
+  color: #fde68a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.heroImage {
+  height: 100px;
+  object-fit: contain;
+  z-index: 1;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+  user-select: none;
+}
+
+.errorBanner {
+  text-align: center;
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-danger-light);
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger-dark);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.searchWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-5);
+}
+
+.searchInner {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-border);
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.searchClear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--color-text-muted);
+  line-height: 1;
+  padding: 4px;
+}
+
+.filters {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  cursor: pointer;
+  text-transform: capitalize;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+}
+
+.filterBtnActive {
+  border: 1.5px solid var(--color-primary);
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+}
+
+.filterBtnInactive {
+  border: 1.5px solid var(--color-border);
+  background-color: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  margin-top: var(--space-12);
+  font-size: 16px;
+  padding: var(--space-8);
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: var(--space-4);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-6);
+  padding: var(--space-3) 0;
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-6);
+  padding: var(--space-3) 0;
+}
+
+.loadingWrapper {
+  padding: var(--space-5);
+  max-width: 1200px;
+  margin: 0 auto;
+}

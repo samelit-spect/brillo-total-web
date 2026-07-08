@@ -3,6 +3,7 @@ import { type Producto } from '../info/productos';
 import { ProductoCard } from '../components/ProductoCard';
 import { obtenerProductos } from '../services/productos';
 import { CATEGORIAS } from '../utils/constants';
+import styles from './Home.module.css';
 
 const CAT_ICONS: Record<string, string> = {
   todos: '✨',
@@ -16,6 +17,14 @@ export const Home: React.FC = () => {
   const [cargando, setCargando] = useState<boolean>(true);
   const [errorFirebase, setErrorFirebase] = useState<string | null>(null);
   const [categoriaActual, setCategoriaActual] = useState<string>('todos');
+  const [busqueda, setBusqueda] = useState<string>('');
+  const [mostrarScrollTop, setMostrarScrollTop] = useState<boolean>(false);
+
+  useEffect(() => {
+    const onScroll = () => setMostrarScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     const cargarProductos = async () => {
@@ -72,19 +81,19 @@ export const Home: React.FC = () => {
     return () => { script.remove(); };
   }, [productos]);
 
-  const productosFiltrados = categoriaActual === 'todos'
-    ? productos
-    : productos.filter((prod) => prod.categoria === categoriaActual);
+  const productosFiltrados = productos.filter((prod) => {
+    const coincideCategoria = categoriaActual === 'todos' || prod.categoria === categoriaActual;
+    const termino = busqueda.toLowerCase().trim();
+    const coincideBusqueda = !termino
+      || prod.nombre.toLowerCase().includes(termino)
+      || prod.descripcion.toLowerCase().includes(termino);
+    return coincideCategoria && coincideBusqueda;
+  });
 
   if (cargando) {
     return (
-      <div style={{ padding: 'var(--space-5)', maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: 'var(--space-6)',
-          padding: 'var(--space-3) 0'
-        }}>
+      <div className={styles.loadingWrapper}>
+        <div className={styles.skeletonGrid}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="skeleton-wrapper">
               <div className="skeleton skeleton-img" />
@@ -103,84 +112,25 @@ export const Home: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: 'var(--space-5)', maxWidth: '1200px', margin: '0 auto' }}>
+    <div className={styles.wrapper}>
 
       {/* Hero Banner */}
-      <div style={{
-        background: 'linear-gradient(135deg, var(--color-navy) 0%, #1e40af 50%, var(--color-primary) 100%)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 'var(--space-8) var(--space-6)',
-        color: 'white',
-        marginTop: 'var(--space-2)',
-        marginBottom: 'var(--space-8)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 'var(--space-5)',
-        position: 'relative',
-        overflow: 'hidden',
-        flexWrap: 'wrap',
-      }}>
-        {/* Círculo decorativo */}
-        <div style={{
-          position: 'absolute',
-          top: '-60px',
-          right: '-40px',
-          width: '200px',
-          height: '200px',
-          background: 'rgba(255, 255, 255, 0.06)',
-          borderRadius: '50%',
-        }} />
-        <div style={{
-          position: 'absolute',
-          bottom: '-30px',
-          left: '10%',
-          width: '120px',
-          height: '120px',
-          background: 'rgba(255, 255, 255, 0.04)',
-          borderRadius: '50%',
-        }} />
+      <div className={styles.hero}>
+        <div className={styles.heroCircle1} />
+        <div className={styles.heroCircle2} />
 
-        <div style={{ flex: '1', minWidth: '280px', zIndex: 1 }}>
-          <span style={{
-            backgroundColor: 'var(--color-accent)',
-            color: '#000000',
-            padding: '4px 14px',
-            borderRadius: 'var(--radius-full)',
-            fontSize: '12px',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            display: 'inline-block',
-            marginBottom: 'var(--space-3)',
-          }}>
+        <div className={styles.heroContent}>
+          <span className={styles.heroTag}>
             🐾 Traé tu Envase y Ahorrá
           </span>
-          <h1 style={{
-            margin: '0 0 var(--space-2)',
-            fontSize: 'clamp(26px, 4vw, 36px)',
-            fontWeight: 800,
-            lineHeight: '1.15',
-            color: '#ffffff',
-          }}>
+          <h1 className={styles.heroTitle}>
             ¡Llená de Brillo tu Hogar! ✨
           </h1>
-          <p style={{
-            margin: '0',
-            fontSize: '15px',
-            opacity: '0.92',
-            lineHeight: '1.6',
-            maxWidth: '540px',
-          }}>
+          <p className={styles.heroText}>
             Elegí los mejores productos de limpieza sueltos para fraccionar por litro.
             Armá tu carrito rápido y envialo directo por WhatsApp.
           </p>
-          <p style={{
-            marginTop: 'var(--space-3)',
-            color: '#fde68a',
-            fontSize: '14px',
-            fontWeight: 600,
-          }}>
+          <p className={styles.heroMayorista}>
             🐕 ¡Si tu pedido supera los 20L, accedés a tarifa Mayorista!
           </p>
         </div>
@@ -188,63 +138,61 @@ export const Home: React.FC = () => {
         <img
           src="/perro-header-transparente.png"
           alt="Mascota Brillo Total"
-          style={{
-            height: '100px',
-            objectFit: 'contain',
-            zIndex: 1,
-            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
-            userSelect: 'none',
-          }}
+          width="100"
+          height="100"
+          decoding="async"
+          className={styles.heroImage}
         />
       </div>
 
       {/* Error de Firebase */}
       {errorFirebase && (
-        <div style={{
-          textAlign: 'center',
-          padding: 'var(--space-4)',
-          marginBottom: 'var(--space-5)',
-          borderRadius: 'var(--radius-sm)',
-          backgroundColor: 'var(--color-danger-light)',
-          border: '1px solid var(--color-danger)',
-          color: 'var(--color-danger-dark)',
-          fontSize: '14px',
-          fontWeight: 600,
-        }}>
+        <div className={styles.errorBanner}>
           ⚠️ {errorFirebase}
         </div>
       )}
 
+      {/* Buscador */}
+      <div className={styles.searchWrapper}>
+        <div className={styles.searchInner}>
+          <span className={styles.searchIcon}>🔍</span>
+          <input
+            type="text"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Buscá un producto..."
+            aria-label="Buscar productos"
+            className={styles.searchInput}
+            onFocus={(e) => {
+              e.target.style.borderColor = 'var(--color-primary)';
+              e.target.style.boxShadow = '0 0 0 3px var(--color-primary-lighter)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = 'var(--color-border)';
+              e.target.style.boxShadow = 'none';
+            }}
+          />
+          {busqueda && (
+            <button
+              onClick={() => setBusqueda('')}
+              aria-label="Limpiar búsqueda"
+              className={styles.searchClear}
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Filtros con íconos */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        gap: 'var(--space-2)',
-        marginBottom: 'var(--space-8)',
-        flexWrap: 'wrap',
-      }}>
+      <div className={styles.filters}>
         {CATEGORIAS.map((cat) => {
           const esActivo = categoriaActual === cat;
           return (
             <button
               key={cat}
               onClick={() => setCategoriaActual(cat)}
-              style={{
-                padding: '8px 18px',
-                borderRadius: 'var(--radius-full)',
-                border: `1.5px solid ${esActivo ? 'var(--color-primary)' : 'var(--color-border)'}`,
-                backgroundColor: esActivo ? 'var(--color-primary)' : 'var(--color-bg-card)',
-                color: esActivo ? '#ffffff' : 'var(--color-text-secondary)',
-                fontWeight: esActivo ? 700 : 500,
-                fontSize: '13px',
-                cursor: 'pointer',
-                textTransform: 'capitalize',
-                transition: 'all 0.2s ease',
-                boxShadow: esActivo ? 'var(--shadow-md)' : 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
+              className={`${styles.filterBtn} ${esActivo ? styles.filterBtnActive : styles.filterBtnInactive}`}
             >
               <span>{CAT_ICONS[cat]}</span>
               {cat}
@@ -253,29 +201,69 @@ export const Home: React.FC = () => {
         })}
       </div>
 
-      {/* Grilla de productos */}
-      {productosFiltrados.length === 0 ? (
+      {/* Contador de resultados */}
+      {!cargando && productos.length > 0 && (
         <div style={{
           textAlign: 'center',
+          fontSize: '13px',
           color: 'var(--color-text-muted)',
-          marginTop: 'var(--space-12)',
-          fontSize: '16px',
-          padding: 'var(--space-8)',
+          marginBottom: 'var(--space-4)',
         }}>
-          <div style={{ fontSize: '48px', marginBottom: 'var(--space-4)' }}>✨</div>
-          <p>Muy pronto sumaremos productos a la línea <strong style={{ textTransform: 'capitalize' }}>{categoriaActual}</strong>.</p>
+          {productosFiltrados.length === productos.length
+            ? `${productos.length} producto${productos.length !== 1 ? 's' : ''} disponible${productos.length !== 1 ? 's' : ''}`
+            : `${productosFiltrados.length} de ${productos.length} producto${productos.length !== 1 ? 's' : ''}`}
+        </div>
+      )}
+
+      {/* Grilla de productos */}
+      {productosFiltrados.length === 0 ? (
+        <div className={styles.empty}>
+          <div className={styles.emptyIcon}>
+            {busqueda ? '🔍' : '✨'}
+          </div>
+          {busqueda ? (
+            <p>No encontramos <strong>"{busqueda}"</strong> en esta categoría. Probá con otro término.</p>
+          ) : (
+            <p>Muy pronto sumaremos productos a la línea <strong style={{ textTransform: 'capitalize' }}>{categoriaActual}</strong>.</p>
+          )}
         </div>
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: 'var(--space-6)',
-          padding: 'var(--space-3) 0',
-        }}>
+        <div className={styles.grid}>
           {productosFiltrados.map((producto) => (
             <ProductoCard key={producto.id} producto={producto} />
           ))}
         </div>
+      )}
+
+      {/* Botón Volver Arriba */}
+      {mostrarScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Volver arriba"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            border: 'none',
+            backgroundColor: 'var(--color-primary)',
+            color: '#fff',
+            fontSize: '20px',
+            cursor: 'pointer',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'opacity 0.2s, transform 0.2s',
+          }}
+          onMouseOver={(e) => { (e.target as HTMLButtonElement).style.transform = 'scale(1.1)'; }}
+          onMouseOut={(e) => { (e.target as HTMLButtonElement).style.transform = 'scale(1)'; }}
+        >
+          ↑
+        </button>
       )}
     </div>
   );

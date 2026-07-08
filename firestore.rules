@@ -10,7 +10,7 @@ service cloud.firestore {
     }
     match /pedidos/{pedido} {
       allow create: if request.auth != null
-        && request.resource.data.keys().hasAll(['nombre', 'items', 'total']);
+        && request.resource.data.keys().hasAll(['nombre', 'items', 'total', 'sessionId']);
       allow read: if request.auth != null;
     }
   }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { guardarPedido } from '../services/pedidos';
 import { WHATSAPP_NUMBER, formatearPrecio } from '../utils/constants';
+import { obtenerSessionId } from '../utils/session';
 
 const UMBRAL_MAYORISTA = 20;
 
@@ -32,6 +33,7 @@ export const CarritoView: React.FC = () => {
         nombre,
         nota,
         esMayorista,
+        sessionId: obtenerSessionId(),
         items: cart.map((item) => {
           const precio = esMayorista ? item.producto.precioMayorista : item.producto.precioMinorista;
           return {
