@@ -117,9 +117,8 @@ function AppLayout() {
         <Header vistaActual={vistaActual} alCambiarVista={alCambiarVista} />
 
         <Main>
-          <div key={rutaActual} className="page-transition">
-                <ErrorBoundary>
-                <Suspense fallback={
+          <ErrorBoundary>
+            <Suspense fallback={
               <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--color-text-secondary)' }}>
                 <div style={{ fontSize: '32px', marginBottom: '12px' }}>⏳</div>
                 <p>Cargando...</p>
@@ -136,8 +135,7 @@ function AppLayout() {
                 <Route path="*" element={<NotFoundView />} />
               </Routes>
             </Suspense>
-                </ErrorBoundary>
-          </div>
+          </ErrorBoundary>
         </Main>
 
         <Footer />
