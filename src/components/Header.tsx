@@ -1,6 +1,6 @@
 // src/components/Header.tsx
-import React, { useState, useEffect } from 'react';
-import { useCart } from '../context/CartContext';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useCart } from '../hooks/useCart';
 import { YOUTUBE_URL } from '../utils/constants';
 
 interface HeaderProps {
@@ -13,22 +13,43 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [videoAbierto, setVideoAbierto] = useState(false);
   const [badgePulse, setBadgePulse] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const tutorialBtnRef = useRef<HTMLButtonElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
 
   const cantidadTotal = obtenerCantidadTotal();
 
   useEffect(() => {
-    if (cantidadTotal > 0) {
-      setBadgePulse(true);
-      const t = setTimeout(() => setBadgePulse(false), 300);
-      return () => clearTimeout(t);
-    }
+    if (cantidadTotal === 0) return;
+    const frame = requestAnimationFrame(() => setBadgePulse(true));
+    return () => cancelAnimationFrame(frame);
   }, [cantidadTotal]);
+
+  useEffect(() => {
+    if (!badgePulse) return;
+    const t = setTimeout(() => setBadgePulse(false), 300);
+    return () => clearTimeout(t);
+  }, [badgePulse]);
 
   const navegarA = (vista: string) => {
     alCambiarVista(vista);
     setMenuAbierto(false);
   };
 
+  const cerrarVideo = useCallback(() => {
+    setVideoAbierto(false);
+    tutorialBtnRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!videoAbierto) return;
+    closeBtnRef.current?.focus();
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') cerrarVideo();
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [videoAbierto, cerrarVideo]);
 
   return (
     <header style={{
@@ -49,12 +70,14 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
         position: 'relative'
       }}>
 
-        {/* LADO IZQUIERDO: Ahora brilla tu logo gigante con su nombre sin interrupciones */}
+        {/* LADO IZQUIERDO: Logo + Nombre */}
         <div
           onClick={() => navegarA('catalogo')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter') navegarA('catalogo'); }}
           style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
         >
-          {/* 🐕 MÁXIMO TAMAÑO FORZADO: Rompiendo el límite de caja estándar */}
           <div style={{ display: 'flex', alignItems: 'center', height: '48px', width: '70px', justifyContent: 'center' }}>
             <img
               src="/perro-header-transparente.png"
@@ -63,7 +86,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                transform: 'scale(1.5)', /* 🔥 Agranda el dibujo un 50% más allá de su contenedor sin empujar el Header hacia abajo */
+                transform: 'scale(1.5)',
                 transformOrigin: 'center'
               }}
             />
@@ -74,18 +97,20 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           </span>
         </div>
 
-        {/* LADO DERECHO: Botón Tutorial + Switch + Carrito + MENÚ HAMBURGUESA NUEVO */}
+        {/* LADO DERECHO */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',               // Le damos 12px para que respire mejor con el nuevo botón
+          gap: '12px',
           flexWrap: 'wrap',
           justifyContent: 'flex-end'
         }}>
 
           {/* Botón de Ayuda / Video Tutorial */}
           <button
+            ref={tutorialBtnRef}
             onClick={() => setVideoAbierto(true)}
+            aria-label="Abrir tutorial de la aplicación"
             style={{
               backgroundColor: 'var(--color-primary-dark)',
               color: '#ffffff',
@@ -105,6 +130,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             <span>📺</span>
             <span style={{ display: 'inline', whiteSpace: 'nowrap' }}>Tutorial</span>
           </button>
+
           {/* Switch Mayorista / Minorista */}
           <div style={{
             display: 'flex',
@@ -119,6 +145,9 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
                 type="checkbox"
                 checked={esMayorista}
                 onChange={(e) => setEsMayorista(e.target.checked)}
+                role="switch"
+                aria-checked={esMayorista}
+                aria-label="Alternar precio mayorista o minorista"
                 style={{ opacity: 0, width: 0, height: 0 }}
               />
               <span style={{
@@ -138,9 +167,11 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             </span>
           </div>
 
-          {/* ☰ MENÚ HAMBURGUESA: Único, ubicado a la izquierda del Carrito */}
+          {/* ☰ MENÚ HAMBURGUESA */}
           <button
             onClick={() => setMenuAbierto(!menuAbierto)}
+            aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={menuAbierto}
             style={{
               background: 'none',
               border: 'none',
@@ -160,6 +191,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           {/* Botón Carrito */}
           <button
             onClick={() => navegarA(vistaActual === 'carrito' ? 'catalogo' : 'carrito')}
+            aria-label={`Carrito de compras, ${cantidadTotal} productos`}
             style={{
               backgroundColor: vistaActual === 'carrito' ? 'var(--color-warning)' : 'var(--color-primary)',
               color: '#ffffff', border: 'none', padding: '6px 12px', borderRadius: '8px',
@@ -180,9 +212,9 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
           </button>
         </div>
 
-        {/* 🍔 MENÚ HAMBURGUESA DESPLEGABLE REALINEADO A LA DERECHA */}
+        {/* 🍔 MENÚ HAMBURGUESA DESPLEGABLE */}
         {menuAbierto && (
-          <div style={{
+          <div role="menu" style={{
             position: 'absolute',
             top: '55px',
             right: 0,
@@ -194,20 +226,44 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             zIndex: 200,
             borderRight: '4px solid var(--color-primary)'
           }}>
-            <div onClick={() => navegarA('catalogo')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'catalogo' ? 'var(--color-primary)' : '#ffffff', backgroundColor: vistaActual === 'catalogo' ? '#2d3748' : 'transparent' }}>🛍️ Catálogo de Productos</div>
-            <div onClick={() => navegarA('carrito')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'carrito' ? 'var(--color-primary)' : '#ffffff', backgroundColor: vistaActual === 'carrito' ? '#2d3748' : 'transparent' }}>🛒 Mi Pedido ({cantidadTotal})</div>
-            <div onClick={() => navegarA('nosotros')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'nosotros' ? 'var(--color-primary)' : '#ffffff', backgroundColor: vistaActual === 'nosotros' ? '#2d3748' : 'transparent' }}>✨ Sobre Nosotros</div>
-            <div onClick={() => navegarA('ubicacion')} style={{ padding: '12px 20px', cursor: 'pointer', color: vistaActual === 'ubicacion' ? 'var(--color-primary)' : '#ffffff', backgroundColor: vistaActual === 'ubicacion' ? '#2d3748' : 'transparent' }}>📍 Ubicación y Horarios</div>
+            {[
+              { vista: 'catalogo', label: '🛍️ Catálogo de Productos' },
+              { vista: 'carrito', label: `🛒 Mi Pedido (${cantidadTotal})` },
+              { vista: 'nosotros', label: '✨ Sobre Nosotros' },
+              { vista: 'ubicacion', label: '📍 Ubicación y Horarios' },
+            ].map(({ vista, label }) => (
+              <div
+                key={vista}
+                role="menuitem"
+                tabIndex={0}
+                onClick={() => navegarA(vista)}
+                onKeyDown={(e) => { if (e.key === 'Enter') navegarA(vista); }}
+                style={{
+                  padding: '12px 20px', cursor: 'pointer',
+                  color: vistaActual === vista ? 'var(--color-primary)' : '#ffffff',
+                  backgroundColor: vistaActual === vista ? '#2d3748' : 'transparent'
+                }}
+              >
+                {label}
+              </div>
+            ))}
           </div>
         )}
 
-        {/* 📺 MODAL FLOTANTE DEL TUTORIAL DE YOUTUBE */}
+        {/* 📺 MODAL FLOTANTE DEL TUTORIAL */}
         {videoAbierto && (
-          <div style={{
-            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            backgroundColor: 'rgba(0, 0, 0, 0.75)', display: 'flex', justifyContent: 'center',
-            alignItems: 'center', zIndex: 300, padding: '20px', boxSizing: 'border-box'
-          }}>
+          <div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Video tutorial de la aplicación"
+            onClick={(e) => { if (e.target === e.currentTarget) cerrarVideo(); }}
+            style={{
+              position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+              backgroundColor: 'rgba(0, 0, 0, 0.75)', display: 'flex', justifyContent: 'center',
+              alignItems: 'center', zIndex: 300, padding: '20px', boxSizing: 'border-box'
+            }}
+          >
             <div style={{
               backgroundColor: '#ffffff', width: '100%', maxWidth: '640px',
               borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.3)',
@@ -217,7 +273,9 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px', backgroundColor: '#f1f5f9', borderBottom: '1px solid var(--color-border-light)', color: 'var(--color-navy)' }}>
                 <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>📺 ¿Cómo usar e instalar la App?</h3>
                 <button
-                  onClick={() => setVideoAbierto(false)}
+                  ref={closeBtnRef}
+                  onClick={cerrarVideo}
+                  aria-label="Cerrar tutorial"
                   style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: 'var(--color-text-muted)', fontWeight: 'bold' }}
                 >
                   ✕
@@ -225,14 +283,21 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               </div>
 
               {/* Contenedor Responsivo del Video */}
-              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
-                <iframe
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
-                  src={YOUTUBE_URL}
-                  title="Tutorial Brillo Total"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                ></iframe>
+              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {YOUTUBE_URL ? (
+                  <iframe
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                    src={YOUTUBE_URL}
+                    title="Tutorial Brillo Total"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)' }}>
+                    <p style={{ fontSize: '14px', margin: 0 }}>🎬 Tutorial no disponible</p>
+                    <p style={{ fontSize: '12px', margin: '8px 0 0' }}>Configurá la URL del video tutorial en <code>src/utils/constants.ts</code></p>
+                  </div>
+                )}
               </div>
 
               {/* Pie del Modal con Instrucciones Rápidas */}

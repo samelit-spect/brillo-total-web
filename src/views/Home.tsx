@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { type Producto } from '../info/productos';
 import { ProductoCard } from '../components/ProductoCard';
-import { db } from '../firebase/config'; // Nuestro puente a la DB
-import { collection, getDocs } from 'firebase/firestore'; // Herramientas de consulta de Google
+import { obtenerProductos } from '../services/productos';
+import { CATEGORIAS } from '../utils/constants';
 
 export const Home: React.FC = () => {
   // 1. Estados para la base de datos dinámica
@@ -12,28 +12,17 @@ export const Home: React.FC = () => {
   const [errorFirebase, setErrorFirebase] = useState<string | null>(null);
   const [categoriaActual, setCategoriaActual] = useState<string>('todos');
 
-  // Array de control para armar los botones del menú
-  const categorias: string[] = ['todos', 'hogar', 'automotor', 'insumos'];
-
   // 2. Efecto para ir a buscar los productos a internet apenas abra la pantalla
   useEffect(() => {
-    const obtenerProductos = async () => {
+    const cargarProductos = async () => {
       try {
         setCargando(true);
         setErrorFirebase(null);
-        const productosRef = collection(db, "productos");
-        const querySnapshot = await getDocs(productosRef);
-
-        const listaProductos: Producto[] = [];
-        querySnapshot.forEach((doc) => {
-          listaProductos.push({ id: doc.id, ...doc.data() } as Producto);
-        });
-
-        if (listaProductos.length === 0) {
+        const lista = await obtenerProductos();
+        if (lista.length === 0) {
           setErrorFirebase("No hay productos cargados en la base de datos.");
         }
-
-        setProductos(listaProductos);
+        setProductos(lista);
       } catch (error) {
         console.error("Error al traer los productos de Firebase:", error);
         setErrorFirebase("Error de conexión con la base de datos. Verificá que Firebase esté configurado correctamente.");
@@ -42,8 +31,48 @@ export const Home: React.FC = () => {
       }
     };
 
-    obtenerProductos();
+    cargarProductos();
   }, []);
+
+  // Schema.org JSON-LD para SEO
+  useEffect(() => {
+    const existing = document.getElementById('schema-productos');
+    if (existing) existing.remove();
+
+    if (productos.length === 0) return;
+
+    const itemList = {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Catálogo de productos Brillo Total',
+      description: 'Venta mayorista y minorista de productos de limpieza sueltos y envasados',
+      numberOfItems: productos.length,
+      itemListElement: productos.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'Product',
+          name: p.nombre,
+          description: p.descripcion,
+          category: p.categoria,
+          offers: {
+            '@type': 'Offer',
+            price: p.precioMinorista,
+            priceCurrency: 'ARS',
+            availability: p.stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          },
+        },
+      })),
+    };
+
+    const script = document.createElement('script');
+    script.id = 'schema-productos';
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(itemList);
+    document.head.appendChild(script);
+
+    return () => { script.remove(); };
+  }, [productos]);
 
   // 3. Lógica de filtrado usando el estado dinámico "productos" en vez del archivo estático
   const productosFiltrados = categoriaActual === 'todos'
@@ -176,7 +205,7 @@ export const Home: React.FC = () => {
         marginBottom: '40px',
         flexWrap: 'wrap'
       }}>
-        {categorias.map((cat) => {
+        {CATEGORIAS.map((cat) => {
           const esActivo = categoriaActual === cat;
           return (
             <button

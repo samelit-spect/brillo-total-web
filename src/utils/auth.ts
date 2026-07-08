@@ -1,4 +1,8 @@
-export const HASH_CLAVE_MAESTRA = '1bf8dd02016b511c30a1b4368b45c64ddbd8e69f897ec1cb372a4288d6f5f31a';
+const _hash = import.meta.env.VITE_HASH_CLAVE_MAESTRA;
+if (!_hash) {
+  throw new Error('VITE_HASH_CLAVE_MAESTRA no configurada en .env.local');
+}
+export const HASH_CLAVE_MAESTRA = _hash;
 
 export const hashSHA256 = async (texto: string): Promise<string> => {
   const encoder = new TextEncoder();

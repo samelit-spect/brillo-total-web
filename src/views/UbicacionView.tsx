@@ -1,12 +1,13 @@
 // src/views/UbicacionView.tsx
 import React from 'react';
+import { UBICACION } from '../utils/constants';
 
 export const UbicacionView: React.FC = () => {
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto', color: 'var(--color-text)' }}>
       <div style={{ textAlign: 'center', marginBottom: '40px', marginTop: '20px' }}>
         <h2 style={{ fontSize: '32px', color: 'var(--color-navy)', marginBottom: '10px' }}>📍 Dónde Estamos</h2>
-        <p style={{ color: 'var(--color-text-muted)', fontSize: '16px' }}>Visitanos en nuestra sucursal en La Rioja Capital.</p>
+        <p style={{ color: 'var(--color-text-muted)', fontSize: '16px' }}>Visitanos en nuestra sucursal en {UBICACION.direccion}.</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
@@ -14,8 +15,8 @@ export const UbicacionView: React.FC = () => {
         {/* Tarjeta de Datos Técnicos */}
         <div style={{ backgroundColor: 'var(--color-bg-card)', borderRadius: '12px', padding: '25px', border: '1px solid var(--color-border)', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
           <h3 style={{ margin: '0 0 15px 0', color: 'var(--color-primary)' }}>Información de la Sucursal</h3>
-          <p style={{ margin: '0 0 10px 0' }}>🏠 <strong>Dirección:</strong> La Rioja Capital, Argentina</p>
-          <p style={{ margin: '0 0 10px 0' }}>⏰ <strong>Horarios:</strong> Lunes a Viernes (08:00 a 13:00 - 17:00 a 21:00 hs) | Sábados (09:00 a 13:00 hs)</p>
+          <p style={{ margin: '0 0 10px 0' }}>🏠 <strong>Dirección:</strong> {UBICACION.direccion}</p>
+          <p style={{ margin: '0 0 10px 0' }}>⏰ <strong>Horarios:</strong> Lunes a Viernes ({UBICACION.horarios.semana}) | Sábados ({UBICACION.horarios.sabado})</p>
           <p style={{ margin: 0 }}>📦 Recuerda que puedes traer tus bidones y envases para fraccionar tus productos en el acto.</p>
         </div>
 

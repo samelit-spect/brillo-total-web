@@ -1,30 +1,43 @@
 // src/context/CartContext.tsx
-import React, { createContext, useContext, useState, type ReactNode } from 'react';
+import React, { useState, useMemo, useEffect, type ReactNode } from 'react';
 import { type Producto } from '../info/productos';
+import { CartContext, type CartItem } from './contextDefinition';
 
-// Definimos la estructura de un ítem dentro del carrito
-export interface CartItem {
-  producto: Producto;
-  cantidad: number;
+const CART_STORAGE_KEY = 'brillo-cart';
+const MAYORISTA_STORAGE_KEY = 'brillo-mayorista';
+
+function cargarCarrito(): CartItem[] {
+  try {
+    const data = localStorage.getItem(CART_STORAGE_KEY);
+    if (data) return JSON.parse(data);
+  } catch { /* ignorar */
+  }
+  return [];
 }
 
-// Definimos todo lo que el contexto va a exponer a la aplicación
-interface CartContextType {
-  cart: CartItem[];
-  esMayorista: boolean;
-  setEsMayorista: (val: boolean) => void;
-  agregarAlCarrito: (producto: Producto) => void;
-  removerDelCarrito: (productoId: string) => void;
-  vaciarCarrito: () => void;
-  obtenerTotal: () => number;
-  obtenerCantidadTotal: () => number;
+function guardarCarrito(items: CartItem[]) {
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  } catch { /* ignorar */
+  }
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+export type { CartItem };
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [esMayorista, setEsMayorista] = useState<boolean>(false); // Falso = Minorista por defecto
+  const [cart, setCart] = useState<CartItem[]>(cargarCarrito);
+  const [esMayorista, setEsMayorista] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(MAYORISTA_STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => { guardarCarrito(cart); }, [cart]);
+  useEffect(() => {
+    try { localStorage.setItem(MAYORISTA_STORAGE_KEY, String(esMayorista)); } catch { /* ignorar */ }
+  }, [esMayorista]);
 
   const agregarAlCarrito = (producto: Producto) => {
     setCart((prevCart) => {
@@ -54,38 +67,23 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const vaciarCarrito = () => setCart([]);
 
-  const obtenerTotal = () => {
-    return cart.reduce((acumulado, item) => {
+  const value = useMemo(() => ({
+    cart,
+    esMayorista,
+    setEsMayorista,
+    agregarAlCarrito,
+    removerDelCarrito,
+    vaciarCarrito,
+    obtenerTotal: () => cart.reduce((sum, item) => {
       const precio = esMayorista ? item.producto.precioMayorista : item.producto.precioMinorista;
-      return acumulado + precio * item.cantidad;
-    }, 0);
-  };
-
-  const obtenerCantidadTotal = () => {
-    return cart.reduce((acumulado, item) => acumulado + item.cantidad, 0);
-  };
+      return sum + precio * item.cantidad;
+    }, 0),
+    obtenerCantidadTotal: () => cart.reduce((sum, item) => sum + item.cantidad, 0),
+  }), [cart, esMayorista]);
 
   return (
-    <CartContext.Provider value={{
-      cart,
-      esMayorista,
-      setEsMayorista,
-      agregarAlCarrito,
-      removerDelCarrito,
-      vaciarCarrito,
-      obtenerTotal,
-      obtenerCantidadTotal
-    }}>
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );
-};
-
-// Hook personalizado para usar el carrito de forma simple en cualquier componente
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart debe ser usado dentro de un CartProvider');
-  }
-  return context;
 };

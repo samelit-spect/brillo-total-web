@@ -1,13 +1,14 @@
 // src/components/Footer.tsx
 import React from 'react';
+import { WHATSAPP_NUMBER, UBICACION } from '../utils/constants';
 
-// Definimos el tipo acá directamente para evitar problemas de importación cruzada
 interface FooterProps {
   vistaActual?: string;
   alCambiarVista?: (vista: string) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) => {
+  const [hoverAdmin, setHoverAdmin] = React.useState(false);
 
   const manejarAccesoAdmin = () => {
     if (!alCambiarVista) return;
@@ -44,7 +45,7 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
         {/* Sección Sucursal e Info de Contacto */}
         <div style={{ flex: '1 1 250px' }}>
           <h4 style={{ color: 'var(--color-navy)', margin: '0 0 10px 0', fontSize: '16px' }}>📍 Sucursal Principal</h4>
-          <p style={{ margin: '0 0 5px 0' }}>La Rioja Capital, Argentina</p>
+          <p style={{ margin: '0 0 5px 0' }}>{UBICACION.direccion}</p>
           <p style={{ margin: '0 0 5px 0' }}>📦 <strong>Fraccionamiento por Litro</strong></p>
           <p style={{ margin: 0 }}>💬 Pedidos directos vía WhatsApp</p>
         </div>
@@ -53,9 +54,9 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
         <div style={{ flex: '1 1 200px' }}>
           <h4 style={{ color: 'var(--color-navy)', margin: '0 0 10px 0', fontSize: '16px' }}>⏰ Horarios de Atención</h4>
           <p style={{ margin: '0 0 5px 0' }}>Lunes a Viernes:</p>
-          <p style={{ color: 'var(--color-text)', margin: '0 0 10px 0', fontWeight: '500' }}>08:00 a 13:00 - 17:00 a 21:00 hs</p>
+          <p style={{ color: 'var(--color-text)', margin: '0 0 10px 0', fontWeight: '500' }}>{UBICACION.horarios.semana}</p>
           <p style={{ margin: '0 0 5px 0' }}>Sábados:</p>
-          <p style={{ color: 'var(--color-text)', margin: 0, fontWeight: '500' }}>09:00 a 13:00 hs</p>
+          <p style={{ color: 'var(--color-text)', margin: 0, fontWeight: '500' }}>{UBICACION.horarios.sabado}</p>
         </div>
 
       </div>
@@ -63,7 +64,7 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
       {/* Redes Sociales centradas entre info y copyright */}
       <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '24px', padding: '20px 0', borderTop: '1px solid var(--color-border-light)' }}>
         <a
-          href="https://www.instagram.com/brillototal.lr"
+          href={`https://www.instagram.com/${UBICACION.instagram}`}
           target="_blank"
           rel="noopener noreferrer"
           style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px' }}
@@ -72,7 +73,7 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
           Instagram
         </a>
         <a
-          href="https://www.facebook.com/brillototal.lr"
+          href={`https://www.facebook.com/${UBICACION.facebook}`}
           target="_blank"
           rel="noopener noreferrer"
           style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px' }}
@@ -81,7 +82,7 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
           Facebook
         </a>
         <a
-          href="https://wa.me/5493837402375"
+          href={`https://wa.me/${WHATSAPP_NUMBER}`}
           target="_blank"
           rel="noopener noreferrer"
           style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '14px', fontWeight: 'bold' }}
@@ -117,7 +118,7 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
             style={{
               background: 'none',
               border: 'none',
-              color: vistaActual === 'admin' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              color: hoverAdmin ? 'var(--color-text-secondary)' : vistaActual === 'admin' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
               cursor: 'pointer',
               fontSize: '11px',
               fontWeight: '500',
@@ -125,8 +126,8 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
               transition: 'color 0.2s',
               outline: 'none'
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text-secondary)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = vistaActual === 'admin' ? 'var(--color-primary)' : 'var(--color-text-secondary)')}
+            onMouseEnter={() => setHoverAdmin(true)}
+            onMouseLeave={() => setHoverAdmin(false)}
           >
             {vistaActual === 'admin' ? '⬅️ Salir de Administración' : '🐾 Información del Sitio'}
           </button>

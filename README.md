@@ -69,12 +69,14 @@ Para dar cumplimiento a los criterios de componentización modular exigidos por 
 src/
 ├── assets/           # Recursos estáticos, logotipos e iconos de la interfaz
 ├── components/       # Componentes estructurales y de UI globalmente reutilizables
+│   ├── ErrorBoundary.tsx  # Captura errores de React y muestra fallback
 │   ├── Header.tsx    # Barra de navegación superior y branding del comercio
 │   ├── Footer.tsx    # Pie de página con accesos informativos y enlace administrativo
-│   └── Main.tsx      # Contenedor dinámico principal de la aplicación
+│   ├── Main.tsx      # Contenedor dinámico principal de la aplicación
+│   └── ProductoCard.tsx # Tarjeta individual de producto con precio y agregar al carrito
 ├── context/          # Estados globales compartidos (Gestión del carrito y tipo de tarifa)
 ├── firebase/         # Archivos de configuración e inicialización del SDK de Google
-│   └── config.ts     # Conexión centralizada hacia el motor Cloud Firestore
+│   └── config.ts     # Conexión centralizada hacia Firestore, Storage y Auth
 ├── hooks/            # Funciones y lógica personalizada (Custom Hooks de estado)
 ├── info/             # Tipados estrictos de TypeScript y catálogos locales de respaldo
 └── views/            # Vistas independientes para el renderizado condicional de la SPA

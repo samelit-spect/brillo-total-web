@@ -1,22 +1,20 @@
 // src/components/ProductoCard.tsx
 import React, { useState } from 'react';
 import { type Producto } from '../info/productos';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../hooks/useCart';
+import { formatearPrecio } from '../utils/constants';
 
 interface ProductoCardProps {
   producto: Producto;
 }
 
-export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
+export const ProductoCard: React.FC<ProductoCardProps> = React.memo(({ producto }) => {
   const { esMayorista, agregarAlCarrito } = useCart();
   const [showToast, setShowToast] = useState(false);
 
   const precioMostrar = esMayorista ? producto.precioMayorista : producto.precioMinorista;
 
-  const precioFormateado = precioMostrar.toLocaleString('es-AR', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  });
+  const precioFormateado = formatearPrecio(precioMostrar);
 
   const handleAdd = () => {
     agregarAlCarrito(producto);
@@ -42,7 +40,7 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
           src={producto.imagenUrl}
           alt={producto.nombre}
           loading="lazy"
-          style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px' }}
+          style={{ width: '100%', aspectRatio: '16 / 9', objectFit: 'cover', borderRadius: '8px' }}
         />
       </div>
 
@@ -109,4 +107,4 @@ export const ProductoCard: React.FC<ProductoCardProps> = ({ producto }) => {
       )}
     </div>
   );
-};
+});

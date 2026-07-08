@@ -1,13 +1,18 @@
 // vite.config.ts
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/test/setup.ts',
+  },
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate', // Aplica actualizaciones de código automáticamente sin molestar al usuario
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Brillo Total Web',
@@ -20,24 +25,45 @@ export default defineConfig({
         orientation: 'portrait',
         start_url: '/',
         icons: [
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+        ],
+      },
+      workbox: {
+        runtimeCaching: [
           {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
+            urlPattern: /^https:\/\/firebasestorage\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'firebase-storage',
+              expiration: { maxEntries: 50, maxAgeSeconds: 86400 },
+            },
           },
           {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'firestore-queries',
+              expiration: { maxEntries: 50, maxAgeSeconds: 3600 },
+            },
           },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable' // Clave para que Android no recorte de forma fea los bordes del ícono
+        ],
+      },
+    }),
+  ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
+            return 'react-vendor';
           }
-        ]
-      }
-    })
-  ]
+          if (id.includes('node_modules/firebase')) {
+            return 'firebase';
+          }
+        },
+      },
+    },
+  },
 });
