@@ -1,7 +1,7 @@
 // src/views/Admin.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { db, storage, auth } from '../firebase/config';
-import { signInAnonymously, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { collection, doc, updateDoc, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { type Producto } from '../info/productos';
@@ -12,6 +12,8 @@ import { formatearPrecio } from '../utils/constants';
 export const Admin: React.FC = () => {
     const [autenticado, setAutenticado] = useState(false);
     const [claveIngresada, setClaveIngresada] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [errorClave, setErrorClave] = useState('');
     const [verificando, setVerificando] = useState(false);
     const [intentosFallidos, setIntentosFallidos] = useState(0);
@@ -72,6 +74,10 @@ export const Admin: React.FC = () => {
 
     const manejarLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!email.trim() || !password.trim()) {
+            setErrorClave('Ingresá email y contraseña.');
+            return;
+        }
         if (!claveIngresada.trim()) {
             setErrorClave('Debe ingresar la clave de administrador.');
             return;
@@ -82,33 +88,37 @@ export const Admin: React.FC = () => {
         }
         setVerificando(true);
         setErrorClave('');
+        setErrorAuthFirebase(null);
         try {
             const hash = await hashSHA256(claveIngresada);
-            if (hash === HASH_CLAVE_MAESTRA) {
-                setAutenticado(true);
-                setIntentosFallidos(0);
-                setBloqueado(false);
-                setSegundosRestantes(0);
-                setErrorClave('');
-                try {
-                    await signInAnonymously(auth);
-                    setErrorAuthFirebase(null);
-                } catch (authErr) {
-                    console.error("Error al autenticar anónimamente en Firebase:", authErr);
-                    setErrorAuthFirebase("No se pudo autenticar con Firebase. Verificá que la autenticación anónima esté habilitada en Firebase Console.");
-                }
-                cargarProductos();
-            } else {
+            if (hash !== HASH_CLAVE_MAESTRA) {
                 const nuevos = intentosFallidos + 1;
                 setIntentosFallidos(nuevos);
-                if (nuevos >= 5) {
-                    setErrorClave(`Clave incorrecta. Demasiados intentos.`);
-                } else {
-                    setErrorClave(`Clave incorrecta. Intento ${nuevos}/5.`);
-                }
+                setErrorClave(nuevos >= 5 ? `Clave incorrecta. Demasiados intentos.` : `Clave incorrecta. Intento ${nuevos}/5.`);
+                return;
             }
-        } catch {
-            setErrorClave('Error al verificar la clave.');
+            setIntentosFallidos(0);
+            setBloqueado(false);
+            setSegundosRestantes(0);
+            setErrorClave('');
+
+            await signInWithEmailAndPassword(auth, email, password);
+
+            setAutenticado(true);
+            setErrorAuthFirebase(null);
+            cargarProductos();
+        } catch (err) {
+            console.error("Error de autenticación:", err);
+            const fbErr = err as { code?: string };
+            if (fbErr.code === 'auth/user-not-found' || fbErr.code === 'auth/wrong-password' || fbErr.code === 'auth/invalid-credential') {
+                setErrorClave('Email o contraseña incorrectos.');
+            } else if (fbErr.code === 'auth/too-many-requests') {
+                setErrorClave('Demasiados intentos. Esperá un momento antes de reintentar.');
+            } else if (fbErr.code === 'auth/invalid-email') {
+                setErrorClave('El formato del email no es válido.');
+            } else {
+                setErrorAuthFirebase("Error al autenticar con Firebase. Verificá que el usuario exista en Firebase Console.");
+            }
         } finally {
             setVerificando(false);
         }
@@ -239,15 +249,41 @@ export const Admin: React.FC = () => {
                         🔐 Acceso Administrador
                     </h2>
                     <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '14px', marginBottom: '25px' }}>
-                        Ingresá la clave maestra para administrar el catálogo.
+                        Ingresá tus credenciales de Firebase y la clave maestra.
                     </p>
                     <form onSubmit={manejarLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => { setEmail(e.target.value); setErrorClave(''); }}
+                            placeholder="Email de administrador"
+                            autoFocus
+                            disabled={bloqueado}
+                            style={{
+                                width: '100%', padding: '12px', borderRadius: '6px',
+                                border: `1px solid ${errorClave ? 'var(--color-danger)' : 'var(--color-border)'}`,
+                                boxSizing: 'border-box', fontSize: '15px',
+                                opacity: bloqueado ? 0.6 : 1
+                            }}
+                        />
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => { setPassword(e.target.value); setErrorClave(''); }}
+                            placeholder="Contraseña"
+                            disabled={bloqueado}
+                            style={{
+                                width: '100%', padding: '12px', borderRadius: '6px',
+                                border: `1px solid ${errorClave ? 'var(--color-danger)' : 'var(--color-border)'}`,
+                                boxSizing: 'border-box', fontSize: '15px',
+                                opacity: bloqueado ? 0.6 : 1
+                            }}
+                        />
                         <input
                             type="password"
                             value={claveIngresada}
                             onChange={(e) => { setClaveIngresada(e.target.value); setErrorClave(''); }}
                             placeholder="Clave maestra"
-                            autoFocus
                             disabled={bloqueado}
                             style={{
                                 width: '100%', padding: '12px', borderRadius: '6px',
@@ -285,6 +321,8 @@ export const Admin: React.FC = () => {
         }
         setAutenticado(false);
         setClaveIngresada('');
+        setEmail('');
+        setPassword('');
         cancelarEdicion();
     };
 
