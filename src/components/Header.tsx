@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useCart } from '../hooks/useCart';
+import { useAuth } from '../context/AuthContext';
 import { YOUTUBE_URL } from '../utils/constants';
 import styles from './Header.module.css';
 
@@ -10,6 +11,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) => {
   const { esMayorista, setEsMayorista, obtenerCantidadTotal } = useCart();
+  const { user, loading } = useAuth();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [videoAbierto, setVideoAbierto] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -109,6 +111,27 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
             </span>
           </div>
 
+          {/* Auth */}
+          {!loading && (
+            user ? (
+              <div
+                onClick={() => navegarA('perfil')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter') navegarA('perfil'); }}
+                className={styles.userBadge}
+                aria-label="Mi Perfil"
+              >
+                <span className={styles.userAvatar}>🐕</span>
+                <span className={styles.userEmail}>{user.email}</span>
+              </div>
+            ) : (
+              <button onClick={() => navegarA('login')} className={styles.authButton}>
+                Ingresar
+              </button>
+            )
+          )}
+
           {/* Carrito */}
           <button
             onClick={() => navegarA(vistaActual === 'carrito' ? 'catalogo' : 'carrito')}
@@ -146,6 +169,7 @@ export const Header: React.FC<HeaderProps> = ({ vistaActual, alCambiarVista }) =
               { vista: 'nosotros', label: '✨ Sobre Nosotros' },
               { vista: 'ubicacion', label: '📍 Ubicación' },
               { vista: 'admin', label: '🔐 Admin' },
+              ...(user ? [{ vista: 'perfil', label: '👤 Mi Perfil' }] : []),
             ].map(({ vista, label }) => (
               <div
                 key={vista}

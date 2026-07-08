@@ -1,22 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
+import { useAuth } from '../context/AuthContext';
 import { guardarPedido } from '../services/pedidos';
 import { WHATSAPP_NUMBER, formatearPrecio } from '../utils/constants';
 import { obtenerSessionId } from '../utils/session';
+import { obtenerZonasDelivery, type ZonaDelivery } from '../services/delivery';
 
 const UMBRAL_MAYORISTA = 20;
 
 export const CarritoView: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { cart, esMayorista, removerDelCarrito, agregarAlCarrito, vaciarCarrito, obtenerTotal } = useCart();
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(user?.displayName || '');
   const [nota, setNota] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [pedidoEnviado, setPedidoEnviado] = useState(false);
+  const [zonas, setZonas] = useState<ZonaDelivery[]>([]);
+  const [zonaSeleccionada, setZonaSeleccionada] = useState<string>('');
 
   const totalLitros = cart.reduce((acumulado, item) => acumulado + item.cantidad, 0);
   const porcentajeMayorista = Math.min(100, (totalLitros / UMBRAL_MAYORISTA) * 100);
+
+  useEffect(() => {
+    obtenerZonasDelivery().then(setZonas);
+  }, []);
+
+  const zonaActual = zonas.find((z) => z.id === zonaSeleccionada);
+  const costoEnvio = zonaActual?.costoEnvio || 0;
+  const totalConEnvio = obtenerTotal() + costoEnvio;
 
   const enviarWhatsApp = async () => {
     if (!nombre.trim()) {
@@ -34,6 +47,7 @@ export const CarritoView: React.FC = () => {
         nota,
         esMayorista,
         sessionId: obtenerSessionId(),
+        userId: user ? user.uid : undefined,
         items: cart.map((item) => {
           const precio = esMayorista ? item.producto.precioMayorista : item.producto.precioMinorista;
           return {
@@ -64,7 +78,10 @@ export const CarritoView: React.FC = () => {
       mensaje += `• ${item.producto.nombre} (${item.producto.presentacion}) x${item.cantidad} - $${formatearPrecio(precio * item.cantidad)}\n`;
     });
     mensaje += `-----------------------------------\n`;
-    mensaje += `*Total Estimado: $${formatearPrecio(obtenerTotal())}*\n\n`;
+    if (zonaActual) {
+      mensaje += `*Envío:* ${zonaActual.nombre} - $${formatearPrecio(costoEnvio)}\n`;
+    }
+    mensaje += `*Total Estimado: $${formatearPrecio(totalConEnvio)}*\n\n`;
     mensaje += `_Pedido generado desde la aplicación web._`;
 
     const mensajeCodificado = encodeURIComponent(mensaje);
@@ -287,13 +304,23 @@ export const CarritoView: React.FC = () => {
               >
                 🗑️ Vaciar
               </button>
-              <span style={{
-                fontSize: '24px',
-                fontWeight: 700,
-                color: 'var(--color-text)',
-              }}>
-                $ {formatearPrecio(obtenerTotal())}
-              </span>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>
+                  Subtotal: ${formatearPrecio(obtenerTotal())}
+                </div>
+                {costoEnvio > 0 && (
+                  <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>
+                    Envío: ${formatearPrecio(costoEnvio)}
+                  </div>
+                )}
+                <span style={{
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  color: 'var(--color-text)',
+                }}>
+                  $ {formatearPrecio(totalConEnvio)}
+                </span>
+              </div>
             </div>
 
             <div>
@@ -342,6 +369,46 @@ export const CarritoView: React.FC = () => {
               )}
             </div>
           </div>
+
+          {/* Zona de delivery */}
+          {zonas.length > 0 && (
+            <div style={{
+              backgroundColor: 'var(--color-bg-card)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--color-border)',
+              padding: 'var(--space-5)',
+              marginBottom: 'var(--space-4)',
+            }}>
+              <label style={{
+                display: 'block', marginBottom: 'var(--space-2)',
+                fontWeight: 600, fontSize: '13px', color: 'var(--color-text-secondary)',
+              }}>
+                🚚 Zona de Envío
+              </label>
+              <select
+                value={zonaSeleccionada}
+                onChange={(e) => setZonaSeleccionada(e.target.value)}
+                style={{
+                  width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--color-border)', fontSize: '14px',
+                  fontFamily: 'inherit', backgroundColor: 'var(--color-bg-card)',
+                  color: 'var(--color-text)', cursor: 'pointer',
+                }}
+              >
+                <option value="">Retiro en local (sin cargo)</option>
+                {zonas.map((z) => (
+                  <option key={z.id} value={z.id}>
+                    {z.nombre} — ${formatearPrecio(z.costoEnvio)} ({z.tiempoEstimado})
+                  </option>
+                ))}
+              </select>
+              {zonaActual && (
+                <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>
+                  {zonaActual.descripcion}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Formulario */}
           <div style={{

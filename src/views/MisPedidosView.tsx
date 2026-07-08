@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { obtenerPedidosPorSesion, type PedidoGuardado } from '../services/pedidos';
+import { useAuth } from '../context/AuthContext';
+import { obtenerPedidosPorSesion, obtenerPedidosPorUsuario, type PedidoGuardado } from '../services/pedidos';
 import { obtenerSessionId } from '../utils/session';
 import { formatearPrecio } from '../utils/constants';
 
 export const MisPedidosView: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [pedidos, setPedidos] = useState<PedidoGuardado[]>([]);
   const [cargando, setCargando] = useState(true);
   const [expandido, setExpandido] = useState<string | null>(null);
@@ -14,8 +16,13 @@ export const MisPedidosView: React.FC = () => {
     const cargar = async () => {
       try {
         setCargando(true);
-        const lista = await obtenerPedidosPorSesion(obtenerSessionId());
-        setPedidos(lista);
+        if (user) {
+          const lista = await obtenerPedidosPorUsuario(user.uid);
+          setPedidos(lista);
+        } else {
+          const lista = await obtenerPedidosPorSesion(obtenerSessionId());
+          setPedidos(lista);
+        }
       } catch {
         // silent
       } finally {
@@ -23,7 +30,7 @@ export const MisPedidosView: React.FC = () => {
       }
     };
     cargar();
-  }, []);
+  }, [user]);
 
   const formatearFecha = (ts: { seconds: number } | null): string => {
     if (!ts) return '—';
@@ -74,6 +81,21 @@ export const MisPedidosView: React.FC = () => {
         </button>
       </div>
 
+      {!user && pedidos.length > 0 && (
+        <div style={{
+          textAlign: 'center', padding: 'var(--space-3) var(--space-5)',
+          marginBottom: 'var(--space-4)',
+          backgroundColor: 'var(--color-bg-card)', borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--color-border-light)',
+          fontSize: '13px', color: 'var(--color-text-muted)',
+        }}>
+          💡 Iniciá sesión para ver tus pedidos en cualquier dispositivo.{' '}
+          <span onClick={() => navigate('/login')} style={{ color: 'var(--color-primary)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
+            Ingresar
+          </span>
+        </div>
+      )}
+
       {pedidos.length === 0 ? (
         <div style={{
           textAlign: 'center',
@@ -83,8 +105,13 @@ export const MisPedidosView: React.FC = () => {
           <div style={{ fontSize: '64px', marginBottom: 'var(--space-4)', transform: 'scaleX(-1)' }}>
             🐕
           </div>
+          {!user && (
+            <p style={{ fontSize: '15px', marginBottom: 'var(--space-3)' }}>
+              Iniciá sesión para ver tu historial de pedidos.
+            </p>
+          )}
           <p style={{ fontSize: '16px', marginBottom: 'var(--space-2)' }}>
-            Todavía no hiciste ningún pedido.
+            {user ? 'Todavía no hiciste ningún pedido.' : 'Todavía no hay pedidos registrados.'}
           </p>
           <p style={{ fontSize: '14px', marginBottom: 'var(--space-6)' }}>
             ¡El salchicha te espera con los productos listos!

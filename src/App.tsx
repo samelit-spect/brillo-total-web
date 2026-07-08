@@ -3,6 +3,7 @@ import { useEffect, useState, lazy, Suspense } from 'react';
 import { Header } from './components/Header';
 import { Main } from './components/Main';
 import { Footer } from './components/Footer';
+import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -15,6 +16,9 @@ const NotFoundView = lazy(() => import('./views/NotFoundView').then(m => ({ defa
 const TerminosView = lazy(() => import('./views/TerminosView').then(m => ({ default: m.TerminosView })));
 const ProductoView = lazy(() => import('./views/ProductoView').then(m => ({ default: m.ProductoView })));
 const MisPedidosView = lazy(() => import('./views/MisPedidosView').then(m => ({ default: m.MisPedidosView })));
+const LoginView = lazy(() => import('./views/LoginView').then(m => ({ default: m.LoginView })));
+const RegisterView = lazy(() => import('./views/RegisterView').then(m => ({ default: m.RegisterView })));
+const PerfilView = lazy(() => import('./views/PerfilView').then(m => ({ default: m.PerfilView })));
 
 const TITULOS: Record<string, string> = {
   '/': 'Brillo Total — Catálogo de Productos de Limpieza',
@@ -47,6 +51,9 @@ const OG_TAGS: Record<string, { title: string; description: string }> = {
   '/salchi': { title: 'Administración — Brillo Total', description: 'Panel de administración del catálogo Brillo Total.' },
   '/terminos': { title: 'Términos y Condiciones — Brillo Total', description: 'Términos y condiciones de uso de la plataforma Brillo Total.' },
   '/mis-pedidos': { title: 'Mis Pedidos — Brillo Total', description: 'Historial de pedidos realizados en Brillo Total.' },
+  '/login': { title: 'Iniciar Sesión — Brillo Total', description: 'Iniciá sesión en Brillo Total para ver tu historial de pedidos.' },
+  '/registro': { title: 'Crear Cuenta — Brillo Total', description: 'Registrate en Brillo Total para guardar tu historial de pedidos.' },
+  '/perfil': { title: 'Mi Perfil — Brillo Total', description: 'Tu perfil e historial de pedidos en Brillo Total.' },
 };
 
 function actualizarMetaTags(ruta: string) {
@@ -99,11 +106,14 @@ function AppLayout() {
       ubicacion: '/ubicacion',
       admin: '/salchi',
       'mis-pedidos': '/mis-pedidos',
+      login: '/login',
+      perfil: '/perfil',
     };
     navigate(mapa[vista] || '/catalogo');
   };
 
   return (
+    <AuthProvider>
     <CartProvider>
       <div style={{
         display: 'flex',
@@ -140,6 +150,9 @@ function AppLayout() {
                 <Route path="/terminos" element={<TerminosView />} />
                 <Route path="/producto/:id" element={<ProductoView />} />
                 <Route path="/mis-pedidos" element={<MisPedidosView />} />
+                <Route path="/login" element={<LoginView />} />
+                <Route path="/registro" element={<RegisterView />} />
+                <Route path="/perfil" element={<PerfilView />} />
                 <Route path="*" element={<NotFoundView />} />
               </Routes>
             </Suspense>
@@ -149,6 +162,7 @@ function AppLayout() {
         <Footer />
       </div>
     </CartProvider>
+    </AuthProvider>
   );
 }
 

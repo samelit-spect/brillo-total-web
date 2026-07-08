@@ -7,6 +7,7 @@ import { type Producto } from '../info/productos';
 import { obtenerProductos } from '../services/productos';
 import { hashSHA256, HASH_CLAVE_MAESTRA } from '../utils/auth';
 import { formatearPrecio } from '../utils/constants';
+import { obtenerTodosLosPedidos, actualizarEstadoPedido, ESTADOS_PEDIDO, type EstadoPedido } from '../services/pedidosAdmin';
 
 export const Admin: React.FC = () => {
     const [autenticado, setAutenticado] = useState(false);
@@ -35,6 +36,10 @@ export const Admin: React.FC = () => {
     const [errorAuthFirebase, setErrorAuthFirebase] = useState<string | null>(null);
     const [guardando, setGuardando] = useState(false);
     const [toast, setToast] = useState<{ mensaje: string; tipo: 'exito' | 'error' } | null>(null);
+    const [tabActiva, setTabActiva] = useState<'productos' | 'pedidos'>('productos');
+    const [pedidos, setPedidos] = useState<any[]>([]);
+    const [cargandoPedidos, setCargandoPedidos] = useState(false);
+    const [filtroEstado, setFiltroEstado] = useState<string>('todos');
 
     const mostrarToast = (mensaje: string, tipo: 'exito' | 'error') => {
         setToast({ mensaje, tipo });
@@ -173,6 +178,18 @@ export const Admin: React.FC = () => {
         setCategoria('hogar');
         setPresentacion('Por Litro');
         setImagenUrl('');
+    };
+
+    const cargarPedidos = async () => {
+        try {
+            setCargandoPedidos(true);
+            const lista = await obtenerTodosLosPedidos();
+            setPedidos(lista);
+        } catch (error) {
+            console.error('Error al cargar pedidos:', error);
+        } finally {
+            setCargandoPedidos(false);
+        }
     };
 
     const manejarEnvio = async (e: React.FormEvent) => {
@@ -350,6 +367,47 @@ export const Admin: React.FC = () => {
                 </div>
             )}
 
+            {/* Tabs */}
+            <div style={{
+                display: 'flex', gap: 'var(--space-2)',
+                marginBottom: 'var(--space-5)',
+                borderBottom: '1px solid var(--color-border)',
+                paddingBottom: 'var(--space-3)',
+            }}>
+                <button onClick={() => setTabActiva('productos')}
+                    style={{
+                        padding: '8px 20px', borderRadius: 'var(--radius-sm)',
+                        border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
+                        backgroundColor: tabActiva === 'productos' ? 'var(--color-primary)' : 'var(--color-border-light)',
+                        color: tabActiva === 'productos' ? '#fff' : 'var(--color-text-secondary)',
+                        fontFamily: 'inherit', transition: 'all 0.2s',
+                    }}>
+                    📦 Productos
+                </button>
+                <button onClick={() => { setTabActiva('pedidos'); cargarPedidos(); }}
+                    style={{
+                        padding: '8px 20px', borderRadius: 'var(--radius-sm)',
+                        border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
+                        backgroundColor: tabActiva === 'pedidos' ? 'var(--color-primary)' : 'var(--color-border-light)',
+                        color: tabActiva === 'pedidos' ? '#fff' : 'var(--color-text-secondary)',
+                        fontFamily: 'inherit', transition: 'all 0.2s',
+                    }}>
+                    📋 Pedidos
+                </button>
+                <div style={{ flex: 1 }} />
+                <button onClick={cerrarSesion}
+                    style={{
+                        backgroundColor: 'transparent', color: 'var(--color-danger)',
+                        border: '1px solid var(--color-danger)', padding: '6px 14px',
+                        borderRadius: 'var(--radius-sm)', fontSize: '12px',
+                        cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit',
+                    }}>
+                    🔒 Cerrar Sesión
+                </button>
+            </div>
+
+            {tabActiva === 'productos' && (
+            <>
             {/* Formulario */}
             <div style={{
                 backgroundColor: 'var(--color-bg-card)', padding: 'var(--space-5)',
@@ -541,16 +599,6 @@ export const Admin: React.FC = () => {
                             </span>
                         )}
                     </h3>
-                    <button onClick={cerrarSesion}
-                        style={{
-                            backgroundColor: 'transparent', color: 'var(--color-danger)',
-                            border: '1px solid var(--color-danger)', padding: '6px 14px',
-                            borderRadius: 'var(--radius-sm)', fontSize: '12px',
-                            cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit',
-                            transition: 'all 0.2s',
-                        }}>
-                        🔒 Cerrar Sesión
-                    </button>
                 </div>
 
                 {cargando ? (
@@ -656,6 +704,128 @@ export const Admin: React.FC = () => {
                     </div>
                 )}
             </div>
+            </> 
+        )}
+
+            {tabActiva === 'pedidos' && (
+            <div>
+                <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)',
+                }}>
+                    <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--color-text)' }}>
+                        📋 Pedidos Recibidos
+                    </h3>
+                    <select value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)}
+                        style={{
+                            padding: '8px 12px', borderRadius: 'var(--radius-sm)',
+                            border: '1px solid var(--color-border)', fontSize: '13px',
+                            fontFamily: 'inherit', backgroundColor: 'var(--color-bg-card)',
+                            color: 'var(--color-text)', cursor: 'pointer',
+                        }}>
+                        <option value="todos">Todos los estados</option>
+                        {Object.entries(ESTADOS_PEDIDO).map(([key, val]) => (
+                            <option key={key} value={key}>{val.label}</option>
+                        ))}
+                    </select>
+                </div>
+
+                {cargandoPedidos ? (
+                    <p style={{ color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                        Cargando pedidos...
+                    </p>
+                ) : pedidos.length === 0 ? (
+                    <p style={{ color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                        No hay pedidos registrados.
+                    </p>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                        {(filtroEstado === 'todos'
+                            ? pedidos
+                            : pedidos.filter((p: any) => p.estado === filtroEstado)
+                        ).map((pedido: any) => {
+                            const estado = (pedido.estado || 'pendiente') as EstadoPedido;
+                            const infoEstado = ESTADOS_PEDIDO[estado] || ESTADOS_PEDIDO.pendiente;
+                            return (
+                                <div key={pedido.id} style={{
+                                    backgroundColor: 'var(--color-bg-card)', padding: 'var(--space-4)',
+                                    borderRadius: 'var(--radius-md)',
+                                    border: '1px solid var(--color-border)',
+                                }}>
+                                    <div style={{
+                                        display: 'flex', justifyContent: 'space-between',
+                                        alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-3)',
+                                    }}>
+                                        <div>
+                                            <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--color-text)' }}>
+                                                {pedido.nombre}
+                                            </div>
+                                            <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                                                {pedido.creadoEn?.seconds
+                                                    ? new Date(pedido.creadoEn.seconds * 1000).toLocaleDateString('es-AR', {
+                                                        day: 'numeric', month: 'long', year: 'numeric',
+                                                        hour: '2-digit', minute: '2-digit',
+                                                    })
+                                                    : '—'}
+                                            </div>
+                                            <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: 'var(--space-1)' }}>
+                                                {pedido.items?.length || 0} ítems · ${formatearPrecio(pedido.total || 0)}
+                                                {pedido.esMayorista ? ' · Mayorista' : ''}
+                                                {pedido.sessionId && ` · ID: ${pedido.sessionId.slice(0, 8)}...`}
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                                            <span style={{
+                                                fontSize: '12px', fontWeight: 600, padding: '4px 12px',
+                                                borderRadius: 'var(--radius-full)',
+                                                color: infoEstado.color, backgroundColor: infoEstado.bg,
+                                            }}>
+                                                {infoEstado.label}
+                                            </span>
+                                            <select value={estado}
+                                                onChange={async (e) => {
+                                                    const nuevoEstado = e.target.value as EstadoPedido;
+                                                    try {
+                                                        await actualizarEstadoPedido(pedido.id, nuevoEstado);
+                                                        setPedidos((prev: any[]) => prev.map((p: any) =>
+                                                            p.id === pedido.id ? { ...p, estado: nuevoEstado } : p
+                                                        ));
+                                                        mostrarToast(`✅ Pedido actualizado a: ${ESTADOS_PEDIDO[nuevoEstado].label}`, 'exito');
+                                                    } catch {
+                                                        mostrarToast('Error al actualizar el estado.', 'error');
+                                                    }
+                                                }}
+                                                style={{
+                                                    padding: '6px 10px', borderRadius: 'var(--radius-sm)',
+                                                    border: '1px solid var(--color-border)', fontSize: '12px',
+                                                    fontFamily: 'inherit', cursor: 'pointer',
+                                                    backgroundColor: 'var(--color-bg-card)',
+                                                    color: 'var(--color-text)',
+                                                }}>
+                                                {Object.entries(ESTADOS_PEDIDO).map(([key, val]) => (
+                                                    <option key={key} value={key}>{val.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {pedido.nota && (
+                                        <div style={{
+                                            marginTop: 'var(--space-2)', fontSize: '12px',
+                                            color: 'var(--color-text-muted)', fontStyle: 'italic',
+                                            padding: 'var(--space-2) var(--space-3)',
+                                            backgroundColor: 'var(--color-border-light)',
+                                            borderRadius: 'var(--radius-sm)',
+                                        }}>
+                                            📝 {pedido.nota}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+        )}
         </div>
     );
 };

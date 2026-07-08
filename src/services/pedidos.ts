@@ -25,13 +25,16 @@ export interface PedidoGuardado {
   items: ItemPedido[];
   total: number;
   sessionId: string;
+  userId?: string;
+  estado?: string;
   creadoEn: { seconds: number; nanoseconds: number } | null;
 }
 
-export const guardarPedido = async (datos: DatosPedido & { sessionId: string }): Promise<void> => {
+export const guardarPedido = async (datos: DatosPedido & { sessionId: string; userId?: string }): Promise<void> => {
   try {
     await addDoc(collection(db, "pedidos"), {
       ...datos,
+      estado: 'pendiente',
       creadoEn: serverTimestamp(),
     });
   } catch (error) {
@@ -51,6 +54,21 @@ export const obtenerPedidosPorSesion = async (sessionId: string): Promise<Pedido
     return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as PedidoGuardado));
   } catch (error) {
     console.error("Error al obtener pedidos:", error);
+    return [];
+  }
+};
+
+export const obtenerPedidosPorUsuario = async (userId: string): Promise<PedidoGuardado[]> => {
+  try {
+    const q = query(
+      collection(db, "pedidos"),
+      where("userId", "==", userId),
+      orderBy("creadoEn", "desc")
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as PedidoGuardado));
+  } catch (error) {
+    console.error("Error al obtener pedidos por usuario:", error);
     return [];
   }
 };

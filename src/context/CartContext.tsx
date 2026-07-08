@@ -2,8 +2,7 @@
 import React, { useState, useMemo, useEffect, type ReactNode } from 'react';
 import { type Producto } from '../info/productos';
 import { CartContext, type CartItem } from './contextDefinition';
-import { auth } from '../firebase/config';
-import { signInAnonymously } from 'firebase/auth';
+
 
 const CART_STORAGE_KEY = 'brillo-cart';
 const MAYORISTA_STORAGE_KEY = 'brillo-mayorista';
@@ -43,12 +42,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     try { localStorage.setItem(MAYORISTA_STORAGE_KEY, String(esMayorista)); } catch (e) { console.warn('Error al guardar preferencia mayorista:', e); }
   }, [esMayorista]);
-
-  useEffect(() => {
-    signInAnonymously(auth).catch((e) => {
-      console.warn('Error al autenticar anónimamente:', e);
-    });
-  }, []);
 
   const agregarAlCarrito = (producto: Producto) => {
     setCart((prevCart) => {

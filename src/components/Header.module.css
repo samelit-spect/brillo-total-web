@@ -160,6 +160,56 @@
   line-height: 16px;
 }
 
+.authButton {
+  background-color: rgba(255,255,255,0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 12px;
+  height: 34px;
+  transition: all 0.2s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.authButton:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.userBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(255,255,255,0.1);
+  padding: 4px 12px 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255,255,255,0.15);
+  height: 34px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.userBadge:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.userAvatar {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.userEmail {
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .hamburger {
   background: none;
   border: none;
