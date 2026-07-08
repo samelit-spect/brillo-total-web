@@ -1,19 +1,10 @@
 // src/components/Footer.tsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { WHATSAPP_NUMBER, UBICACION } from '../utils/constants';
 
-interface FooterProps {
-  vistaActual?: string;
-  alCambiarVista?: (vista: string) => void;
-}
-
-export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) => {
-  const [hoverAdmin, setHoverAdmin] = React.useState(false);
-
-  const manejarAccesoAdmin = () => {
-    if (!alCambiarVista) return;
-    alCambiarVista(vistaActual === 'admin' ? 'catalogo' : 'admin');
-  };
+export const Footer: React.FC = () => {
+  const navigate = useNavigate();
 
   return (
     <footer style={{
@@ -111,27 +102,15 @@ export const Footer: React.FC<FooterProps> = ({ vistaActual, alCambiarVista }) =
           Desarrollado con React & TypeScript.
         </p>
 
-        {/* Botón de Administración */}
-        {alCambiarVista && (
-          <button
-            onClick={manejarAccesoAdmin}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: hoverAdmin ? 'var(--color-text-secondary)' : vistaActual === 'admin' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-              cursor: 'pointer',
-              fontSize: '11px',
-              fontWeight: '500',
-              marginTop: '10px',
-              transition: 'color 0.2s',
-              outline: 'none'
-            }}
-            onMouseEnter={() => setHoverAdmin(true)}
-            onMouseLeave={() => setHoverAdmin(false)}
-          >
-            {vistaActual === 'admin' ? '⬅️ Salir de Administración' : '🐾 Información del Sitio'}
-          </button>
-        )}
+        <span
+          onClick={() => navigate('/terminos')}
+          style={{ color: 'var(--color-text-muted)', fontSize: '11px', textDecoration: 'underline', marginTop: '5px', cursor: 'pointer' }}
+          role="link"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter') navigate('/terminos'); }}
+        >
+          Términos y Condiciones
+        </span>
       </div>
     </footer>
   );

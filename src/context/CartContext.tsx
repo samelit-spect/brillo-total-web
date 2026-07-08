@@ -2,6 +2,8 @@
 import React, { useState, useMemo, useEffect, type ReactNode } from 'react';
 import { type Producto } from '../info/productos';
 import { CartContext, type CartItem } from './contextDefinition';
+import { auth } from '../firebase/config';
+import { signInAnonymously } from 'firebase/auth';
 
 const CART_STORAGE_KEY = 'brillo-cart';
 const MAYORISTA_STORAGE_KEY = 'brillo-mayorista';
@@ -10,7 +12,8 @@ function cargarCarrito(): CartItem[] {
   try {
     const data = localStorage.getItem(CART_STORAGE_KEY);
     if (data) return JSON.parse(data);
-  } catch { /* ignorar */
+  } catch (e) {
+    console.warn('Error al cargar carrito de localStorage:', e);
   }
   return [];
 }
@@ -18,7 +21,8 @@ function cargarCarrito(): CartItem[] {
 function guardarCarrito(items: CartItem[]) {
   try {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
-  } catch { /* ignorar */
+  } catch (e) {
+    console.warn('Error al guardar carrito en localStorage:', e);
   }
 }
 
@@ -29,15 +33,22 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [esMayorista, setEsMayorista] = useState<boolean>(() => {
     try {
       return localStorage.getItem(MAYORISTA_STORAGE_KEY) === 'true';
-    } catch {
+    } catch (e) {
+      console.warn('Error al leer preferencia mayorista:', e);
       return false;
     }
   });
 
   useEffect(() => { guardarCarrito(cart); }, [cart]);
   useEffect(() => {
-    try { localStorage.setItem(MAYORISTA_STORAGE_KEY, String(esMayorista)); } catch { /* ignorar */ }
+    try { localStorage.setItem(MAYORISTA_STORAGE_KEY, String(esMayorista)); } catch (e) { console.warn('Error al guardar preferencia mayorista:', e); }
   }, [esMayorista]);
+
+  useEffect(() => {
+    signInAnonymously(auth).catch((e) => {
+      console.warn('Error al autenticar anónimamente:', e);
+    });
+  }, []);
 
   const agregarAlCarrito = (producto: Producto) => {
     setCart((prevCart) => {

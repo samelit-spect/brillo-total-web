@@ -11,6 +11,8 @@ const CarritoView = lazy(() => import('./views/CarritoView').then(m => ({ defaul
 const NosotrosView = lazy(() => import('./views/NosotrosView').then(m => ({ default: m.NosotrosView })));
 const UbicacionView = lazy(() => import('./views/UbicacionView').then(m => ({ default: m.UbicacionView })));
 const Admin = lazy(() => import('./views/Admin').then(m => ({ default: m.Admin })));
+const NotFoundView = lazy(() => import('./views/NotFoundView').then(m => ({ default: m.NotFoundView })));
+const TerminosView = lazy(() => import('./views/TerminosView').then(m => ({ default: m.TerminosView })));
 
 const TITULOS: Record<string, string> = {
   '/': 'Brillo Total — Catálogo de Productos de Limpieza',
@@ -18,7 +20,8 @@ const TITULOS: Record<string, string> = {
   '/carrito': 'Tu Pedido — Brillo Total',
   '/nosotros': 'Sobre Nosotros — Brillo Total',
   '/ubicacion': 'Ubicación y Horarios — Brillo Total',
-  '/admin': 'Administración — Brillo Total',
+  '/salchi': 'Administración — Brillo Total',
+  '/terminos': 'Términos y Condiciones — Brillo Total',
 };
 
 const RUTA_A_VISTA: Record<string, string> = {
@@ -27,7 +30,8 @@ const RUTA_A_VISTA: Record<string, string> = {
   '/carrito': 'carrito',
   '/nosotros': 'nosotros',
   '/ubicacion': 'ubicacion',
-  '/admin': 'admin',
+  '/salchi': 'admin',
+  '/terminos': 'terminos',
 };
 
 const OG_TAGS: Record<string, { title: string; description: string }> = {
@@ -36,7 +40,8 @@ const OG_TAGS: Record<string, { title: string; description: string }> = {
   '/carrito': { title: 'Tu Pedido — Brillo Total', description: 'Resumen de tu pedido de productos de limpieza Brillo Total.' },
   '/nosotros': { title: 'Sobre Nosotros — Brillo Total', description: 'Conocé la historia de Brillo Total, venta de productos de limpieza en La Rioja.' },
   '/ubicacion': { title: 'Ubicación y Horarios — Brillo Total', description: 'Visitanos en La Rioja Capital. Conocé nuestros horarios de atención.' },
-  '/admin': { title: 'Administración — Brillo Total', description: 'Panel de administración del catálogo Brillo Total.' },
+  '/salchi': { title: 'Administración — Brillo Total', description: 'Panel de administración del catálogo Brillo Total.' },
+  '/terminos': { title: 'Términos y Condiciones — Brillo Total', description: 'Términos y condiciones de uso de la plataforma Brillo Total.' },
 };
 
 function actualizarMetaTags(ruta: string) {
@@ -87,7 +92,7 @@ function AppLayout() {
       carrito: '/carrito',
       nosotros: '/nosotros',
       ubicacion: '/ubicacion',
-      admin: '/admin',
+      admin: '/salchi',
     };
     navigate(mapa[vista] || '/catalogo');
   };
@@ -126,14 +131,16 @@ function AppLayout() {
                 <Route path="/carrito" element={<CarritoView />} />
                 <Route path="/nosotros" element={<NosotrosView />} />
                 <Route path="/ubicacion" element={<UbicacionView />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route path="/salchi" element={<Admin />} />
+                <Route path="/terminos" element={<TerminosView />} />
+                <Route path="*" element={<NotFoundView />} />
               </Routes>
             </Suspense>
                 </ErrorBoundary>
           </div>
         </Main>
 
-        <Footer vistaActual={vistaActual} alCambiarVista={alCambiarVista} />
+        <Footer />
       </div>
     </CartProvider>
   );
